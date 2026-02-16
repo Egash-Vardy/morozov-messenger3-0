@@ -1,0 +1,15 @@
+{
+  "name": "Morozov Ultra",
+  "short_name": "Morozov",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#2b5278",
+  "theme_color": "#517da2",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/5962/5962463.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
