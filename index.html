@@ -45,10 +45,10 @@
     <div id="add-friend-modal" class="hidden fixed inset-0 z-[6000] bg-black/50 flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl">
             <h3 class="text-xl font-bold mb-4 text-center">Новый контакт</h3>
-            <input id="friend-name-input" type="text" placeholder="Имя друга" class="w-full p-3 mb-3 border rounded-xl outline-none bg-gray-50">
-            <input id="friend-uid-input" type="text" placeholder="UID друга" class="w-full p-3 mb-4 border rounded-xl outline-none bg-gray-50 text-xs font-mono">
+            <input id="friend-name-input" type="text" placeholder="Имя друга" class="w-full p-3 mb-3 border rounded-xl outline-none bg-gray-50 focus:border-blue-500">
+            <input id="friend-uid-input" type="text" placeholder="UID друга" class="w-full p-3 mb-4 border rounded-xl outline-none bg-gray-50 text-xs font-mono focus:border-blue-500">
             <div class="flex gap-2">
-                <button onclick="window.closeAddFriendModal()" class="flex-1 py-3 text-gray-500 font-bold">ОТМЕНА</button>
+                <button onclick="window.closeAddFriendModal()" class="flex-1 py-3 text-gray-400 font-bold">ОТМЕНА</button>
                 <button onclick="window.confirmAddFriend()" class="flex-1 bg-[#3390ec] text-white py-3 rounded-xl font-bold">ДОБАВИТЬ</button>
             </div>
         </div>
@@ -59,19 +59,20 @@
             <div class="flex items-center gap-4 mb-4">
                 <div class="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center text-2xl font-bold" id="user-avatar">?</div>
                 <div>
-                    <div class="font-bold text-lg" id="display-name">Загрузка...</div>
+                    <div class="font-bold text-lg" id="display-name">...</div>
                     <div class="text-xs opacity-70" id="display-email">...</div>
                 </div>
             </div>
             <div class="bg-black/20 p-3 rounded-xl">
-                <p class="text-[10px] uppercase opacity-60 mb-1">Твой ID:</p>
-                <div id="my-uid-display" class="text-[10px] font-mono break-all mb-2">Загрузка...</div>
-                <button onclick="window.copyMyID()" class="w-full bg-white text-[#517da2] py-1 rounded text-xs font-bold">СКОПИРОВАТЬ ID</button>
+                <p class="text-[10px] uppercase opacity-60 mb-1 text-blue-200">Твой уникальный ID:</p>
+                <div id="my-uid-display" class="text-[10px] font-mono break-all mb-2 select-all">Загрузка...</div>
+                <button onclick="window.copyMyID()" class="w-full bg-white text-[#517da2] py-1 rounded text-xs font-bold active:bg-blue-100">СКОПИРОВАТЬ ID</button>
             </div>
         </div>
-        <div class="p-4 flex flex-col gap-2 text-gray-700">
-            <button onclick="window.openAddFriendModal()" class="flex items-center gap-4 p-4 hover:bg-gray-100 rounded-xl"><i class="fas fa-user-plus text-blue-500"></i> Добавить друга</button>
-            <button onclick="window.logout()" class="flex items-center gap-4 p-4 text-red-500 hover:bg-red-50 rounded-xl"><i class="fas fa-sign-out-alt"></i> Выход</button>
+        <div class="p-4 flex flex-col gap-2">
+            <button onclick="window.openAddFriendModal()" class="flex items-center gap-4 p-4 hover:bg-gray-100 rounded-xl transition-colors"><i class="fas fa-user-plus text-blue-500"></i> Добавить друга</button>
+            <div class="flex-1"></div>
+            <button onclick="window.logout()" class="flex items-center gap-4 p-4 text-red-500 hover:bg-red-50 rounded-xl transition-colors"><i class="fas fa-sign-out-alt"></i> Выход</button>
         </div>
     </div>
 
@@ -82,20 +83,18 @@
                 <span id="chat-target-name" class="font-bold"></span>
             </div>
             <div class="flex gap-4">
-                <button onclick="window.startCall('audio')" class="p-2"><i class="fas fa-phone"></i></button>
-                <button onclick="window.startCall('video')" class="p-2"><i class="fas fa-video"></i></button>
+                <button onclick="window.startCall('audio')" class="p-2 active:opacity-50"><i class="fas fa-phone"></i></button>
+                <button onclick="window.startCall('video')" class="p-2 active:opacity-50"><i class="fas fa-video"></i></button>
             </div>
         </header>
         <div id="chat-window" class="flex-1 overflow-y-auto p-4 flex flex-col gap-1"></div>
-        
         <div id="sticker-panel" class="hidden p-4 bg-gray-100 grid grid-cols-5 gap-4 border-t">
-            <button onclick="window.sendSticker('🔥')" class="text-4xl">🔥</button>
-            <button onclick="window.sendSticker('😂')" class="text-4xl">😂</button>
-            <button onclick="window.sendSticker('❤️')" class="text-4xl">❤️</button>
-            <button onclick="window.sendSticker('👍')" class="text-4xl">👍</button>
-            <button onclick="window.sendSticker('🚀')" class="text-4xl">🚀</button>
+            <button onclick="window.sendSticker('🔥')" class="text-4xl hover:scale-110 transition-transform">🔥</button>
+            <button onclick="window.sendSticker('😂')" class="text-4xl hover:scale-110 transition-transform">😂</button>
+            <button onclick="window.sendSticker('❤️')" class="text-4xl hover:scale-110 transition-transform">❤️</button>
+            <button onclick="window.sendSticker('👍')" class="text-4xl hover:scale-110 transition-transform">👍</button>
+            <button onclick="window.sendSticker('🚀')" class="text-4xl hover:scale-110 transition-transform">🚀</button>
         </div>
-
         <div class="p-4 bg-white border-t flex items-center gap-3 pb-8">
             <button onclick="window.toggleStickers()" class="text-2xl text-gray-400"><i class="fas fa-smile"></i></button>
             <input id="m-input" type="text" onkeydown="if(event.key==='Enter') window.sendMsg()" class="flex-1 bg-gray-100 h-12 rounded-full px-6 outline-none" placeholder="Сообщение...">
@@ -107,7 +106,7 @@
         <video id="v-remote" autoplay playsinline></video>
         <video id="v-local" autoplay playsinline muted></video>
         <div id="incoming-ui" class="absolute inset-0 bg-[#2b5278] flex flex-col items-center justify-center text-white hidden z-50">
-            <h2 class="text-2xl font-bold mb-8">Вам звонят!</h2>
+            <h2 class="text-2xl font-bold mb-8 animate-pulse">Вам звонят!</h2>
             <div class="flex gap-10">
                 <button onclick="window.acceptCall()" class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-phone"></i></button>
                 <button onclick="window.endCall()" class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-times"></i></button>
@@ -143,7 +142,7 @@
             const n = document.getElementById('auth-name').value;
             const e = document.getElementById('auth-email').value;
             const p = document.getElementById('auth-pass').value;
-            if(!e || !p) return alert("Заполни данные!");
+            if(!e || !p) return; 
 
             try {
                 await signInWithEmailAndPassword(auth, e, p);
@@ -170,33 +169,33 @@
             }
         });
 
-        // --- НОВОЕ МОДАЛЬНОЕ ОКНО (ВМЕСТО PROMPT) ---
+        // МОДАЛКА БЕЗ СИСТЕМНЫХ ОКОН
         window.openAddFriendModal = () => {
             document.getElementById('add-friend-modal').classList.remove('hidden');
-            window.toggleMenu(); // Закрываем боковое меню
+            document.getElementById('side-menu').classList.add('hidden');
         };
 
         window.closeAddFriendModal = () => {
             document.getElementById('add-friend-modal').classList.add('hidden');
-            document.getElementById('friend-name-input').value = "";
-            document.getElementById('friend-uid-input').value = "";
         };
 
         window.confirmAddFriend = () => {
             const n = document.getElementById('friend-name-input').value;
             const id = document.getElementById('friend-uid-input').value;
-            if(n && id) {
+            if(n.trim() && id.trim()) {
                 let f = JSON.parse(localStorage.getItem('f_list') || "[]");
-                f.push({name: n, uid: id.trim()});
+                f.push({name: n.trim(), uid: id.trim()});
                 localStorage.setItem('f_list', JSON.stringify(f));
                 window.renderFriends();
                 window.closeAddFriendModal();
-            } else {
-                alert("Заполни все поля!");
             }
         };
 
-        window.copyMyID = () => { navigator.clipboard.writeText(currentUser.uid).then(() => alert("ID скопирован!")); };
+        window.copyMyID = () => { 
+            navigator.clipboard.writeText(currentUser.uid);
+            // Вместо alert можно добавить визуальный эффект кнопки, но пока просто копируем.
+        };
+
         window.toggleMenu = () => document.getElementById('side-menu').classList.toggle('hidden');
         window.closeChat = () => document.getElementById('chat-screen').classList.add('hidden');
         window.toggleStickers = () => document.getElementById('sticker-panel').classList.toggle('hidden');
@@ -205,8 +204,8 @@
             const l = document.getElementById('c-list'); l.innerHTML = "";
             JSON.parse(localStorage.getItem('f_list') || "[]").forEach(f => {
                 const d = document.createElement('div');
-                d.className = "p-4 border-b flex items-center gap-4 cursor-pointer active:bg-gray-100";
-                d.innerHTML = `<div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">${f.name[0]}</div><b>${f.name}</b>`;
+                d.className = "p-4 border-b flex items-center gap-4 cursor-pointer active:bg-gray-100 transition-colors";
+                d.innerHTML = `<div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">${f.name[0]}</div><b class="text-gray-800">${f.name}</b>`;
                 d.onclick = () => window.openChat(f);
                 l.appendChild(d);
             });
@@ -252,9 +251,7 @@
                 localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
                 if(videoMode) document.getElementById('v-local').srcObject = localStream;
                 pc.ontrack = (e) => document.getElementById('v-remote').srcObject = e.streams[0];
-            } catch (err) {
-                console.warn("Доступ не предоставлен");
-            }
+            } catch (err) { console.warn("Камера недоступна"); }
         }
 
         window.startCall = async (mode) => {
@@ -264,7 +261,6 @@
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
             set(ref(db, 'calls/' + activeFriend.uid), { offer: { type: offer.type, sdp: offer.sdp }, from: currentUser.uid, mode: mode });
-            
             onValue(ref(db, 'calls/' + activeFriend.uid + '/answer'), async (s) => {
                 if (s.exists() && pc && pc.signalingState !== "stable") {
                     await pc.setRemoteDescription(new RTCSessionDescription(s.val()));
