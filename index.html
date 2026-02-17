@@ -6,7 +6,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <title>Morozov Ultra Fix</title>
+    <title>Morozov Ultra</title>
     <style>
         html, body { height: 100%; margin: 0; overflow: hidden; font-family: sans-serif; }
         .hidden { display: none !important; }
@@ -36,10 +36,22 @@
     <div id="main-app" class="hidden flex flex-col h-full bg-white">
         <header class="bg-[#517da2] h-16 flex items-center justify-between px-4 text-white shadow-md">
             <button onclick="window.toggleMenu()" class="text-xl p-2"><i class="fas fa-bars"></i></button>
-            <span class="font-bold">Чаты</span>
+            <span class="font-bold">Морозов Ультра</span>
             <div class="w-10"></div>
         </header>
         <div id="c-list" class="flex-1 overflow-y-auto"></div>
+    </div>
+
+    <div id="add-friend-modal" class="hidden fixed inset-0 z-[6000] bg-black/50 flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 text-center">Новый контакт</h3>
+            <input id="friend-name-input" type="text" placeholder="Имя друга" class="w-full p-3 mb-3 border rounded-xl outline-none bg-gray-50">
+            <input id="friend-uid-input" type="text" placeholder="UID друга" class="w-full p-3 mb-4 border rounded-xl outline-none bg-gray-50 text-xs font-mono">
+            <div class="flex gap-2">
+                <button onclick="window.closeAddFriendModal()" class="flex-1 py-3 text-gray-500 font-bold">ОТМЕНА</button>
+                <button onclick="window.confirmAddFriend()" class="flex-1 bg-[#3390ec] text-white py-3 rounded-xl font-bold">ДОБАВИТЬ</button>
+            </div>
+        </div>
     </div>
 
     <div id="side-menu" class="hidden fixed inset-0 z-[5000] bg-white flex flex-col">
@@ -57,8 +69,8 @@
                 <button onclick="window.copyMyID()" class="w-full bg-white text-[#517da2] py-1 rounded text-xs font-bold">СКОПИРОВАТЬ ID</button>
             </div>
         </div>
-        <div class="p-4 flex flex-col gap-2">
-            <button onclick="window.addFriend()" class="flex items-center gap-4 p-4 hover:bg-gray-100 rounded-xl"><i class="fas fa-user-plus text-blue-500"></i> Добавить друга</button>
+        <div class="p-4 flex flex-col gap-2 text-gray-700">
+            <button onclick="window.openAddFriendModal()" class="flex items-center gap-4 p-4 hover:bg-gray-100 rounded-xl"><i class="fas fa-user-plus text-blue-500"></i> Добавить друга</button>
             <button onclick="window.logout()" class="flex items-center gap-4 p-4 text-red-500 hover:bg-red-50 rounded-xl"><i class="fas fa-sign-out-alt"></i> Выход</button>
         </div>
     </div>
@@ -134,7 +146,7 @@
             if(!e || !p) return alert("Заполни данные!");
 
             try {
-                const res = await signInWithEmailAndPassword(auth, e, p);
+                await signInWithEmailAndPassword(auth, e, p);
             } catch {
                 const res = await createUserWithEmailAndPassword(auth, e, p);
                 if(n) await updateProfile(res.user, { displayName: n });
@@ -158,22 +170,36 @@
             }
         });
 
-        // --- Остальные функции (копирование, друзья, стикеры) ---
-        window.copyMyID = () => { navigator.clipboard.writeText(currentUser.uid).then(() => alert("ID скопирован!")); };
-        window.toggleMenu = () => document.getElementById('side-menu').classList.toggle('hidden');
-        window.closeChat = () => document.getElementById('chat-screen').classList.add('hidden');
-        window.toggleStickers = () => document.getElementById('sticker-panel').classList.toggle('hidden');
+        // --- НОВОЕ МОДАЛЬНОЕ ОКНО (ВМЕСТО PROMPT) ---
+        window.openAddFriendModal = () => {
+            document.getElementById('add-friend-modal').classList.remove('hidden');
+            window.toggleMenu(); // Закрываем боковое меню
+        };
 
-        window.addFriend = () => {
-            const n = prompt("Имя друга:"), id = prompt("UID друга:");
+        window.closeAddFriendModal = () => {
+            document.getElementById('add-friend-modal').classList.add('hidden');
+            document.getElementById('friend-name-input').value = "";
+            document.getElementById('friend-uid-input').value = "";
+        };
+
+        window.confirmAddFriend = () => {
+            const n = document.getElementById('friend-name-input').value;
+            const id = document.getElementById('friend-uid-input').value;
             if(n && id) {
                 let f = JSON.parse(localStorage.getItem('f_list') || "[]");
                 f.push({name: n, uid: id.trim()});
                 localStorage.setItem('f_list', JSON.stringify(f));
                 window.renderFriends();
-                window.toggleMenu();
+                window.closeAddFriendModal();
+            } else {
+                alert("Заполни все поля!");
             }
         };
+
+        window.copyMyID = () => { navigator.clipboard.writeText(currentUser.uid).then(() => alert("ID скопирован!")); };
+        window.toggleMenu = () => document.getElementById('side-menu').classList.toggle('hidden');
+        window.closeChat = () => document.getElementById('chat-screen').classList.add('hidden');
+        window.toggleStickers = () => document.getElementById('sticker-panel').classList.toggle('hidden');
 
         window.renderFriends = () => {
             const l = document.getElementById('c-list'); l.innerHTML = "";
@@ -219,7 +245,6 @@
             window.toggleStickers();
         };
 
-        // --- ЗВОНКИ (ИСПРАВЛЕНО) ---
         async function initWebRTC(videoMode) {
             pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
             try {
@@ -228,7 +253,7 @@
                 if(videoMode) document.getElementById('v-local').srcObject = localStream;
                 pc.ontrack = (e) => document.getElementById('v-remote').srcObject = e.streams[0];
             } catch (err) {
-                alert("Ошибка доступа к камере/микрофону: " + err.message);
+                console.warn("Доступ не предоставлен");
             }
         }
 
@@ -280,4 +305,3 @@
     </script>
 </body>
 </html>
-
