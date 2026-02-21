@@ -3,247 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Morozov Ultimate Engineering v6.0</title>
+    <title>Morozov Engineering OS v7.1</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* ИНЖЕНЕРНЫЕ ПЕРЕМЕННЫЕ И СЛОИ */
         :root {
             --p-blue: #0088cc;
-            --p-blue-hover: #0077b5;
+            --p-blue-dark: #0077b5;
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
-            --anim-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            --anim-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-blur: blur(20px);
         }
 
+        /* ТЕМАТИЧЕСКИЕ ПЕРЕМЕННЫЕ */
         .light-theme {
-            --bg-main: #ffffff;
-            --bg-secondary: #f4f4f5;
-            --bg-item: #ffffff;
-            --text-primary: #000000;
-            --text-secondary: #707579;
-            --border-color: #dfe1e5;
-            --chat-wallpaper: #e5ddd5;
-            --bubble-mine: #effdde;
-            --bubble-their: #ffffff;
-            --header-bg: #517da2;
+            --bg: #ffffff; --surface: #f4f4f5; --text: #000000;
+            --border: #dfe1e5; --header: #517da2; --chat-bg: #e5ddd5;
+            --bubble-me: #effdde; --bubble-he: #ffffff;
         }
-
         .dark-theme {
-            --bg-main: #0e1621;
-            --bg-secondary: #17212b;
-            --bg-item: #1c2733;
-            --text-primary: #ffffff;
-            --text-secondary: #a8a8a8;
-            --border-color: #242f3d;
-            --chat-wallpaper: #070d14;
-            --bubble-mine: #2b5278;
-            --bubble-their: #182533;
-            --header-bg: #242f3d;
+            --bg: #0e1621; --surface: #17212b; --text: #ffffff;
+            --border: #242f3d; --header: #242f3d; --chat-bg: #070d14;
+            --bubble-me: #2b5278; --bubble-he: #182533;
         }
 
-        /* ГЛОБАЛЬНЫЙ СБРОС */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body, html { 
-            height: 100%; width: 100%; margin: 0; padding: 0;
-            overflow: hidden; position: fixed;
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-main); color: var(--text-primary);
+            height: 100%; width: 100%; margin: 0; overflow: hidden;
+            background: var(--bg); color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* АРХИТЕКТУРА ЭКРАНОВ */
+        /* СИСТЕМА ЭКРАНОВ (STACK) */
         .screen {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-            background: var(--bg-main); transition: transform 0.4s var(--anim-smooth);
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            background: var(--bg); transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
             display: flex; flex-direction: column; z-index: 10;
+            will-change: transform;
         }
-        .screen-right { transform: translateX(100%); z-index: 20; }
-        .screen-left { transform: translateX(-30%); filter: brightness(0.6); }
-        .screen-active { transform: translateX(0); }
+        .screen-right { transform: translate3d(100%, 0, 0); z-index: 20; }
+        .screen-left { transform: translate3d(-30%, 0, 0); filter: brightness(0.6); }
+        .active { transform: translate3d(0, 0, 0); }
 
-        /* КОМПОНЕНТ: ШАПКА */
-        .u-header {
+        /* HEADER */
+        .u-app-bar {
             padding-top: var(--safe-top);
             height: calc(64px + var(--safe-top));
-            background: var(--header-bg); color: #fff;
+            background: var(--header); color: #fff;
             display: flex; align-items: center; justify-content: space-between;
             padding-left: 16px; padding-right: 16px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            z-index: 50; flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            flex-shrink: 0; z-index: 50;
         }
 
-        /* КОМПОНЕНТ: СПИСОК */
-        .scroll-v { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
-        .u-item {
-            display: flex; align-items: center; padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-item); transition: background 0.2s;
-            cursor: pointer; position: relative;
+        /* AUTH OVERLAY */
+        #auth-gate {
+            position: fixed; inset: 0; z-index: 1000;
+            background: linear-gradient(135deg, #2b5278 0%, #0e1621 100%);
+            display: flex; align-items: center; justify-content: center; padding: 24px;
         }
-        .u-item:active { background: rgba(0,0,0,0.05); }
-
-        /* МОДАЛЬНОЕ ОКНО (FULL LOGIC) */
-        .u-modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-            z-index: 1000; display: none; align-items: center; justify-content: center;
-            backdrop-filter: blur(8px); padding: 20px;
-        }
-        .u-modal {
-            background: var(--bg-secondary); width: 100%; max-width: 400px;
-            border-radius: 28px; padding: 28px; transform: scale(0.9);
-            transition: transform 0.3s var(--anim-bounce);
+        .auth-box {
+            background: #fff; width: 100%; max-width: 400px;
+            border-radius: 32px; padding: 36px; color: #000;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
-        .u-modal-show .u-modal { transform: scale(1); }
 
-        /* ИНПУТЫ И КНОПКИ */
+        /* UI COMPONENTS */
         .u-input {
-            width: 100%; padding: 14px 18px; background: var(--bg-main);
-            border: 2px solid var(--border-color); border-radius: 16px;
-            color: var(--text-primary); margin-bottom: 16px; transition: border-color 0.2s;
+            width: 100%; padding: 16px; margin-bottom: 12px;
+            background: #f1f5f9; border-radius: 16px;
+            border: 2px solid transparent; transition: all 0.3s;
         }
-        .u-input:focus { border-color: var(--p-blue); outline: none; }
-        
+        .u-input:focus { border-color: var(--p-blue); background: #fff; }
+
         .u-btn-primary {
-            width: 100%; padding: 16px; background: var(--p-blue);
-            color: white; border-radius: 16px; font-weight: 700;
-            box-shadow: 0 4px 12px rgba(0,136,204,0.3); transition: 0.2s;
+            width: 100%; padding: 18px; background: var(--p-blue);
+            color: #fff; border-radius: 18px; font-weight: 800;
+            box-shadow: 0 10px 15px -3px rgba(0,136,204,0.3);
+            transition: all 0.2s;
         }
-        .u-btn-primary:active { transform: scale(0.96); background: var(--p-blue-hover); }
+        .u-btn-primary:active { transform: scale(0.96); background: var(--p-blue-dark); }
 
-        /* ЧАТ МЕХАНИКА */
-        .u-chat-container {
+        /* CHAT INTERFACE */
+        .chat-area {
             flex: 1; overflow-y: auto; padding: 16px;
-            display: flex; flex-direction: column; gap: 6px;
             background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-            background-blend-mode: overlay; background-color: var(--chat-wallpaper);
+            background-blend-mode: overlay; background-color: var(--chat-bg);
+            display: flex; flex-direction: column; gap: 8px;
         }
-        .u-bubble {
-            max-width: 80%; padding: 8px 14px; border-radius: 18px;
-            font-size: 16px; line-height: 1.4; position: relative;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            animation: bubbleIn 0.2s var(--anim-bounce);
+        .msg {
+            max-width: 80%; padding: 10px 14px; border-radius: 18px;
+            font-size: 15px; line-height: 1.4; position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            animation: slideUp 0.3s ease-out;
         }
-        @keyframes bubbleIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .u-mine { align-self: flex-end; background: var(--bubble-mine); border-bottom-right-radius: 4px; }
-        .u-their { align-self: flex-start; background: var(--bubble-their); border-bottom-left-radius: 4px; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* СИСТЕМА УВЕДОМЛЕНИЙ */
+        .msg-me { align-self: flex-end; background: var(--bubble-me); border-bottom-right-radius: 4px; }
+        .msg-he { align-self: flex-start; background: var(--bubble-he); border-bottom-left-radius: 4px; color: #000; }
+
         .u-badge {
-            background: #31b545; color: white; padding: 2px 8px;
-            border-radius: 12px; font-size: 11px; font-weight: 800;
-            min-width: 20px; text-align: center;
+            background: #31b545; color: white; min-width: 20px; height: 20px;
+            border-radius: 10px; display: flex; items-center; justify-content: center;
+            font-size: 11px; font-weight: bold;
         }
     </style>
 </head>
 <body class="light-theme">
 
-    <div id="modal-add" class="u-modal-overlay">
-        <div class="u-modal">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black">Новый контакт</h2>
-                <i onclick="closeAddModal()" class="fas fa-times opacity-30 text-xl"></i>
+    <div id="auth-gate">
+        <div class="auth-box">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-black text-blue-600">ENGINEERING</h1>
+                <p id="auth-sub" class="text-gray-400 mt-2 font-medium">Безопасный вход в систему</p>
             </div>
-            <p class="text-sm opacity-60 mb-4">Введите идентификатор пользователя и имя для отображения в списке.</p>
-            <input id="in-uid" type="text" placeholder="UID (из настроек друга)" class="u-input">
-            <input id="in-name" type="text" placeholder="Имя друга" class="u-input">
-            <div class="flex gap-4">
-                <button onclick="closeAddModal()" class="flex-1 p-4 rounded-xl font-bold opacity-50">Отмена</button>
-                <button onclick="logicAddFriend()" class="u-btn-primary flex-1">Добавить</button>
+
+            <div id="auth-form-body">
+                <div id="reg-extra" class="hidden">
+                    <input id="inp-name" type="text" placeholder="Ваше полное имя" class="u-input">
+                </div>
+                <input id="inp-email" type="email" placeholder="Email адрес" class="u-input">
+                <input id="inp-pass" type="password" placeholder="Пароль (6+ символов)" class="u-input">
+                
+                <button onclick="executeAuth()" id="btn-auth-submit" class="u-btn-primary mt-4">АВТОРИЗОВАТЬСЯ</button>
+                
+                <div class="text-center mt-6 text-sm">
+                    <span id="toggle-txt" class="text-gray-500">Нет аккаунта?</span>
+                    <button onclick="toggleAuthMode()" id="toggle-btn" class="text-blue-600 font-bold ml-1">Создать сейчас</button>
+                </div>
+            </div>
+
+            <div id="auth-loader" class="hidden py-10 text-center">
+                <div class="inline-block w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <p class="mt-4 font-bold text-blue-600">Синхронизация...</p>
             </div>
         </div>
     </div>
 
     <div id="scr-main" class="screen">
-        <header class="u-header">
-            <button onclick="openSettings()" class="w-10 h-10 flex items-center justify-center text-xl">
-                <i class="fas fa-cog"></i>
-            </button>
-            <h1 class="font-black text-xl tracking-tight">Morozov Pro</h1>
-            <button onclick="openAddModal()" class="w-10 h-10 flex items-center justify-center text-xl">
-                <i class="fas fa-user-plus text-blue-200"></i>
-            </button>
+        <header class="u-app-bar">
+            <button onclick="showScreen('scr-settings')" class="p-2 text-xl"><i class="fas fa-bars"></i></button>
+            <span class="font-black text-xl">Чаты</span>
+            <button onclick="triggerAddFriend()" class="p-2 text-xl text-blue-200"><i class="fas fa-plus-circle"></i></button>
         </header>
-
-        <div id="contact-anchor" class="scroll-v">
-            <div class="p-20 text-center opacity-20 mt-10">
-                <i class="fas fa-ghost text-6xl mb-4"></i>
-                <p>Список пуст</p>
+        <div id="contact-list" class="flex-1 overflow-y-auto">
             </div>
-        </div>
     </div>
 
     <div id="scr-chat" class="screen screen-right">
-        <header class="u-header">
-            <div class="flex items-center">
-                <button onclick="navBack()" class="w-10 h-10 flex items-center justify-center mr-2">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <div class="flex flex-col">
-                    <span id="chat-title" class="font-bold leading-none">Имя</span>
-                    <span class="text-[10px] opacity-60 mt-1">активное соединение</span>
-                </div>
+        <header class="u-app-bar">
+            <button onclick="navBack()" class="p-2 mr-2"><i class="fas fa-chevron-left text-xl"></i></button>
+            <div class="flex-1">
+                <div id="chat-target-name" class="font-bold leading-tight">Загрузка...</div>
+                <div class="text-[10px] opacity-70">Зашифрованный канал</div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="alert('Вызов...')" class="w-10 h-10"><i class="fas fa-phone"></i></button>
-                <button onclick="alert('Видео...')" class="w-10 h-10"><i class="fas fa-video"></i></button>
-            </div>
+            <button onclick="alert('Вызов...')" class="p-3"><i class="fas fa-phone-alt"></i></button>
         </header>
-
-        <div id="msg-anchor" class="u-chat-container"></div>
-
-        <div class="p-3 bg-[var(--bg-secondary)] flex items-end gap-3 border-t border-[var(--border-color)]">
-            <div id="msg-field" class="flex-1 p-3 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-color)] max-h-32 overflow-y-auto outline-none" contenteditable="true" data-placeholder="Сообщение..."></div>
-            <button onclick="logicSendMsg()" class="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition">
+        <div id="chat-feed" class="chat-area"></div>
+        <div class="p-3 bg-[var(--surface)] flex items-end gap-3 border-t border-[var(--border)]">
+            <div id="msg-input" contenteditable="true" class="flex-1 p-3 bg-[var(--bg)] rounded-2xl max-h-32 overflow-y-auto outline-none text-[var(--text)] border border-[var(--border)]" data-placeholder="Cообщение..."></div>
+            <button onclick="processSendMessage()" class="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
 
     <div id="scr-settings" class="screen screen-right">
-        <header class="u-header">
-            <button onclick="closeSettings()" class="w-10 h-10"><i class="fas fa-arrow-left"></i></button>
-            <span class="font-bold">Настройки системы</span>
+        <header class="u-app-bar">
+            <button onclick="navBack()" class="p-2"><i class="fas fa-arrow-left"></i></button>
+            <span class="font-bold">Профиль</span>
             <div class="w-10"></div>
         </header>
-
-        <div class="scroll-v p-6">
-            <div class="bg-[var(--bg-secondary)] rounded-[2rem] p-8 flex flex-col items-center mb-6">
-                <div id="u-avatar" class="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center text-4xl text-white font-black mb-4 shadow-2xl">?</div>
-                <h2 id="u-name-display" class="text-2xl font-black mb-1">Пользователь</h2>
-                <button onclick="logicChangeName()" class="text-blue-500 text-sm font-bold">Изменить профиль</button>
+        <div class="p-6">
+            <div class="flex flex-col items-center mb-10">
+                <div id="my-avatar-big" class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-4xl text-white font-black shadow-2xl mb-4">?</div>
+                <h2 id="my-name-display" class="text-2xl font-black">Пользователь</h2>
+                <span id="my-email-display" class="text-sm opacity-50">email@example.com</span>
             </div>
 
-            <div class="bg-[var(--bg-secondary)] rounded-3xl overflow-hidden border border-[var(--border-color)]">
-                <div onclick="logicToggleTheme()" class="p-5 flex justify-between items-center border-b border-[var(--border-color)] active:bg-black/5">
-                    <div class="flex items-center gap-4"><i class="fas fa-moon opacity-50"></i> Темная тема</div>
-                    <div id="th-toggle" class="w-10 h-6 bg-gray-400 rounded-full relative transition-all">
-                        <div id="th-dot" class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-all"></div>
-                    </div>
+            <div class="space-y-4">
+                <div onclick="handleThemeToggle()" class="p-5 bg-[var(--surface)] rounded-2xl flex justify-between items-center border border-[var(--border)]">
+                    <span class="font-medium">Ночной режим</span>
+                    <i id="theme-icon" class="fas fa-moon text-blue-500"></i>
                 </div>
-                <div class="p-5">
-                    <span class="text-[10px] uppercase font-bold opacity-40">Ваш персональный ID (UID)</span>
-                    <div id="u-uid-display" class="text-xs font-mono break-all mt-2 bg-black/5 p-3 rounded-lg">...</div>
+                <div class="p-5 bg-[var(--surface)] rounded-2xl border border-[var(--border)]">
+                    <p class="text-[10px] uppercase font-bold opacity-40">Ваш уникальный ID (UID)</p>
+                    <p id="my-uid-display" class="text-xs font-mono mt-2 break-all select-all"></p>
                 </div>
+                <button onclick="processLogout()" class="w-full p-5 text-red-500 font-bold bg-red-500/5 rounded-2xl mt-10">ВЫЙТИ ИЗ СИСТЕМЫ</button>
             </div>
+        </div>
+    </div>
 
-            <button onclick="logicLogout()" class="w-full mt-10 p-5 text-red-500 font-bold bg-red-500/5 rounded-3xl">ВЫЙТИ ИЗ СИСТЕМЫ</button>
+    <div id="modal-add" class="fixed inset-0 z-[500] bg-black/60 hidden items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-[var(--bg)] p-8 rounded-[2.5rem] w-full max-w-sm border border-[var(--border)]">
+            <h3 class="text-2xl font-black mb-6 text-center">Новый друг</h3>
+            <input id="add-friend-uid" type="text" placeholder="UID из профиля друга" class="u-input">
+            <input id="add-friend-name" type="text" placeholder="Имя для отображения" class="u-input">
+            <div class="flex gap-3 mt-4">
+                <button onclick="closeAddModal()" class="flex-1 p-4 bg-gray-200 dark:bg-gray-800 rounded-xl font-bold">ОТМЕНА</button>
+                <button onclick="executeAddFriend()" class="flex-1 p-4 bg-blue-600 text-white rounded-xl font-bold">ДОБАВИТЬ</button>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, push, set, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getAuth, onAuthStateChanged, signOut, updateProfile, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // CONFIGURATION
-        const fbCfg = {
+        // КРИТИЧЕСКИЙ КОНФИГ
+        const cfg = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
@@ -253,195 +225,175 @@
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        const app = initializeApp(fbCfg);
+        const app = initializeApp(cfg);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // GLOBAL STATE
-        const State = {
-            user: null,
-            activeChat: null,
-            isDark: localStorage.getItem('theme') === 'dark'
+        let GLOBAL_USER = null;
+        let ACTIVE_TARGET = null;
+        let IS_REGISTER = false;
+
+        // --- 1. AUTH PIPELINE ---
+        window.toggleAuthMode = () => {
+            IS_REGISTER = !IS_REGISTER;
+            document.getElementById('reg-extra').classList.toggle('hidden', !IS_REGISTER);
+            document.getElementById('auth-sub').innerText = IS_REGISTER ? 'Создание новой учетной записи' : 'Безопасный вход в систему';
+            document.getElementById('btn-auth-submit').innerText = IS_REGISTER ? 'СОЗДАТЬ АККАУНТ' : 'АВТОРИЗОВАТЬСЯ';
+            document.getElementById('toggle-txt').innerText = IS_REGISTER ? 'Уже зарегистрированы?' : 'Нет аккаунта?';
+            document.getElementById('toggle-btn').innerText = IS_REGISTER ? 'Войти' : 'Создать сейчас';
         };
 
-        // --- AUTH PIPELINE ---
+        window.executeAuth = async () => {
+            const email = document.getElementById('inp-email').value;
+            const pass = document.getElementById('inp-pass').value;
+            const name = document.getElementById('inp-name').value;
+
+            if (!email || pass.length < 6) return alert("Ошибка: Проверьте email и пароль (мин. 6 симв)");
+
+            document.getElementById('auth-form-body').classList.add('hidden');
+            document.getElementById('auth-loader').classList.remove('hidden');
+
+            try {
+                if (IS_REGISTER) {
+                    const res = await createUserWithEmailAndPassword(auth, email, pass);
+                    await updateProfile(res.user, { displayName: name || "User" });
+                } else {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                }
+                // onAuthStateChanged сделает остальное
+            } catch (e) {
+                alert("Ошибка доступа: " + e.message);
+                document.getElementById('auth-form-body').classList.remove('hidden');
+                document.getElementById('auth-loader').classList.add('hidden');
+            }
+        };
+
         onAuthStateChanged(auth, u => {
-            if(u) {
-                State.user = u;
-                renderUI();
-                initAppLogic();
+            if (u) {
+                GLOBAL_USER = u;
+                document.getElementById('auth-gate').style.display = 'none';
+                document.getElementById('my-name-display').innerText = u.displayName;
+                document.getElementById('my-email-display').innerText = u.email;
+                document.getElementById('my-uid-display').innerText = u.uid;
+                document.getElementById('my-avatar-big').innerText = (u.displayName || "U")[0];
+                renderContactList();
+                applyTheme(localStorage.getItem('sys_theme') || 'light');
             } else {
-                handleFirstEntry();
+                document.getElementById('auth-gate').style.display = 'flex';
             }
         });
 
-        async function handleFirstEntry() {
-            const email = prompt("Введите Email для входа:");
-            const pass = prompt("Введите пароль (мин 6 знаков):");
-            if(!email || !pass) return location.reload();
+        // --- 2. CONTACT SYSTEM ---
+        window.triggerAddFriend = () => document.getElementById('modal-add').style.display = 'flex';
+        window.closeAddModal = () => document.getElementById('modal-add').style.display = 'none';
 
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch {
-                const name = prompt("Как вас зовут?");
-                const res = await createUserWithEmailAndPassword(auth, email, pass);
-                await updateProfile(res.user, { displayName: name || "User" });
-                location.reload();
+        window.executeAddFriend = () => {
+            const uid = document.getElementById('add-friend-uid').value.trim();
+            const name = document.getElementById('add-friend-name').value.trim();
+            if (uid && name) {
+                let friends = JSON.parse(localStorage.getItem('v7_friends') || "[]");
+                if (friends.find(f => f.id === uid)) return alert("Уже в списке!");
+                friends.push({id: uid, name: name});
+                localStorage.setItem('v7_friends', JSON.stringify(friends));
+                renderContactList();
+                closeAddModal();
             }
-        }
-
-        // --- NAVIGATION ENGINE ---
-        window.openAddModal = () => {
-            const m = document.getElementById('modal-add');
-            m.style.display = 'flex';
-            setTimeout(() => m.classList.add('u-modal-show'), 10);
-        };
-        window.closeAddModal = () => {
-            const m = document.getElementById('modal-add');
-            m.classList.remove('u-modal-show');
-            setTimeout(() => m.style.display = 'none', 300);
         };
 
-        window.openSettings = () => document.getElementById('scr-settings').classList.add('screen-active');
-        window.closeSettings = () => document.getElementById('scr-settings').classList.remove('screen-active');
-        
-        window.navBack = () => {
-            State.activeChat = null;
-            document.getElementById('scr-chat').classList.remove('screen-active');
-            document.getElementById('scr-main').classList.remove('screen-left');
-        };
+        function renderContactList() {
+            const anchor = document.getElementById('contact-list');
+            const friends = JSON.parse(localStorage.getItem('v7_friends') || "[]");
+            anchor.innerHTML = friends.length === 0 ? '<div class="p-20 text-center opacity-20">Список друзей пуст</div>' : '';
 
-        // --- CORE LOGIC: FRIENDS ---
-        window.logicAddFriend = () => {
-            const uid = document.getElementById('in-uid').value.trim();
-            const name = document.getElementById('in-name').value.trim();
-            
-            if(uid.length < 5 || name.length < 2) return alert("Данные не валидны!");
-
-            let list = JSON.parse(localStorage.getItem('v6_contacts') || "[]");
-            if(list.find(f => f.id === uid)) return alert("Контакт уже есть!");
-
-            list.push({id: uid, name: name});
-            localStorage.setItem('v6_contacts', JSON.stringify(list));
-            
-            closeAddModal();
-            renderContacts();
-        };
-
-        function renderContacts() {
-            const anchor = document.getElementById('contact-anchor');
-            anchor.innerHTML = "";
-            const list = JSON.parse(localStorage.getItem('v6_contacts') || "[]");
-
-            if(list.length === 0) {
-                anchor.innerHTML = `<div class="p-20 text-center opacity-20">Список пуст</div>`;
-                return;
-            }
-
-            list.forEach(f => {
-                const div = document.createElement('div');
-                div.className = "u-item";
-                div.innerHTML = `
-                    <div class="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xl">${f.name[0]}</div>
-                    <div class="ml-4 flex-1">
+            friends.forEach(f => {
+                const row = document.createElement('div');
+                row.className = "flex items-center p-4 border-b border-[var(--border)] active:bg-black/5 transition cursor-pointer";
+                row.innerHTML = `
+                    <div class="w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4 shadow-md">${f.name[0]}</div>
+                    <div class="flex-1">
                         <div class="font-bold text-lg">${f.name}</div>
-                        <div id="last-msg-${f.id}" class="text-sm opacity-50 truncate">Открыть диалог...</div>
+                        <div id="preview-${f.id}" class="text-sm opacity-50 truncate">Нажмите для общения</div>
                     </div>
                     <div id="badge-${f.id}" class="u-badge hidden">0</div>
                 `;
-                div.onclick = () => launchChat(f);
-                anchor.appendChild(div);
+                row.onclick = () => openChatRoom(f);
+                anchor.appendChild(row);
             });
         }
 
-        // --- CORE LOGIC: CHAT ENGINE ---
-        window.launchChat = (friend) => {
-            State.activeChat = friend;
+        // --- 3. CHAT ENGINE ---
+        function openChatRoom(friend) {
+            ACTIVE_TARGET = friend;
+            showScreen('scr-chat');
             document.getElementById('scr-main').classList.add('screen-left');
-            document.getElementById('scr-chat').classList.add('screen-active');
-            document.getElementById('chat-title').innerText = friend.name;
+            document.getElementById('chat-target-name').innerText = friend.name;
 
-            const channelId = [State.user.uid, friend.id].sort().join("_");
-            
-            // Real-time synchronization
-            onValue(ref(db, `v6/chats/${channelId}`), snap => {
-                const wall = document.getElementById('msg-anchor');
-                wall.innerHTML = "";
-                snap.forEach(child => {
-                    const m = child.val();
-                    const isMine = m.sid === State.user.uid;
-                    const bubble = document.createElement('div');
-                    bubble.className = `u-bubble ${isMine ? 'u-mine' : 'u-their'}`;
-                    bubble.innerText = m.txt;
+            const channelId = [GLOBAL_USER.uid, friend.id].sort().join("___");
+            onValue(ref(db, `v7/rooms/${channelId}`), snap => {
+                const feed = document.getElementById('chat-feed');
+                feed.innerHTML = "";
+                snap.forEach(m => {
+                    const data = m.val();
+                    const isMe = data.sid === GLOBAL_USER.uid;
+                    const el = document.createElement('div');
+                    el.className = `msg ${isMe ? 'msg-me' : 'msg-he'}`;
+                    el.innerText = data.txt;
+                    const time = new Date(data.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                    el.innerHTML += `<div class="text-[9px] opacity-40 text-right mt-1">${time} ${isMe ? (data.r ? '✓✓' : '✓') : ''}</div>`;
                     
-                    // Time status
-                    const time = new Date(m.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-                    bubble.innerHTML += `<div class="text-[9px] opacity-40 text-right mt-1">${time} ${isMine ? (m.r ? '✓✓' : '✓') : ''}</div>`;
-                    
-                    if(!isMine && !m.r) update(ref(db, `v6/chats/${channelId}/${child.key}`), { r: true });
-                    wall.appendChild(bubble);
+                    if (!isMe && !data.r) update(ref(db, `v7/rooms/${channelId}/${m.key}`), { r: true });
+                    feed.appendChild(el);
                 });
-                wall.scrollTop = wall.scrollHeight;
+                feed.scrollTop = feed.scrollHeight;
             });
-        };
+        }
 
-        window.logicSendMsg = () => {
-            const field = document.getElementById('msg-field');
-            const txt = field.innerText.trim();
-            if(!txt || !State.activeChat) return;
+        window.processSendMessage = () => {
+            const input = document.getElementById('msg-input');
+            const txt = input.innerText.trim();
+            if (!txt || !ACTIVE_TARGET) return;
 
-            const channelId = [State.user.uid, State.activeChat.id].sort().join("_");
-            push(ref(db, `v6/chats/${channelId}`), {
-                sid: State.user.uid,
+            const channelId = [GLOBAL_USER.uid, ACTIVE_TARGET.id].sort().join("___");
+            push(ref(db, `v7/rooms/${channelId}`), {
+                sid: GLOBAL_USER.uid,
                 txt: txt,
                 ts: Date.now(),
                 r: false
             });
-            field.innerText = "";
+            input.innerText = "";
         };
 
-        // --- SETTINGS LOGIC ---
-        window.logicToggleTheme = () => {
-            State.isDark = !State.isDark;
-            localStorage.setItem('theme', State.isDark ? 'dark' : 'light');
-            renderTheme();
+        // --- 4. NAVIGATION & THEME ---
+        window.showScreen = (id) => {
+            document.getElementById(id).classList.add('active');
+            if (id === 'scr-chat') document.getElementById('scr-main').classList.add('screen-left');
         };
 
-        function renderTheme() {
-            document.body.className = State.isDark ? 'dark-theme' : 'light-theme';
-            const dot = document.getElementById('th-dot');
-            dot.style.left = State.isDark ? '20px' : '4px';
-            document.getElementById('th-toggle').style.background = State.isDark ? '#0088cc' : '#9ca3af';
-        }
-
-        function renderUI() {
-            document.getElementById('u-name-display').innerText = State.user.displayName;
-            document.getElementById('u-avatar').innerText = (State.user.displayName || "U")[0];
-            document.getElementById('u-uid-display').innerText = State.user.uid;
-            renderTheme();
-            renderContacts();
-        }
-
-        window.logicChangeName = async () => {
-            const n = prompt("Новое имя:", State.user.displayName);
-            if(n) {
-                await updateProfile(auth.currentUser, { displayName: n });
-                location.reload();
-            }
-        };
-
-        window.logicLogout = () => signOut(auth).then(() => location.reload());
-
-        // INITIALIZE
-        function initAppLogic() {
-            // Watch for Enter key
-            document.getElementById('msg-field').addEventListener('keydown', e => {
-                if(e.key === 'Enter') {
-                    e.preventDefault();
-                    logicSendMsg();
-                }
+        window.navBack = () => {
+            document.querySelectorAll('.screen').forEach(s => {
+                if (s.id !== 'scr-main') s.classList.remove('active');
             });
+            document.getElementById('scr-main').classList.remove('screen-left');
+            ACTIVE_TARGET = null;
+        };
+
+        window.handleThemeToggle = () => {
+            const theme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+            applyTheme(theme);
+        };
+
+        function applyTheme(t) {
+            document.body.className = t + '-theme';
+            localStorage.setItem('sys_theme', t);
+            document.getElementById('theme-icon').className = t === 'dark' ? 'fas fa-sun text-yellow-400' : 'fas fa-moon text-blue-500';
         }
+
+        window.processLogout = () => { if(confirm("Выйти?")) signOut(auth).then(() => location.reload()); };
+
+        // Глобальный слушатель Enter
+        document.getElementById('msg-input').addEventListener('keydown', e => {
+            if(e.key === 'Enter') { e.preventDefault(); processSendMessage(); }
+        });
 
     </script>
 </body>
