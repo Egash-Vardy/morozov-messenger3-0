@@ -3,307 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Morozov Ultra v10.0 | X-Edition Infrastructure</title>
+    <title>Morozov Ultra v11.5 | Heavy Duty Infrastructure</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     
     <style>
-        /* ========================================================
-           1. ДИЗАЙН-СИСТЕМА И ПЕРЕМЕННЫЕ
-           ======================================================== */
+        /* --- CORE DESIGN SYSTEM --- */
         :root {
-            --bg: #05070a;
-            --surf: #0d1117;
-            --border: #21262d;
-            --text: #c9d1d9;
-            --accent: #2f81f7;
-            --accent-glow: rgba(47, 129, 247, 0.4);
-            --me: #238636;
-            --he: #161b22;
-            --red: #f85149;
-            --gold: #d29922;
+            --u-bg: #05070a;
+            --u-surf: #0d1117;
+            --u-border: #21262d;
+            --u-text: #c9d1d9;
+            --u-accent: #2f81f7;
+            --u-accent-glow: rgba(47, 129, 247, 0.4);
+            --u-me: #238636;
+            --u-he: #161b22;
+            --u-red: #f85149;
+            --u-gold: #d29922;
         }
 
-        * { 
-            box-sizing: border-box; 
-            outline: none; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body, html { 
             height: 100%; width: 100%; margin: 0; padding: 0; 
-            background: var(--bg); color: var(--text); 
+            background: var(--u-bg); color: var(--u-text); 
             font-family: 'Inter', sans-serif; overflow: hidden;
-            user-select: none;
         }
 
-        /* ========================================================
-           2. ENGINE: ПЕРЕКЛЮЧАТЕЛЬ ЭКРАНОВ
-           ======================================================== */
-        .screen {
-            position: fixed; inset: 0; background: var(--bg); z-index: 10;
+        /* --- SCREEN MANAGEMENT --- */
+        .u-screen {
+            position: fixed; inset: 0; background: var(--u-bg); z-index: 10;
             display: flex; flex-direction: column; 
-            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
-            will-change: transform, opacity;
+            transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s ease;
         }
-        .screen-hidden { transform: scale(1.05); opacity: 0; pointer-events: none; visibility: hidden; }
-        .screen-active { transform: scale(1); opacity: 1; z-index: 50; pointer-events: auto; visibility: visible; }
+        .u-screen-hidden { transform: scale(1.1); opacity: 0; pointer-events: none; visibility: hidden; }
+        .u-screen-active { transform: scale(1); opacity: 1; z-index: 50; pointer-events: auto; visibility: visible; }
 
-        /* ========================================================
-           3. КОМПОНЕНТЫ UI
-           ======================================================== */
-        .u-header {
-            height: 80px; padding: 0 24px; background: var(--surf);
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-            backdrop-filter: blur(20px); z-index: 100;
-        }
-
-        .u-card {
-            background: var(--surf); border: 1px solid var(--border);
-            border-radius: 24px; transition: 0.3s;
-        }
-        .u-card:active { transform: scale(0.98); border-color: var(--accent); }
-
-        .u-avatar {
-            width: 50px; height: 50px; border-radius: 18px;
-            background: linear-gradient(135deg, var(--accent), #8250df);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 900; font-size: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-
-        /* Мессенджерские баблы */
+        /* --- MESSAGING & BUBBLES --- */
+        .u-feed { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 8px; background: #010409; }
         .u-bubble { 
-            max-width: 82%; padding: 14px 18px; border-radius: 24px; font-size: 15px; 
+            max-width: 85%; padding: 14px 18px; border-radius: 22px; font-size: 14.5px; 
             line-height: 1.5; position: relative; word-wrap: break-word;
-            animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: bubblePop 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.2);
         }
-        @keyframes bounceIn { from { opacity: 0; transform: scale(0.5) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes bubblePop { from { opacity: 0; transform: scale(0.8) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        .u-bubble-me { align-self: flex-end; background: var(--u-me); color: white; border-bottom-right-radius: 4px; }
+        .u-bubble-he { align-self: flex-start; background: var(--u-he); border: 1px solid var(--u-border); border-bottom-left-radius: 4px; }
 
-        .u-bubble-me { align-self: flex-end; background: var(--me); color: white; border-bottom-right-radius: 4px; }
-        .u-bubble-he { align-self: flex-start; background: var(--he); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+        .u-meta { display: flex; align-items: center; justify-content: flex-end; gap: 5px; font-size: 9px; margin-top: 5px; opacity: 0.5; font-family: 'JetBrains Mono', monospace; }
 
-        .u-meta {
-            display: flex; align-items: center; justify-content: flex-end;
-            gap: 6px; font-size: 10px; margin-top: 6px; opacity: 0.5;
-            font-family: 'JetBrains Mono', monospace;
-        }
+        /* --- AUDIO VISUALIZER --- */
+        .rec-wave { display: flex; align-items: center; gap: 3px; height: 30px; padding: 0 10px; }
+        .wave-bar { width: 3px; background: var(--u-accent); border-radius: 10px; transition: height 0.1s ease; }
 
-        /* Индикатор печати */
-        .typing-box { display: flex; gap: 4px; align-items: center; height: 20px; }
-        .dot { width: 4px; height: 4px; background: var(--accent); border-radius: 50%; animation: dotAnim 1.4s infinite; }
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes dotAnim { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+        /* --- UI COMPONENTS --- */
+        .u-header { height: 85px; padding: 0 24px; background: var(--u-surf); border-bottom: 1px solid var(--u-border); display: flex; align-items: center; justify-content: space-between; z-index: 100; }
+        .u-btn { background: var(--u-accent); color: white; border-radius: 20px; font-weight: 800; display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 8px 20px var(--u-accent-glow); }
+        .u-btn:active { transform: scale(0.92); }
+        .u-input { width: 100%; padding: 18px; background: var(--u-bg); border: 1px solid var(--u-border); border-radius: 22px; color: white; transition: 0.3s; font-size: 14px; }
+        .u-input:focus { border-color: var(--u-accent); box-shadow: 0 0 0 4px var(--u-accent-glow); }
 
-        /* Кастомизация скролла */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        /* --- TOAST NOTIFICATIONS --- */
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; pointer-events: none; }
+        .u-toast { background: var(--u-surf); border: 1px solid var(--u-border); padding: 12px 24px; border-radius: 50px; color: white; font-size: 12px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: toastIn 0.5s ease both; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Кнопки и инпуты */
-        .u-btn {
-            background: var(--accent); color: white; border-radius: 20px;
-            font-weight: 800; display: flex; align-items: center; justify-content: center;
-            transition: 0.3s; box-shadow: 0 10px 20px var(--accent-glow);
-        }
-        .u-btn:active { transform: scale(0.95); opacity: 0.9; }
-
-        .u-input {
-            width: 100%; padding: 18px; background: var(--bg);
-            border: 1px solid var(--border); border-radius: 20px;
-            color: white; transition: 0.3s;
-        }
-        .u-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
-
-        /* Видео контейнеры */
-        .video-container { position: relative; flex: 1; background: black; overflow: hidden; }
+        /* --- VIDEO CALL --- */
+        .v-call-layer { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
         #v-remote { width: 100%; height: 100%; object-fit: cover; }
-        #v-local { 
-            position: absolute; top: 40px; right: 24px; width: 120px; height: 180px; 
-            border-radius: 24px; border: 2px solid rgba(255,255,255,0.2); 
-            object-fit: cover; z-index: 1000; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-        }
+        #v-local { position: absolute; top: 40px; right: 25px; width: 110px; height: 160px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; z-index: 1001; background: #111; }
     </style>
 </head>
 <body>
 
-    <div id="scr-gate" class="screen z-[9999] justify-center items-center px-10">
+    <div id="toast-container"></div>
+
+    <div id="scr-gate" class="u-screen z-[9999] justify-center items-center px-10">
         <div class="w-full max-w-sm">
             <div class="text-center mb-12">
-                <div class="inline-block p-4 rounded-3xl bg-blue-500/10 mb-6">
-                    <i class="fas fa-shield-halved text-4xl text-blue-500"></i>
+                <div class="w-20 h-20 bg-blue-600 rounded-[30%] mx-auto flex items-center justify-center mb-6 shadow-2xl rotate-12">
+                    <i class="fas fa-bolt-lightning text-3xl text-white"></i>
                 </div>
                 <h1 class="text-5xl font-black italic tracking-tighter text-white">ULTRA <span class="text-blue-500">X</span></h1>
-                <p class="text-[10px] font-mono opacity-30 mt-4 tracking-[0.6em] uppercase">Hyper-Scale Comm v10.0.1</p>
+                <p class="text-[9px] font-mono opacity-20 mt-4 tracking-[0.5em] uppercase">Enterprise Infrastructure v11.5</p>
             </div>
 
-            <div class="bg-[var(--surf)] p-8 rounded-[40px] border border-[var(--border)] shadow-2xl relative overflow-hidden">
-                <div class="space-y-4 relative z-10">
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-black opacity-30 ml-4 uppercase tracking-widest">Node Address</label>
-                        <input id="gate-email" type="email" placeholder="agent@mesh.net" class="u-input">
-                    </div>
+            <div class="bg-[var(--u-surf)] p-8 rounded-[45px] border border-[var(--u-border)] shadow-2xl relative overflow-hidden">
+                <div class="space-y-4">
+                    <input id="gate-email" type="email" placeholder="Access Email" class="u-input">
+                    <input id="gate-pass" type="password" placeholder="Encryption Key" class="u-input">
                     
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-black opacity-30 ml-4 uppercase tracking-widest">Encryption Key</label>
-                        <input id="gate-pass" type="password" placeholder="••••••••" class="u-input">
+                    <div id="reg-ext" class="hidden space-y-4 animate-fadeIn">
+                        <input id="gate-nick" type="text" placeholder="Identity Name" class="u-input">
                     </div>
 
-                    <div id="gate-reg-ext" class="hidden animate-fadeIn space-y-1">
-                        <label class="text-[9px] font-black opacity-30 ml-4 uppercase tracking-widest">Identity Handle</label>
-                        <input id="gate-nick" type="text" placeholder="Egor Morozov" class="u-input !border-blue-500/30">
-                    </div>
-
-                    <button id="gate-btn-main" onclick="handleAuthAction()" class="u-btn w-full p-5 mt-6">
-                        <span id="gate-btn-label">INITIALIZE LINK</span>
+                    <button id="gate-btn" onclick="handleAuth()" class="u-btn w-full p-5 mt-4">
+                        <span id="gate-btn-text">INITIALIZE NODE</span>
                     </button>
 
-                    <button onclick="toggleAuthMode()" id="gate-btn-toggle" class="w-full text-[10px] font-black opacity-30 uppercase tracking-[0.2em] pt-6 hover:opacity-100 transition-all">
-                        Request Identity Certificate
+                    <button onclick="toggleAuth()" id="gate-switch" class="w-full text-[10px] font-black opacity-30 uppercase tracking-[0.3em] pt-6 hover:opacity-100 transition-all text-center">
+                        Generate New Identity
                     </button>
                 </div>
             </div>
-            <div id="gate-error" class="text-red-500 text-[10px] font-black text-center mt-8 uppercase leading-tight min-h-[20px]"></div>
+            <div id="gate-error" class="text-red-500 text-[10px] font-black text-center mt-8 uppercase h-4 tracking-widest"></div>
         </div>
     </div>
 
-    <div id="scr-main" class="screen screen-hidden">
+    <div id="scr-main" class="u-screen u-screen-hidden">
         <header class="u-header">
-            <button onclick="nav('settings')" class="w-12 h-12 rounded-2xl bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center active:scale-90 transition">
-                <i class="fas fa-bars-staggered opacity-40"></i>
+            <button onclick="nav('settings')" class="w-12 h-12 rounded-2xl bg-[var(--u-bg)] border border-[var(--u-border)] flex items-center justify-center">
+                <i class="fas fa-sliders opacity-40"></i>
             </button>
-            <div class="flex flex-col items-center">
-                <span class="font-black italic text-xl tracking-tighter text-white">ULTRA <span class="text-blue-500">X</span></span>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                    <span class="text-[8px] font-black opacity-30 uppercase tracking-[0.2em]">Quantum Mesh Online</span>
+            <div class="text-center">
+                <span class="font-black italic text-xl tracking-tighter">ULTRA <span class="text-blue-500">CORE</span></span>
+                <div class="flex items-center justify-center gap-1.5 mt-0.5">
+                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-[8px] font-black opacity-30 uppercase tracking-widest">Mesh Link Active</span>
                 </div>
             </div>
-            <button onclick="broadcastSearch()" class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg active:scale-90 transition">
+            <button onclick="searchAgent()" class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
                 <i class="fas fa-plus"></i>
             </button>
         </header>
-
+        
         <div class="flex-1 overflow-y-auto px-6 py-8">
             <div class="flex items-center justify-between mb-8">
-                <p class="text-[10px] font-black opacity-30 uppercase tracking-[0.4em]">Active Nodes</p>
-                <div class="h-px flex-1 bg-[var(--border)] ml-6"></div>
+                <p class="text-[10px] font-black opacity-20 uppercase tracking-[0.5em]">Connected Nodes</p>
+                <div class="h-px flex-1 bg-[var(--u-border)] ml-6"></div>
             </div>
-
-            <div id="hub-friends-list" class="space-y-3"></div>
-
+            <div id="hub-list" class="space-y-3"></div>
             <div id="hub-empty" class="hidden flex flex-col items-center justify-center py-32 opacity-10">
-                <i class="fas fa-satellite-dish text-7xl mb-6"></i>
-                <p class="font-black text-xs uppercase tracking-[0.5em]">No Active Signals</p>
+                <i class="fas fa-wind text-7xl mb-6"></i>
+                <p class="font-black text-xs uppercase tracking-[0.5em]">Silence in Frequency</p>
             </div>
         </div>
     </div>
 
-    <div id="scr-chat" class="screen screen-hidden">
+    <div id="scr-chat" class="u-screen u-screen-hidden">
         <header class="u-header">
             <div class="flex items-center gap-4">
-                <button onclick="nav('main')" class="text-xl opacity-30 hover:opacity-100 transition"><i class="fas fa-chevron-left"></i></button>
-                <div id="ch-av" class="u-avatar !w-11 !h-11 shadow-none">?</div>
+                <button onclick="nav('main')" class="text-xl opacity-30"><i class="fas fa-chevron-left"></i></button>
+                <div id="ch-av" class="w-11 h-11 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-xl shadow-xl">?</div>
                 <div>
-                    <div id="ch-name" class="font-bold text-sm text-white">...</div>
-                    <div id="ch-typing" class="hidden">
-                        <div class="typing-box">
-                            <span class="text-[9px] font-black text-blue-500 uppercase tracking-tighter">Typing</span>
-                            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        </div>
+                    <div id="ch-name" class="font-bold text-sm">...</div>
+                    <div id="ch-typing" class="hidden flex items-center gap-1">
+                        <span class="text-[9px] text-blue-500 font-black uppercase tracking-tighter">Typing</span>
+                        <div class="flex gap-0.5"><div class="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div><div class="w-1 h-1 bg-blue-500 rounded-full animate-bounce delay-75"></div></div>
                     </div>
-                    <div id="ch-status" class="text-[9px] font-black text-green-500 uppercase tracking-widest opacity-80">Connected</div>
+                    <div id="ch-status" class="text-[9px] text-green-500 font-black uppercase opacity-60">Secure Connection</div>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="initiateCall('video')" class="w-10 h-10 flex items-center justify-center text-blue-500 text-xl"><i class="fas fa-video"></i></button>
-            </div>
+            <button onclick="startCall()" class="text-blue-500 text-2xl"><i class="fas fa-video"></i></button>
         </header>
 
-        <div id="ch-feed" class="flex-1 overflow-y-auto p-5 flex flex-col space-y-2 bg-[#010409]">
-            </div>
+        <div id="ch-feed" class="u-feed"></div>
 
-        <div class="p-4 bg-[var(--surf)] border-t border-[var(--border)] pb-10">
+        <div class="p-4 bg-[var(--u-surf)] border-t border-[var(--u-border)] pb-10">
             <div class="flex items-end gap-3">
-                <button class="w-12 h-12 rounded-2xl bg-[var(--bg)] border border-[var(--border)] text-blue-500 flex items-center justify-center">
-                    <i class="fas fa-paperclip"></i>
+                <button id="mic-btn" class="w-14 h-14 rounded-2xl bg-[var(--u-bg)] border border-[var(--u-border)] text-red-500 flex items-center justify-center transition-all">
+                    <i class="fas fa-microphone text-xl"></i>
                 </button>
-                <div id="ch-input" contenteditable="true" 
-                     class="flex-1 bg-[var(--bg)] p-4 rounded-2xl max-h-40 overflow-y-auto text-sm border border-[var(--border)] focus:border-blue-500 transition-all" 
-                     placeholder="Transmit encrypted data..."
-                     oninput="sendTypingSignal()"></div>
-                <button onclick="pushMessage()" class="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-xl active:scale-90 transition">
+                <div id="ch-input" contenteditable="true" class="flex-1 bg-[var(--u-bg)] p-4 rounded-2xl max-h-40 overflow-y-auto text-sm border border-[var(--u-border)]" placeholder="Transmit data..." oninput="reportTyping()"></div>
+                <button onclick="pushMsg()" class="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-2xl active:scale-90 transition">
                     <i class="fas fa-paper-plane text-lg"></i>
                 </button>
             </div>
+            <div id="audio-viz" class="hidden mt-4 flex items-center justify-center bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20">
+                <div class="rec-wave" id="wave-container"></div>
+                <span class="text-[10px] font-black text-blue-500 uppercase ml-4">Recording Signal...</span>
+            </div>
         </div>
     </div>
 
-    <div id="scr-settings" class="screen screen-hidden">
+    <div id="scr-settings" class="u-screen u-screen-hidden">
         <header class="u-header">
-            <button onclick="nav('main')" class="w-12 h-12 rounded-2xl bg-[var(--bg)] flex items-center justify-center"><i class="fas fa-chevron-left"></i></button>
-            <span class="font-black text-[10px] uppercase tracking-[0.4em] opacity-40">System Core</span>
-            <div class="w-12"></div>
+            <button onclick="nav('main')"><i class="fas fa-arrow-left opacity-30"></i></button>
+            <span class="font-black text-[10px] uppercase tracking-[0.4em]">Configuration Node</span>
+            <div class="w-10"></div>
         </header>
 
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto pb-20">
             <div class="p-12 flex flex-col items-center">
-                <div id="st-av" class="w-32 h-32 bg-blue-600 rounded-[40%] flex items-center justify-center text-5xl font-black mb-6 shadow-2xl border-4 border-[var(--bg)]">?</div>
-                <h2 id="st-nick" class="text-3xl font-black text-white tracking-tighter">...</h2>
-                <div id="st-mail" class="text-[10px] font-mono opacity-20 uppercase mt-2 tracking-widest">...</div>
-                
-                <div class="flex gap-3 mt-8">
-                    <button onclick="copyUID()" class="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition">Copy Identity Hash</button>
-                </div>
+                <div id="st-av" class="w-32 h-32 bg-blue-600 rounded-[40%] flex items-center justify-center text-5xl font-black mb-6 shadow-2xl border-4 border-[var(--u-bg)]">?</div>
+                <h2 id="st-name" class="text-3xl font-black tracking-tighter text-white">...</h2>
+                <div id="st-mail" class="text-[10px] font-mono opacity-20 uppercase mt-2">...</div>
             </div>
 
-            <div class="px-8 space-y-6 pb-20">
-                <div class="p-6 bg-[var(--surf)] border border-[var(--border)] rounded-[32px]">
-                    <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-6">Security Modules</p>
+            <div class="px-8 space-y-4">
+                <div class="p-6 bg-[var(--u-surf)] rounded-[35px] border border-[var(--u-border)]">
+                    <p class="text-[10px] font-black text-blue-500 uppercase mb-6 tracking-widest">Hardware Sync</p>
                     <div class="space-y-6">
                         <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-white">Ghost Mode</p>
-                                <p class="text-[9px] opacity-40">Hide presence from public mesh</p>
-                            </div>
-                            <div class="w-10 h-5 bg-white/10 rounded-full"></div>
+                            <span class="text-xs font-bold">Haptic Feedback</span>
+                            <div class="w-10 h-5 bg-blue-600 rounded-full relative"><div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div></div>
                         </div>
-                        <div class="h-px bg-[var(--border)]"></div>
                         <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-white">Biometric Lock</p>
-                                <p class="text-[9px] opacity-40">Require key on app launch</p>
-                            </div>
+                            <span class="text-xs font-bold">Biometric Security</span>
                             <div class="w-10 h-5 bg-blue-600 rounded-full relative"><div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div></div>
                         </div>
                     </div>
                 </div>
-
-                <button onclick="terminateSession()" class="w-full p-6 bg-red-500/10 border border-red-500/20 rounded-[30px] flex items-center justify-between text-red-500 active:bg-red-500 active:text-white transition-all">
-                    <div class="text-left">
-                        <p class="font-black text-xs uppercase italic">Destroy Link</p>
-                        <p class="text-[9px] opacity-60">Logout and clear session cache</p>
-                    </div>
-                    <i class="fas fa-power-off text-xl"></i>
-                </button>
+                <button onclick="terminate()" class="w-full p-6 bg-red-500/10 border border-red-500/20 rounded-[35px] text-red-500 font-black uppercase text-xs">Terminate Link</button>
             </div>
         </div>
     </div>
 
-    <div id="media-call" class="fixed inset-0 bg-black z-[10000] hidden flex-col overflow-hidden">
+    <div id="call-layer" class="v-call-layer">
         <video id="v-remote" autoplay playsinline></video>
         <video id="v-local" autoplay muted playsinline></video>
-        
-        <div class="absolute inset-0 flex flex-col justify-between items-center py-20 bg-gradient-to-b from-black/80 via-transparent to-black/90">
+        <div class="absolute inset-0 flex flex-col justify-between items-center py-24 bg-gradient-to-b from-black/60 via-transparent to-black/80">
             <div class="text-center">
-                <div id="call-av" class="w-24 h-24 bg-blue-600 rounded-[40%] mx-auto flex items-center justify-center text-4xl font-black mb-6 border-4 border-white/10">?</div>
-                <h2 id="call-name" class="text-3xl font-black text-white uppercase italic tracking-tighter">Requesting...</h2>
-                <div class="text-[10px] font-mono text-blue-400 mt-4 tracking-[0.5em] animate-pulse">P2P ENCRYPTION ACTIVE</div>
+                <div id="call-av" class="w-24 h-24 bg-blue-600 rounded-[40%] mx-auto flex items-center justify-center text-4xl font-black mb-6 border-4 border-white/20 shadow-2xl">?</div>
+                <h2 id="call-partner" class="text-3xl font-black text-white italic">...</h2>
+                <div class="text-[10px] font-mono text-blue-400 mt-4 tracking-[0.5em] animate-pulse">P2P ENCRYPTED CALL</div>
             </div>
-
             <button onclick="location.reload()" class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center text-3xl text-white shadow-2xl active:scale-75 transition">
                 <i class="fas fa-phone-slash"></i>
             </button>
@@ -315,8 +232,8 @@
         import { getDatabase, ref, push, set, onValue, update, get, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // CONFIG
-        const firebaseConfig = {
+        // CONFIG (Same for all Morozov Ultra nodes)
+        const fbConfig = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
@@ -325,76 +242,72 @@
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(fbConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // GLOBAL STATE
+        // SYSTEM STATE
         let me = null;
-        let partnerNode = null;
-        let currentRoomId = null;
-        let isRegistration = false;
-        let pc = null;
-        let typingTimer = null;
+        let pNode = null;
+        let room = null;
+        let isReg = false;
+        let peer = null;
+        let tT = null;
 
-        // 1. NAVIGATION
-        window.nav = (target) => {
-            console.log(`[CORE] Navigating to ${target}`);
+        // --- CORE NAVIGATION ---
+        window.nav = (id) => {
             const screens = ['gate', 'main', 'chat', 'settings'];
             screens.forEach(s => {
                 const el = document.getElementById(`scr-${s}`);
-                if(s === target) el.classList.replace('screen-hidden', 'screen-active');
-                else el.classList.replace('screen-active', 'screen-hidden');
+                if(s === id) el.classList.replace('u-screen-hidden', 'u-screen-active');
+                else el.classList.replace('u-screen-active', 'u-screen-hidden');
             });
-
-            if(target === 'settings' && auth.currentUser) {
+            if(id === 'settings' && auth.currentUser) {
                 const u = auth.currentUser;
-                document.getElementById('st-nick').innerText = u.displayName || "Agent";
+                document.getElementById('st-name').innerText = u.displayName || "Agent";
                 document.getElementById('st-mail').innerText = u.email;
                 document.getElementById('st-av').innerText = (u.displayName ? u.displayName[0] : "A").toUpperCase();
             }
         };
 
-        // 2. AUTHENTICATION HANDLER
-        window.toggleAuthMode = () => {
-            isRegistration = !isRegistration;
-            document.getElementById('gate-reg-ext').classList.toggle('hidden', !isRegistration);
-            document.getElementById('gate-btn-label').innerText = isRegistration ? "GENERATE IDENTITY" : "INITIALIZE LINK";
-            document.getElementById('gate-btn-toggle').innerText = isRegistration ? "Already verified? Connect" : "Request Identity Certificate";
+        window.toast = (msg) => {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'u-toast';
+            t.innerText = msg;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
         };
 
-        window.handleAuthAction = async () => {
-            const email = document.getElementById('gate-email').value.trim();
-            const pass = document.getElementById('gate-pass').value.trim();
-            const nick = document.getElementById('gate-nick').value.trim();
-            const errorEl = document.getElementById('gate-error');
-            const btn = document.getElementById('gate-btn-main');
+        // --- AUTH & LEGACY MIGRATION BRIDGE ---
+        window.toggleAuth = () => {
+            isReg = !isReg;
+            document.getElementById('reg-ext').classList.toggle('hidden', !isReg);
+            document.getElementById('gate-btn-text').innerText = isReg ? "GENERATE IDENTITY" : "INITIALIZE NODE";
+            document.getElementById('gate-switch').innerText = isReg ? "Already verified? Connect" : "Generate New Identity";
+        };
 
-            if(!email || pass.length < 6) {
-                errorEl.innerText = "CRITICAL: DATA INTEGRITY CHECK FAILED";
-                return;
-            }
+        window.handleAuth = async () => {
+            const e = document.getElementById('gate-email').value.trim();
+            const p = document.getElementById('gate-pass').value.trim();
+            const n = document.getElementById('gate-nick').value.trim();
+            const log = document.getElementById('gate-error');
 
-            errorEl.innerText = "PROCESSING QUANTUM LINK...";
-            btn.disabled = true;
+            if(!e || p.length < 6) { log.innerText = "DATA INTEGRITY ERROR"; return; }
+            log.innerText = "SYNCING WITH MESH...";
 
             try {
-                if(isRegistration) {
-                    const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    await updateProfile(res.user, { displayName: nick || "Agent" });
-                    // Store in v10 Mesh
-                    await set(ref(db, `v10/users/${res.user.uid}`), {
-                        name: nick || "Agent",
-                        email: email,
-                        uid: res.user.uid,
-                        ts: Date.now()
-                    });
+                if(isReg) {
+                    const res = await createUserWithEmailAndPassword(auth, e, p);
+                    await updateProfile(res.user, { displayName: n || "Agent" });
+                    // Store in v11 branch
+                    await set(ref(db, `v11/users/${res.user.uid}`), { name: n || "Agent", email: e, uid: res.user.uid, ts: Date.now() });
                 } else {
-                    const res = await signInWithEmailAndPassword(auth, email, pass);
-                    // Check for migration
-                    const check = await get(ref(db, `v10/users/${res.user.uid}`));
+                    const res = await signInWithEmailAndPassword(auth, e, p);
+                    // LEGACY BRIDGE: If user not in v11, migrate from v10 or force create
+                    const check = await get(ref(db, `v11/users/${res.user.uid}`));
                     if(!check.exists()) {
-                        await set(ref(db, `v10/users/${res.user.uid}`), {
+                        await set(ref(db, `v11/users/${res.user.uid}`), {
                             name: res.user.displayName || "Agent",
                             email: res.user.email,
                             uid: res.user.uid,
@@ -402,218 +315,200 @@
                         });
                     }
                 }
-            } catch(e) {
-                errorEl.innerText = "PROTOCOL ERROR: " + e.code.toUpperCase().replace('AUTH/', '');
-                btn.disabled = false;
-            }
+            } catch(err) { log.innerText = "ERR: " + err.code.toUpperCase(); }
         };
 
-        onAuthStateChanged(auth, (user) => {
-            if(user) {
-                me = user;
-                document.getElementById('scr-gate').style.display = 'none';
-                initSocialMesh();
-                nav('main');
-            } else {
-                document.getElementById('scr-gate').style.display = 'flex';
-                nav('gate');
-            }
+        onAuthStateChanged(auth, u => {
+            if(u) { me = u; nav('main'); initSocial(); toast("Welcome, Agent"); }
+            else { nav('gate'); }
         });
 
-        // 3. SOCIAL MESH & HUB
-        function initSocialMesh() {
-            onValue(ref(db, `v10/social/${me.uid}`), (snap) => {
-                const list = document.getElementById('hub-friends-list');
+        // --- SOCIAL INFRASTRUCTURE ---
+        function initSocial() {
+            onValue(ref(db, `v11/social/${me.uid}`), snap => {
+                const list = document.getElementById('hub-list');
                 const empty = document.getElementById('hub-empty');
                 list.innerHTML = "";
-                let count = 0;
-
-                snap.forEach(child => {
-                    const d = child.val();
-                    count++;
-                    const card = document.createElement('div');
-                    card.className = "u-card p-5 flex items-center justify-between cursor-pointer";
-                    card.innerHTML = `
+                let has = false;
+                snap.forEach(c => {
+                    has = true;
+                    const d = c.val();
+                    const div = document.createElement('div');
+                    div.className = "p-5 bg-[var(--u-surf)] rounded-[30px] border border-[var(--u-border)] flex items-center justify-between cursor-pointer active:scale-95 transition-all";
+                    div.innerHTML = `
                         <div class="flex items-center gap-4">
-                            <div class="u-avatar shadow-none">${d.name[0]}</div>
+                            <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg">${d.name[0]}</div>
                             <div>
                                 <div class="font-bold text-sm text-white">${d.name}</div>
-                                <div class="text-[9px] font-black opacity-30 uppercase tracking-widest">Quantum Link Active</div>
+                                <div class="text-[9px] opacity-20 uppercase font-black tracking-widest">Quantum Link Active</div>
                             </div>
                         </div>
-                        <i class="fas fa-chevron-right text-[10px] opacity-20"></i>
+                        <i class="fas fa-chevron-right opacity-10"></i>
                     `;
-                    card.onclick = () => openSecureTerminal(d);
-                    list.appendChild(card);
+                    div.onclick = () => openChat(d);
+                    list.appendChild(div);
                 });
-
-                empty.classList.toggle('hidden', count > 0);
+                empty.classList.toggle('hidden', has);
             });
-
-            listenIncomingCalls();
+            listenSignals();
         }
 
-        window.broadcastSearch = async () => {
-            const targetMail = prompt("Enter Target Agent Email:");
-            if(!targetMail || targetMail.toLowerCase() === me.email.toLowerCase()) return;
+        window.searchAgent = async () => {
+            const mail = prompt("Target Agent Email:");
+            if(!mail || mail.toLowerCase() === me.email.toLowerCase()) return;
+            
+            toast("Searching Mesh...");
+            const users = await get(ref(db, `v11/users`));
+            let found = null;
+            users.forEach(u => { if(u.val().email.toLowerCase() === mail.toLowerCase()) found = u.val(); });
 
-            const usersDb = await get(ref(db, `v10/users`));
-            let foundAgent = null;
-            usersDb.forEach(u => { if(u.val().email.toLowerCase() === targetMail.toLowerCase()) foundAgent = u.val(); });
-
-            if(foundAgent) {
-                await update(ref(db, `v10/social/${foundAgent.uid}/${me.uid}`), { id: me.uid, name: me.displayName });
-                await update(ref(db, `v10/social/${me.uid}/${foundAgent.uid}`), { id: foundAgent.uid, name: foundAgent.name });
-                alert("Handshake Complete. Connection Established.");
-            } else {
-                alert("Target Agent Node not found in global v10 directory.");
-            }
+            if(found) {
+                await update(ref(db, `v11/social/${me.uid}/${found.uid}`), { id: found.uid, name: found.name });
+                await update(ref(db, `v11/social/${found.uid}/${me.uid}`), { id: me.uid, name: me.displayName });
+                toast("Handshake Complete.");
+            } else { toast("Node not found."); }
         };
 
-        // 4. CHAT ENGINE (TYPING + TICKS)
-        window.openSecureTerminal = (partner) => {
-            partnerNode = partner;
-            currentRoomId = [me.uid, partner.id].sort().join("_X_");
+        // --- MESSAGING ENGINE ---
+        window.openChat = (p) => {
+            pNode = p;
+            room = [me.uid, p.id].sort().join("_X_");
             nav('chat');
+            document.getElementById('ch-name').innerText = p.name;
+            document.getElementById('ch-av').innerText = p.name[0];
             
-            document.getElementById('ch-name').innerText = partner.name;
-            document.getElementById('ch-av').innerText = partner.name[0];
-            
-            // Listen for Messages
-            onValue(ref(db, `v10/rooms/${currentRoomId}/messages`), (snap) => {
+            onValue(ref(db, `v11/rooms/${room}/msgs`), snap => {
                 const feed = document.getElementById('ch-feed');
                 feed.innerHTML = "";
                 snap.forEach(m => {
                     const d = m.val();
                     const isMe = d.sid === me.uid;
+                    if(!isMe && d.st !== 'read') update(ref(db, `v11/rooms/${room}/msgs/${m.key}`), { st: 'read' });
                     
-                    // Logic: Mark as read if receiving
-                    if(!isMe && d.st !== 'read') {
-                        update(ref(db, `v10/rooms/${currentRoomId}/messages/${m.key}`), { st: 'read' });
-                    }
-
-                    const time = new Date(d.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const t = new Date(d.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     const tick = d.st === 'read' ? '<i class="fas fa-check-double text-blue-500"></i>' : '<i class="fas fa-check"></i>';
-
+                    
                     const b = document.createElement('div');
                     b.className = `u-bubble ${isMe ? 'u-bubble-me' : 'u-bubble-he'}`;
-                    b.innerHTML = `
-                        <div>${d.cnt}</div>
-                        <div class="u-meta">
-                            <span>${time}</span>
-                            ${isMe ? tick : ''}
-                        </div>
-                    `;
+                    b.innerHTML = `<div>${d.cnt}</div><div class="u-meta"><span>${t}</span>${isMe ? tick : ''}</div>`;
                     feed.appendChild(b);
                 });
                 feed.scrollTop = feed.scrollHeight;
             });
 
-            // Listen for Typing Signal
-            onValue(ref(db, `v10/rooms/${currentRoomId}/typing/${partner.id}`), snap => {
-                const isTyping = snap.val() === true;
-                document.getElementById('ch-typing').classList.toggle('hidden', !isTyping);
-                document.getElementById('ch-status').classList.toggle('hidden', isTyping);
+            onValue(ref(db, `v11/rooms/${room}/typing/${p.id}`), s => {
+                document.getElementById('ch-typing').classList.toggle('hidden', !s.val());
+                document.getElementById('ch-status').classList.toggle('hidden', s.val());
             });
         };
 
-        window.sendTypingSignal = () => {
-            if(!currentRoomId) return;
-            set(ref(db, `v10/rooms/${currentRoomId}/typing/${me.uid}`), true);
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => {
-                set(ref(db, `v10/rooms/${currentRoomId}/typing/${me.uid}`), false);
-            }, 2500);
+        window.reportTyping = () => {
+            if(!room) return;
+            set(ref(db, `v11/rooms/${room}/typing/${me.uid}`), true);
+            clearTimeout(tT);
+            tT = setTimeout(() => set(ref(db, `v11/rooms/${room}/typing/${me.uid}`), false), 2500);
         };
 
-        window.pushMessage = () => {
-            const input = document.getElementById('ch-input');
-            const text = input.innerText.trim();
-            if(!text || !currentRoomId) return;
-
-            push(ref(db, `v10/rooms/${currentRoomId}/messages`), {
-                sid: me.uid,
-                cnt: text,
-                ts: Date.now(),
-                st: 'sent'
-            });
-            
-            set(ref(db, `v10/rooms/${currentRoomId}/typing/${me.uid}`), false);
-            input.innerText = "";
+        window.pushMsg = () => {
+            const inp = document.getElementById('ch-input');
+            const txt = inp.innerText.trim();
+            if(!txt) return;
+            push(ref(db, `v11/rooms/${room}/msgs`), { sid: me.uid, cnt: txt, ts: Date.now(), st: 'sent' });
+            inp.innerText = "";
+            set(ref(db, `v11/rooms/${room}/typing/${me.uid}`), false);
         };
 
-        // 5. P2P MEDIA (WebRTC)
-        window.initiateCall = async () => {
-            document.getElementById('media-call').classList.remove('hidden');
-            document.getElementById('call-name').innerText = partnerNode.name;
-            document.getElementById('call-av').innerText = partnerNode.name[0];
+        // --- AUDIO VISUALIZER LOGIC ---
+        let micStream = null, audioCtx = null, analyzer = null;
+        const micBtn = document.getElementById('mic-btn');
+        micBtn.onclick = async () => {
+            if(!micStream) {
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                document.getElementById('audio-viz').classList.remove('hidden');
+                micBtn.classList.replace('bg-[var(--u-bg)]', 'bg-red-600');
+                micBtn.classList.replace('text-red-500', 'text-white');
+                
+                audioCtx = new AudioContext();
+                analyzer = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaStreamSource(micStream);
+                source.connect(analyzer);
+                analyzer.fftSize = 32;
+                const bufferLength = analyzer.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                const wave = document.getElementById('wave-container');
+                wave.innerHTML = "";
+                for(let i=0; i<8; i++) { const b = document.createElement('div'); b.className='wave-bar'; wave.appendChild(b); }
+                
+                function draw() {
+                    if(!micStream) return;
+                    analyzer.getByteFrequencyData(dataArray);
+                    const bars = wave.querySelectorAll('.wave-bar');
+                    bars.forEach((b, i) => { 
+                        const h = (dataArray[i] / 255) * 30 + 5;
+                        b.style.height = h + 'px';
+                    });
+                    requestAnimationFrame(draw);
+                }
+                draw();
+            } else {
+                micStream.getTracks().forEach(t => t.stop());
+                micStream = null;
+                document.getElementById('audio-viz').classList.add('hidden');
+                micBtn.classList.replace('bg-red-600', 'bg-[var(--u-bg)]');
+                micBtn.classList.replace('text-white', 'text-red-500');
+                toast("Audio data discarded.");
+            }
+        };
 
-            pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            stream.getTracks().forEach(t => pc.addTrack(t, stream));
-            document.getElementById('v-local').srcObject = stream;
+        // --- P2P MEDIA (WEBRTC) ---
+        window.startCall = async () => {
+            document.getElementById('call-layer').style.display = 'flex';
+            document.getElementById('call-partner').innerText = pNode.name;
+            document.getElementById('call-av').innerText = pNode.name[0];
 
-            pc.onicecandidate = e => e.candidate && push(ref(db, `v10/calls/${partnerNode.id}/ice`), e.candidate.toJSON());
-            pc.ontrack = e => document.getElementById('v-remote').srcObject = e.streams[0];
+            peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+            const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            s.getTracks().forEach(t => peer.addTrack(t, s));
+            document.getElementById('v-local').srcObject = s;
 
-            const offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            
-            await remove(ref(db, `v10/calls/${partnerNode.id}`));
-            await set(ref(db, `v10/calls/${partnerNode.id}/sig`), { 
-                offer, 
-                from: me.uid, 
-                name: me.displayName 
-            });
+            peer.onicecandidate = e => e.candidate && push(ref(db, `v11/calls/${pNode.id}/ice`), e.candidate.toJSON());
+            peer.ontrack = e => document.getElementById('v-remote').srcObject = e.streams[0];
 
-            onValue(ref(db, `v10/calls/${partnerNode.id}/ans`), async snap => {
-                if(snap.val() && !pc.currentRemoteDescription) await pc.setRemoteDescription(new RTCSessionDescription(snap.val()));
+            const o = await peer.createOffer();
+            await peer.setLocalDescription(o);
+            await remove(ref(db, `v11/calls/${pNode.id}`));
+            await set(ref(db, `v11/calls/${pNode.id}/sig`), { offer: o, from: me.uid, name: me.displayName });
+
+            onValue(ref(db, `v11/calls/${pNode.id}/ans`), async snap => {
+                if(snap.val() && !peer.currentRemoteDescription) await peer.setRemoteDescription(new RTCSessionDescription(snap.val()));
             });
         };
 
-        function listenIncomingCalls() {
-            onValue(ref(db, `v10/calls/${me.uid}/sig`), async snap => {
-                const data = snap.val();
-                if(data && data.offer && !pc) {
-                    if(confirm(`INCOMING CALL: Agent ${data.name} is calling. Accept?`)) {
-                        document.getElementById('media-call').classList.remove('hidden');
-                        document.getElementById('call-name').innerText = data.name;
-                        
-                        pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-                        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        stream.getTracks().forEach(t => pc.addTrack(t, stream));
-                        document.getElementById('v-local').srcObject = stream;
-
-                        pc.ontrack = e => document.getElementById('v-remote').srcObject = e.streams[0];
-                        pc.onicecandidate = e => e.candidate && push(ref(db, `v10/calls/${data.from}/ice`), e.candidate.toJSON());
-                        
-                        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-                        const answer = await pc.createAnswer();
-                        await pc.setLocalDescription(answer);
-                        set(ref(db, `v10/calls/${data.from}/ans`), answer);
-
-                        onValue(ref(db, `v10/calls/${me.uid}/ice`), iceSnap => {
-                            iceSnap.forEach(c => pc.addIceCandidate(new RTCIceCandidate(c.val())));
-                        });
-                    } else {
-                        remove(ref(db, `v10/calls/${me.uid}`));
-                    }
+        function listenSignals() {
+            onValue(ref(db, `v11/calls/${me.uid}/sig`), async snap => {
+                const d = snap.val();
+                if(d && d.offer && !peer) {
+                    if(confirm("INCOMING CALL: Agent " + d.name)) {
+                        document.getElementById('call-layer').style.display = 'flex';
+                        document.getElementById('call-partner').innerText = d.name;
+                        peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+                        const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                        s.getTracks().forEach(t => peer.addTrack(t, s));
+                        document.getElementById('v-local').srcObject = s;
+                        peer.ontrack = e => document.getElementById('v-remote').srcObject = e.streams[0];
+                        peer.onicecandidate = e => e.candidate && push(ref(db, `v11/calls/${d.from}/ice`), e.candidate.toJSON());
+                        await peer.setRemoteDescription(new RTCSessionDescription(d.offer));
+                        const a = await peer.createAnswer();
+                        await peer.setLocalDescription(a);
+                        set(ref(db, `v11/calls/${d.from}/ans`), a);
+                        onValue(ref(db, `v11/calls/${me.uid}/ice`), iS => iS.forEach(c => peer.addIceCandidate(new RTCIceCandidate(c.val()))));
+                    } else { remove(ref(db, `v11/calls/${me.uid}`)); }
                 }
             });
         }
 
-        // 6. UTILITIES
-        window.copyUID = () => {
-            navigator.clipboard.writeText(me.uid);
-            alert("Identity Hash copied to clipboard.");
-        };
-
-        window.terminateSession = () => {
-            if(confirm("Destroy all secure links and logout?")) {
-                signOut(auth).then(() => location.reload());
-            }
-        };
-
+        window.terminate = () => signOut(auth).then(() => location.reload());
     </script>
 </body>
 </html>
