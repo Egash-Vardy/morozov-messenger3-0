@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Morozov Ultra | Titanium Enterprise</title>
+    <title>Morozov Ultra Maximum v15.0</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* Глобальные переменные и темы */
+        /* ГЛОБАЛЬНЫЕ СТИЛИ И ПЕРЕМЕННЫЕ */
         :root {
             --m-blue: #0088cc;
             --m-dark: #0e1621;
@@ -18,481 +18,452 @@
             --m-chat-bg: #070d14;
             --m-me: #2b5278;
             --m-he: #182533;
-            --safe-top: env(safe-area-inset-top);
+            --m-accent: #4fc3f7;
         }
 
         body, html {
             height: 100%; width: 100%; margin: 0; padding: 0;
-            background: var(--m-dark); color: white;
-            font-family: -apple-system, system-ui, Roboto, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            overflow: hidden;
+            background: var(--m-dark); color: #ffffff;
+            font-family: -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden; -webkit-font-smoothing: antialiased;
         }
 
-        /* Система навигации по экранам */
+        /* АНИМАЦИИ И ПЕРЕХОДЫ ЭКРАНОВ */
         .u-screen {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            position: fixed; inset: 0; width: 100%; height: 100%;
             background: var(--m-dark); z-index: 10;
-            transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1);
+            transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1), opacity 0.3s;
             display: flex; flex-direction: column;
-            will-change: transform;
         }
-        .u-screen-off { transform: translate3d(100%, 0, 0); }
-        .u-screen-active { transform: translate3d(0, 0, 0); z-index: 20; }
+        .u-screen-hidden { transform: translate3d(100%, 0, 0); opacity: 0; pointer-events: none; }
+        .u-screen-active { transform: translate3d(0, 0, 0); opacity: 1; z-index: 50; }
 
-        /* Кастомный интерфейс входа */
-        #u-gate {
-            position: fixed; inset: 0; z-index: 9999;
-            background: radial-gradient(circle at top right, #2b5278, #0e1621);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .u-card {
-            background: white; width: 92%; max-width: 420px;
-            padding: 45px 30px; border-radius: 40px; color: #111;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.6); text-align: center;
-        }
-
-        /* Движок сообщений */
-        .u-feed {
+        /* ИНТЕРФЕЙС СООБЩЕНИЙ */
+        .u-chat-area {
             flex: 1; overflow-y: auto; padding: 20px 15px;
             background: var(--m-chat-bg);
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
             background-blend-mode: overlay;
-            display: flex; flex-direction: column; gap: 8px;
-            scroll-behavior: smooth;
+            display: flex; flex-direction: column; gap: 10px;
         }
-        
-        .u-msg {
-            max-width: 82%; padding: 10px 14px; border-radius: 20px;
-            font-size: 15.5px; position: relative; word-wrap: break-word;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-        }
-        .u-msg-me { align-self: flex-end; background: var(--m-me); border-bottom-right-radius: 4px; color: white; }
-        .u-msg-he { align-self: flex-start; background: var(--m-he); border-bottom-left-radius: 4px; color: white; }
 
-        .u-meta {
+        .u-bubble {
+            max-width: 85%; padding: 10px 14px; border-radius: 18px;
+            font-size: 15px; position: relative; line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .u-bubble-me { align-self: flex-end; background: var(--m-me); border-bottom-right-radius: 4px; }
+        .u-bubble-he { align-self: flex-start; background: var(--m-he); border-bottom-left-radius: 4px; }
+
+        .u-time {
             display: flex; align-items: center; justify-content: flex-end;
-            gap: 5px; font-size: 10px; opacity: 0.5; margin-top: 4px;
+            gap: 4px; font-size: 10px; opacity: 0.6; margin-top: 5px;
         }
-        .u-read { color: #4fc3f7; }
+        .u-tick-read { color: var(--m-accent); }
 
-        /* Панель ввода */
-        .u-input-area {
-            background: var(--m-surface); padding: 12px 16px;
-            display: flex; align-items: flex-end; gap: 14px;
-            border-top: 1px solid var(--m-border);
-            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+        /* ВХОД В СИСТЕМУ */
+        #u-auth-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: linear-gradient(135deg, #17212b 0%, #0e1621 100%);
+            display: flex; align-items: center; justify-content: center; padding: 20px;
         }
-        .u-editor {
-            flex: 1; background: var(--m-dark); padding: 12px 18px;
-            border-radius: 24px; max-height: 160px; overflow-y: auto;
-            outline: none; font-size: 16px; border: 1px solid var(--m-border);
+        .u-auth-card {
+            background: #ffffff; color: #000000; width: 100%; max-width: 380px;
+            padding: 40px; border-radius: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
 
-        /* Видеозвонки WebRTC */
-        #u-call-view {
-            position: fixed; inset: 0; z-index: 8000;
+        /* ЗВОНКИ */
+        #u-call-ui {
+            position: fixed; inset: 0; z-index: 9000;
             background: #000; display: none; flex-direction: column;
         }
-        .u-video-remote { width: 100%; height: 100%; object-fit: cover; }
-        .u-video-local {
-            position: absolute; top: 60px; right: 25px;
-            width: 110px; height: 165px; object-fit: cover;
-            border-radius: 20px; border: 2px solid rgba(255,255,255,0.3); z-index: 8001;
+        .u-remote-vid { width: 100%; height: 100%; object-fit: cover; }
+        .u-local-vid {
+            position: absolute; top: 50px; right: 20px;
+            width: 100px; height: 150px; object-fit: cover;
+            border-radius: 15px; border: 2px solid #fff; z-index: 9001;
         }
 
-        /* Индикаторы и стикеры */
-        .u-sticker-panel {
-            display: none; position: absolute; bottom: 90px; left: 15px; right: 15px;
-            background: var(--m-surface); border-radius: 30px; padding: 20px;
-            grid-template-columns: repeat(4, 1fr); gap: 15px; z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        
-        .u-pulse { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        /* ИНДИКАТОРЫ */
+        .u-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .u-online { background: #4caf50; box-shadow: 0 0 8px #4caf50; }
     </style>
 </head>
 <body>
 
-    <div id="u-gate">
-        <div class="u-card">
-            <h1 class="text-5xl font-black text-blue-600 mb-2 italic">ULTRA</h1>
-            <p class="text-gray-400 font-bold text-xs tracking-[0.2em] mb-10 uppercase">Security Communication Lab</p>
+    <div id="u-auth-overlay">
+        <div class="u-auth-card">
+            <h1 class="text-4xl font-black text-blue-600 italic text-center mb-2">ULTRA</h1>
+            <p class="text-[10px] text-center font-bold text-gray-400 uppercase tracking-widest mb-8">Infrastructure Maximum v15</p>
             
             <div class="space-y-4">
-                <input id="u-email" type="email" placeholder="Email (test@test.ru)" class="w-full bg-gray-100 p-5 rounded-2xl outline-none focus:ring-2 ring-blue-500 transition">
-                <input id="u-pass" type="password" placeholder="Пароль" class="w-full bg-gray-100 p-5 rounded-2xl outline-none focus:ring-2 ring-blue-500 transition">
-                <input id="u-name" type="text" placeholder="Имя профиля" class="w-full bg-gray-100 p-5 rounded-2xl mb-4 outline-none">
-                <button onclick="uActionAuth()" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-black text-lg shadow-xl hover:bg-blue-700 active:scale-95 transition-all">ВХОД / РЕГИСТРАЦИЯ</button>
+                <div class="relative">
+                    <i class="fas fa-envelope absolute left-4 top-5 text-gray-400"></i>
+                    <input id="u-email" type="email" placeholder="Email адрес" class="w-full p-4 pl-12 bg-gray-100 rounded-2xl outline-none focus:ring-2 ring-blue-500 transition">
+                </div>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-4 top-5 text-gray-400"></i>
+                    <input id="u-pass" type="password" placeholder="Пароль" class="w-full p-4 pl-12 bg-gray-100 rounded-2xl outline-none focus:ring-2 ring-blue-500 transition">
+                </div>
+                <div id="u-reg-fields" class="hidden animate-fade-in">
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-4 top-5 text-gray-400"></i>
+                        <input id="u-nick" type="text" placeholder="Ваше имя" class="w-full p-4 pl-12 bg-gray-100 rounded-2xl outline-none focus:ring-2 ring-blue-500 transition">
+                    </div>
+                </div>
+                
+                <button onclick="uCoreAuth()" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all">ВХОД / РЕГИСТРАЦИЯ</button>
+                
+                <div class="text-center pt-4">
+                    <button onclick="uToggleReg()" id="u-toggle-btn" class="text-xs font-bold text-blue-500 uppercase tracking-widest">Нет аккаунта? Создать</button>
+                </div>
+                <p id="u-auth-msg" class="text-center text-red-500 text-xs font-bold mt-2"></p>
             </div>
-            <p class="mt-8 text-xs text-gray-400">Версия Titanium v11.4.2</p>
         </div>
     </div>
 
-    <div id="u-scr-main" class="u-screen">
-        <header class="h-[70px] bg-[var(--m-surface)] flex items-center justify-between px-6 border-b border-[var(--m-border)] pt-[var(--safe-top)]">
-            <button onclick="uShowSettings()"><i class="fas fa-user-shield text-xl"></i></button>
-            <span class="font-black text-2xl tracking-tighter">MOROZOV <span class="text-blue-500">ULTRA</span></span>
-            <button onclick="uPromptAdd()"><i class="fas fa-user-plus text-xl"></i></button>
+    <div id="u-scr-list" class="u-screen">
+        <header class="h-16 bg-[var(--m-surface)] flex items-center justify-between px-6 border-b border-[var(--m-border)]">
+            <button onclick="uLogout()"><i class="fas fa-sign-out-alt text-xl"></i></button>
+            <span class="font-black text-xl italic tracking-tighter">MOROZOV <span class="text-blue-500">ULTRA</span></span>
+            <button onclick="uSearchFriend()"><i class="fas fa-user-plus text-xl text-blue-400"></i></button>
         </header>
-        <div id="u-contact-list" class="flex-1 overflow-y-auto pt-2"></div>
+
+        <div id="u-pending-area" class="bg-blue-600/10 hidden">
+            <p class="px-6 py-2 text-[10px] font-black text-blue-400 uppercase">Запросы в друзья</p>
+            <div id="u-pending-list"></div>
+        </div>
+
+        <div class="px-6 py-4">
+            <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Ваши контакты</p>
+            <div id="u-main-contacts" class="space-y-2"></div>
+        </div>
     </div>
 
-    <div id="u-scr-chat" class="u-screen u-screen-off">
-        <header class="h-[70px] bg-[var(--m-surface)] flex items-center px-4 border-b border-[var(--m-border)] pt-[var(--safe-top)]">
-            <button onclick="uCloseChat()"><i class="fas fa-chevron-left text-2xl p-2"></i></button>
-            <div class="flex-1 ml-2">
-                <div id="u-chat-name" class="font-black text-lg leading-none">Контакт</div>
-                <div id="u-chat-status" class="text-[10px] text-green-400 font-bold uppercase mt-1">Защищенное соединение</div>
+    <div id="u-scr-chat" class="u-screen u-screen-hidden">
+        <header class="h-16 bg-[var(--m-surface)] flex items-center px-4 border-b border-[var(--m-border)]">
+            <button onclick="uBackToList()" class="p-2"><i class="fas fa-chevron-left text-xl"></i></button>
+            <div class="flex-1 ml-4">
+                <div id="u-target-name" class="font-bold text-lg leading-none">Имя...</div>
+                <div class="flex items-center mt-1">
+                    <span class="u-status-dot u-online"></span>
+                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Зашифрованный канал</span>
+                </div>
             </div>
             <div class="flex gap-6 pr-2">
-                <button onclick="uStartCall('audio')" class="text-gray-300 hover:text-white"><i class="fas fa-phone-alt"></i></button>
-                <button onclick="uStartCall('video')" class="text-gray-300 hover:text-white"><i class="fas fa-video"></i></button>
+                <button onclick="uMakeCall('audio')" class="text-gray-400 hover:text-white"><i class="fas fa-phone-alt"></i></button>
+                <button onclick="uMakeCall('video')" class="text-gray-400 hover:text-white"><i class="fas fa-video"></i></button>
             </div>
         </header>
 
-        <div id="u-chat-feed" class="u-feed"></div>
+        <div id="u-chat-messages" class="u-chat-area"></div>
 
-        <div id="u-stickers" class="u-sticker-panel grid">
-            <img src="https://cdn-icons-png.flaticon.com/512/2274/2274543.png" class="w-full hover:scale-110 transition cursor-pointer" onclick="uSendMedia('sticker', this.src)">
-            <img src="https://cdn-icons-png.flaticon.com/512/2274/2274556.png" class="w-full hover:scale-110 transition cursor-pointer" onclick="uSendMedia('sticker', this.src)">
-            <img src="https://cdn-icons-png.flaticon.com/512/4392/4392471.png" class="w-full hover:scale-110 transition cursor-pointer" onclick="uSendMedia('sticker', this.src)">
-            <img src="https://cdn-icons-png.flaticon.com/512/2274/2274555.png" class="w-full hover:scale-110 transition cursor-pointer" onclick="uSendMedia('sticker', this.src)">
-        </div>
-
-        <div class="u-input-area">
-            <button onclick="uToggleStickers()"><i class="far fa-laugh-wink text-2xl text-gray-400"></i></button>
-            <label class="cursor-pointer">
-                <i class="fas fa-paperclip text-2xl text-gray-400"></i>
-                <input type="file" class="hidden" onchange="uUploadFile(this)" accept="image/*">
+        <div class="p-3 bg-[var(--m-surface)] flex items-end gap-3 border-t border-[var(--m-border)]">
+            <label class="p-3 cursor-pointer text-gray-400 hover:text-white">
+                <i class="fas fa-paperclip text-xl"></i>
+                <input type="file" class="hidden" onchange="uHandleFile(this)" accept="image/*">
             </label>
-            <div id="u-msg-input" contenteditable="true" class="u-editor" oninput="uUpdateUI()"></div>
-            
-            <button id="u-btn-voice" class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg active:bg-blue-700" onmousedown="uVoiceStart()" onmouseup="uVoiceStop()" ontouchstart="uVoiceStart()" ontouchend="uVoiceStop()">
-                <i class="fas fa-microphone text-white" id="u-mic-ico"></i>
-            </button>
-            
-            <button id="u-btn-send" onclick="uSendText()" class="hidden w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700">
+            <div id="u-msg-input" contenteditable="true" class="flex-1 bg-[var(--m-dark)] p-3 rounded-2xl outline-none max-h-32 overflow-y-auto text-sm border border-[var(--m-border)]" oninput="uCheckInput()"></div>
+            <button id="u-send-btn" onclick="uPushMsg()" class="hidden w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition">
                 <i class="fas fa-paper-plane text-white"></i>
             </button>
+            <button id="u-mic-btn" class="w-12 h-12 bg-blue-600/20 text-blue-500 rounded-full flex items-center justify-center" onmousedown="uRecStart()" onmouseup="uRecStop()" ontouchstart="uRecStart()" ontouchend="uRecStop()">
+                <i class="fas fa-microphone" id="u-mic-ico"></i>
+            </button>
         </div>
     </div>
 
-    <div id="u-call-view">
-        <video id="u-v-remote" class="u-video-remote" autoplay playsinline></video>
-        <video id="u-v-local" class="u-video-local" autoplay muted playsinline></video>
-        <div class="absolute inset-0 flex flex-col justify-between py-24 items-center z-[9000]">
+    <div id="u-call-ui">
+        <video id="u-remote-stream" class="u-remote-vid" autoplay playsinline></video>
+        <video id="u-local-stream" class="u-local-vid" autoplay muted playsinline></video>
+        <div class="absolute inset-0 flex flex-col justify-between items-center py-20 z-[9002]">
             <div class="text-center">
-                <div id="u-call-avatar" class="w-24 h-24 bg-blue-600 rounded-full mx-auto flex items-center justify-center text-4xl font-black mb-4 shadow-2xl">?</div>
-                <h2 id="u-call-target-name" class="text-4xl font-black uppercase tracking-widest">ВЫЗОВ</h2>
-                <div class="mt-4 flex items-center justify-center gap-2">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
-                    <span class="text-xs font-bold opacity-60">P2P ENCRYPTED CONNECTION</span>
-                </div>
+                <div id="u-call-av" class="w-24 h-24 bg-blue-600 rounded-full mx-auto flex items-center justify-center text-4xl font-black mb-4 shadow-2xl border-4 border-white/10">?</div>
+                <h2 id="u-call-name" class="text-3xl font-black uppercase">ВЫЗОВ</h2>
+                <p class="text-xs text-blue-400 font-bold mt-2 animate-pulse uppercase tracking-widest">P2P ENCRYPTED</p>
             </div>
-            
-            <div class="flex gap-8">
-                <button onclick="uEndCall()" class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center text-3xl shadow-[0_0_50px_rgba(220,38,38,0.5)] active:scale-90 transition">
-                    <i class="fas fa-phone-slash"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="u-scr-settings" class="u-screen u-screen-off">
-        <header class="h-[70px] bg-[var(--m-surface)] flex items-center px-6 pt-[var(--safe-top)]">
-            <button onclick="uCloseSettings()"><i class="fas fa-arrow-left text-xl p-2"></i></button>
-            <span class="ml-4 font-black text-xl">ПРОФИЛЬ</span>
-        </header>
-        <div class="p-8 flex flex-col items-center">
-            <div id="u-my-av" class="w-28 h-28 bg-blue-600 rounded-full flex items-center justify-center text-5xl font-black text-white shadow-2xl mb-6">?</div>
-            <h2 id="u-my-name" class="text-3xl font-black">Agent</h2>
-            <p id="u-my-email" class="opacity-40 text-sm mt-1">email@ultra.com</p>
-            
-            <div class="w-full mt-10 space-y-4">
-                <div class="bg-[var(--m-surface)] p-6 rounded-3xl border border-[var(--m-border)]">
-                    <p class="text-[10px] uppercase font-black opacity-30 tracking-widest mb-2">Personal Security Token (UID)</p>
-                    <p id="u-my-uid" class="text-xs font-mono break-all text-blue-400 select-all"></p>
-                </div>
-                <button onclick="location.reload()" class="w-full p-5 bg-red-600/10 text-red-500 font-black rounded-3xl border border-red-600/20 active:bg-red-600 active:text-white transition-all">ВЫЙТИ ИЗ СИСТЕМЫ</button>
-            </div>
+            <button onclick="uHangup()" class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center text-3xl shadow-2xl active:scale-75 transition-all">
+                <i class="fas fa-phone-slash text-white"></i>
+            </button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, update, remove, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, push, set, onValue, update, get, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // КОНФИГУРАЦИЯ БАЗЫ ДАННЫХ
+        // КОНФИГУРАЦИЯ БЕЗОПАСНОСТИ (FIREBASE)
         const firebaseConfig = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
             projectId: "morozov-ultra",
             storageBucket: "morozov-ultra.firebasestorage.app",
-            messagingSenderId: "255345933856",
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
+        // Инициализация
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        let currentUser = null;
-        let activePartner = null;
-        let peerConnection = null;
-        let mediaRecorder = null;
-        let audioChunks = [];
+        let uGlobalUser = null;
+        let uActivePartner = null;
+        let uRTCPeer = null;
+        let uMediaRec = null;
+        let uAudioChunks = [];
+        let uIsReg = false;
 
-        // --- МОДУЛЬ АВТОРИЗАЦИИ (БЛОК 1) ---
-        window.uActionAuth = async () => {
-            const email = document.getElementById('u-email').value;
-            const pass = document.getElementById('u-pass').value;
-            const name = document.getElementById('u-name').value;
+        console.log("Morozov Ultra Maximum: Система инициализирована");
 
-            if(!email || pass.length < 6) return alert("Email и пароль (мин 6 симв) обязательны!");
-
-            try {
-                // Пытаемся войти
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (err) {
-                // Если нет аккаунта — регистрируем
-                const res = await createUserWithEmailAndPassword(auth, email, pass);
-                await updateProfile(res.user, { displayName: name || "User" });
-            }
-            location.reload();
+        // --- БЛОК 1: УПРАВЛЕНИЕ АВТОРИЗАЦИЕЙ ---
+        window.uToggleReg = () => {
+            uIsReg = !uIsReg;
+            document.getElementById('u-reg-fields').classList.toggle('hidden', !uIsReg);
+            document.getElementById('u-toggle-btn').innerText = uIsReg ? "Есть аккаунт? Войти" : "Нет аккаунта? Создать";
         };
 
-        onAuthStateChanged(auth, (user) => {
-            if(user) {
-                currentUser = user;
-                document.getElementById('u-gate').style.display = 'none';
-                document.getElementById('u-my-name').innerText = user.displayName;
-                document.getElementById('u-my-email').innerText = user.email;
-                document.getElementById('u-my-uid').innerText = user.uid;
-                document.getElementById('u-my-av').innerText = (user.displayName || "U")[0];
-                uRenderContacts();
-                uListenForIncomingCalls();
+        window.uCoreAuth = async () => {
+            const email = document.getElementById('u-email').value.trim();
+            const pass = document.getElementById('u-pass').value.trim();
+            const nick = document.getElementById('u-nick').value.trim();
+            const msg = document.getElementById('u-auth-msg');
+            msg.innerText = "Синхронизация...";
+
+            if(!email || pass.length < 6) return msg.innerText = "Ошибка формата данных";
+
+            try {
+                if(uIsReg) {
+                    const res = await createUserWithEmailAndPassword(auth, email, pass);
+                    await updateProfile(res.user, { displayName: nick || "User" });
+                    await set(ref(db, `v15/directory/${res.user.uid}`), { email, name: nick || "User", uid: res.user.uid });
+                } else {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                }
+            } catch (err) {
+                msg.innerText = "Ошибка: " + err.code;
+            }
+        };
+
+        onAuthStateChanged(auth, (u) => {
+            if(u) {
+                uGlobalUser = u;
+                document.getElementById('u-auth-overlay').style.display = 'none';
+                uStartGlobalSync();
+            } else {
+                document.getElementById('u-auth-overlay').style.display = 'flex';
             }
         });
 
-        // --- УПРАВЛЕНИЕ КОНТАКТАМИ (БЛОК 2) ---
-        window.uPromptAdd = () => {
-            const uid = prompt("Вставьте UID друга:");
-            const name = prompt("Введите имя для этого контакта:");
-            if(uid && name) {
-                let list = JSON.parse(localStorage.getItem('ultra_titanium_fs') || "[]");
-                list.push({id: uid, name: name});
-                localStorage.setItem('ultra_titanium_fs', JSON.stringify(list));
-                uRenderContacts();
+        // --- БЛОК 2: СИСТЕМА ДРУЗЕЙ И ПОИСКА ---
+        window.uSearchFriend = async () => {
+            const email = prompt("Введите точный Email друга:");
+            if(!email) return;
+
+            console.log("Поиск пользователя:", email);
+            const snap = await get(ref(db, `v15/directory`));
+            let target = null;
+            snap.forEach(s => { if(s.val().email === email) target = s.val(); });
+
+            if(target && target.uid !== uGlobalUser.uid) {
+                await update(ref(db, `v15/social/${target.uid}/${uGlobalUser.uid}`), { id: uGlobalUser.uid, name: uGlobalUser.displayName, status: 'request' });
+                await update(ref(db, `v15/social/${uGlobalUser.uid}/${target.uid}`), { id: target.uid, name: target.name, status: 'waiting' });
+                alert("Запрос успешно отправлен!");
+            } else {
+                alert("Пользователь не найден или это вы сами");
             }
         };
 
-        function uRenderContacts() {
-            const list = JSON.parse(localStorage.getItem('ultra_titanium_fs') || "[]");
-            const box = document.getElementById('u-contact-list');
-            box.innerHTML = list.length ? "" : '<div class="p-20 text-center opacity-20 font-bold uppercase tracking-widest">Нет активных каналов</div>';
-            
-            list.forEach(item => {
-                const div = document.createElement('div');
-                div.className = "flex items-center p-5 border-b border-[var(--m-border)] active:bg-white/5 transition cursor-pointer";
-                div.innerHTML = `
-                    <div class="w-14 h-14 bg-gradient-to-tr from-blue-700 to-blue-500 rounded-full flex items-center justify-center font-black text-xl shadow-lg mr-5">${item.name[0]}</div>
-                    <div class="flex-1">
-                        <div class="font-black text-lg">${item.name}</div>
-                        <div class="text-[10px] opacity-40 uppercase font-bold tracking-widest mt-1">End-to-end Encrypted</div>
-                    </div>
-                `;
-                div.onclick = () => uOpenChat(item);
-                box.appendChild(div);
+        function uStartGlobalSync() {
+            // Синхронизация списка друзей
+            onValue(ref(db, `v15/social/${uGlobalUser.uid}`), (snap) => {
+                const mainBox = document.getElementById('u-main-contacts');
+                const pendBox = document.getElementById('u-pending-list');
+                const pendArea = document.getElementById('u-pending-area');
+                
+                mainBox.innerHTML = ""; pendBox.innerHTML = "";
+                let hasPending = false;
+
+                snap.forEach(s => {
+                    const data = s.val();
+                    const el = document.createElement('div');
+                    
+                    if(data.status === 'request') {
+                        hasPending = true;
+                        el.className = "flex items-center p-4 bg-white/5 mx-6 my-2 rounded-2xl border border-blue-500/30";
+                        el.innerHTML = `<div class="flex-1 font-bold text-sm">${data.name} хочет в друзья</div>
+                                        <button onclick="uConfirmFriend('${data.id}')" class="bg-blue-600 px-4 py-2 rounded-xl text-[10px] font-black">ПРИНЯТЬ</button>`;
+                        pendBox.appendChild(el);
+                    } else if(data.status === 'confirmed') {
+                        el.className = "flex items-center p-5 bg-[var(--m-surface)] rounded-3xl border border-[var(--m-border)] active:scale-95 transition cursor-pointer";
+                        el.innerHTML = `<div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center font-black mr-4 text-xl">${data.name[0]}</div>
+                                        <div class="flex-1"><div class="font-black text-lg">${data.name}</div><div class="text-[10px] opacity-40 uppercase font-bold tracking-widest mt-1">Active Secure Channel</div></div>
+                                        <i class="fas fa-chevron-right opacity-20"></i>`;
+                        el.onclick = () => uOpenChatRoom(data);
+                        mainBox.appendChild(el);
+                    }
+                });
+                pendArea.classList.toggle('hidden', !hasPending);
             });
+
+            uListenForCalls();
         }
 
-        // --- МОДУЛЬ ЧАТА И ГАЛОЧЕК (БЛОК 3) ---
-        window.uOpenChat = (partner) => {
-            activePartner = partner;
+        window.uConfirmFriend = async (fid) => {
+            await update(ref(db, `v15/social/${uGlobalUser.uid}/${fid}`), { status: 'confirmed' });
+            await update(ref(db, `v15/social/${fid}/${uGlobalUser.uid}`), { status: 'confirmed' });
+        };
+
+        // --- БЛОК 3: ИНЖЕНЕРИЯ ЧАТА ---
+        window.uOpenChatRoom = (partner) => {
+            uActivePartner = partner;
             document.getElementById('u-scr-chat').classList.add('u-screen-active');
-            document.getElementById('u-chat-name').innerText = partner.name;
+            document.getElementById('u-target-name').innerText = partner.name;
             
-            const channelId = [currentUser.uid, partner.id].sort().join("___");
+            const roomID = [uGlobalUser.uid, partner.id].sort().join("___");
             
-            // Слушаем сообщения
-            onValue(ref(db, `titanium/v12/rooms/${channelId}`), (snap) => {
-                const feed = document.getElementById('u-chat-feed');
+            onValue(ref(db, `v15/messages/${roomID}`), (snap) => {
+                const feed = document.getElementById('u-chat-messages');
                 feed.innerHTML = "";
-                snap.forEach(msgSnap => {
-                    const data = msgSnap.val();
-                    const isMe = data.sid === currentUser.uid;
+                snap.forEach(m => {
+                    const d = m.val();
+                    const isMe = d.sid === uGlobalUser.uid;
 
-                    // Логика "Прочитано" (Галочки)
-                    if(!isMe && data.status !== 2) {
-                        update(ref(db, `titanium/v12/rooms/${channelId}/${msgSnap.key}`), { status: 2 });
-                    }
+                    // Обновление галочек (прочитано)
+                    if(!isMe && d.st !== 2) update(ref(db, `v15/messages/${roomID}/${m.key}`), { st: 2 });
 
-                    const time = new Date(data.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const tickClass = data.status === 2 ? 'u-read fa-check-double' : 'fa-check';
-                    const ticks = isMe ? `<i class="fas ${tickClass} ml-1"></i>` : "";
+                    const time = new Date(d.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const tick = isMe ? `<i class="fas ${d.st === 2 ? 'fa-check-double u-tick-read' : 'fa-check'} ml-1"></i>` : "";
 
                     const bubble = document.createElement('div');
-                    bubble.className = `u-msg ${isMe ? 'u-msg-me' : 'u-msg-he'}`;
+                    bubble.className = `u-bubble ${isMe ? 'u-bubble-me' : 'u-bubble-he'}`;
                     
-                    let content = `<div>${data.body}</div>`;
-                    if(data.type === 'img' || data.type === 'sticker') {
-                        content = `<img src="${data.body}" class="rounded-2xl max-w-full shadow-lg">`;
-                    } else if(data.type === 'voice') {
-                        content = `<audio controls src="${data.body}" class="w-48 brightness-90"></audio>`;
-                    }
+                    let content = `<div>${d.body}</div>`;
+                    if(d.tp === 'img') content = `<img src="${d.body}" class="rounded-xl max-w-full shadow-md">`;
+                    if(d.tp === 'audio') content = `<audio controls src="${d.body}" class="w-48 scale-90 origin-left"></audio>`;
 
-                    bubble.innerHTML = `
-                        ${content}
-                        <div class="u-meta">${time} ${ticks}</div>
-                    `;
+                    bubble.innerHTML = `${content}<div class="u-time">${time} ${tick}</div>`;
                     feed.appendChild(bubble);
                 });
                 feed.scrollTop = feed.scrollHeight;
             });
         };
 
-        window.uSendText = () => {
+        window.uPushMsg = () => {
             const input = document.getElementById('u-msg-input');
             const text = input.innerText.trim();
-            if(text) uSubmitToFirebase('text', text);
-            input.innerText = "";
-            uUpdateUI();
+            if(text) uExecuteSend('text', text);
+            input.innerText = ""; uCheckInput();
         };
 
-        function uSubmitToFirebase(type, body) {
-            if(!activePartner) return;
-            const channelId = [currentUser.uid, activePartner.id].sort().join("___");
-            push(ref(db, `titanium/v12/rooms/${channelId}`), {
-                sid: currentUser.uid,
-                type: type,
-                body: body,
-                ts: Date.now(),
-                status: 1 // 1 - отправлено, 2 - прочитано
-            });
-            if(type === 'sticker') uToggleStickers();
+        function uExecuteSend(tp, body) {
+            const roomID = [uGlobalUser.uid, uActivePartner.id].sort().join("___");
+            push(ref(db, `v15/messages/${roomID}`), { sid: uGlobalUser.uid, tp, body, ts: Date.now(), st: 1 });
         }
 
-        window.uUploadFile = (input) => {
-            if(!input.files[0]) return;
-            const reader = new FileReader();
-            reader.onload = (e) => uSubmitToFirebase('img', e.target.result);
-            reader.readAsDataURL(input.files[0]);
+        window.uHandleFile = (f) => {
+            const r = new FileReader();
+            r.onload = (e) => uExecuteSend('img', e.target.result);
+            r.readAsDataURL(f.files[0]);
         };
 
-        // --- ГОЛОСОВЫЕ СООБЩЕНИЯ (БЛОК 4) ---
-        window.uVoiceStart = async () => {
-            audioChunks = [];
+        // --- БЛОК 4: ГОЛОСОВОЙ ДВИЖОК ---
+        window.uRecStart = async () => {
+            uAudioChunks = [];
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
-                    const reader = new FileReader();
-                    reader.onload = (e) => uSubmitToFirebase('voice', e.target.result);
-                    reader.readAsDataURL(audioBlob);
+                const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+                uMediaRec = new MediaRecorder(s);
+                uMediaRec.ondataavailable = (e) => uAudioChunks.push(e.data);
+                uMediaRec.onstop = () => {
+                    const blob = new Blob(uAudioChunks, { type: 'audio/ogg' });
+                    const r = new FileReader();
+                    r.onload = (e) => uExecuteSend('audio', e.target.result);
+                    r.readAsDataURL(blob);
                 };
-                mediaRecorder.start();
-                document.getElementById('u-mic-ico').className = "fas fa-circle text-red-500 u-pulse";
-            } catch (err) { alert("Микрофон недоступен"); }
+                uMediaRec.start();
+                document.getElementById('u-mic-ico').className = "fas fa-circle text-red-500 animate-pulse";
+            } catch (e) { alert("Доступ к микрофону заблокирован"); }
         };
 
-        window.uVoiceStop = () => {
-            if(mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                document.getElementById('u-mic-ico').className = "fas fa-microphone text-white";
+        window.uRecStop = () => {
+            if(uMediaRec && uMediaRec.state !== 'inactive') {
+                uMediaRec.stop();
+                document.getElementById('u-mic-ico').className = "fas fa-microphone";
             }
         };
 
-        // --- WEBRTC МОДУЛЬ ЗВОНКОВ (БЛОК 5) ---
-        const rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+        // --- БЛОК 5: WebRTC ЗВОНКИ (СЛОЖНЫЙ СИГНАЛИНГ) ---
+        const rtcConf = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
-        window.uStartCall = async (type) => {
-            peerConnection = new RTCPeerConnection(rtcConfig);
-            const stream = await navigator.mediaDevices.getUserMedia({ video: type === 'video', audio: true });
-            stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+        window.uMakeCall = async (tp) => {
+            console.log("Инициализация вызова:", tp);
+            uRTCPeer = new RTCPeerConnection(rtcConf);
+            const stream = await navigator.mediaDevices.getUserMedia({ video: tp === 'video', audio: true });
+            stream.getTracks().forEach(t => uRTCPeer.addTrack(t, stream));
             
-            document.getElementById('u-v-local').srcObject = stream;
-            document.getElementById('u-call-view').style.display = 'flex';
-            document.getElementById('u-call-target-name').innerText = activePartner.name;
-            document.getElementById('u-call-avatar').innerText = activePartner.name[0];
+            document.getElementById('u-local-stream').srcObject = stream;
+            document.getElementById('u-call-ui').style.display = 'flex';
+            document.getElementById('u-call-av').innerText = uActivePartner.name[0];
+            document.getElementById('u-call-name').innerText = uActivePartner.name;
 
-            peerConnection.onicecandidate = (e) => {
-                if(e.candidate) push(ref(db, `titanium/v12/calls/${activePartner.id}/ice`), e.candidate.toJSON());
+            uRTCPeer.onicecandidate = (e) => {
+                if(e.candidate) push(ref(db, `v15/calls/${uActivePartner.id}/ice`), e.candidate.toJSON());
             };
-            peerConnection.ontrack = (e) => {
-                document.getElementById('u-v-remote').srcObject = e.streams[0];
-            };
+            uRTCPeer.ontrack = (e) => document.getElementById('u-remote-stream').srcObject = e.streams[0];
 
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
+            const off = await uRTCPeer.createOffer();
+            await uRTCPeer.setLocalDescription(off);
 
-            set(ref(db, `titanium/v12/calls/${activePartner.id}`), {
-                offer: offer, from: currentUser.uid, name: currentUser.displayName, type: type
-            });
+            set(ref(db, `v15/calls/${uActivePartner.id}/data`), { off, from: uGlobalUser.uid, name: uGlobalUser.displayName, tp });
 
-            onValue(ref(db, `titanium/v12/calls/${activePartner.id}/answer`), async (snap) => {
-                const answer = snap.val();
-                if(answer && !peerConnection.currentRemoteDescription) {
-                    await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+            onValue(ref(db, `v15/calls/${uActivePartner.id}/ans`), async snap => {
+                if(snap.val() && !uRTCPeer.currentRemoteDescription) {
+                    await uRTCPeer.setRemoteDescription(new RTCSessionDescription(snap.val()));
                 }
             });
         };
 
-        function uListenForIncomingCalls() {
-            onValue(ref(db, `titanium/v12/calls/${currentUser.uid}`), async (snap) => {
-                const data = snap.val();
-                if(data && data.offer && !peerConnection) {
-                    if(confirm(`Входящий ${data.type === 'video' ? 'видео' : 'аудио'} звонок от ${data.name}. Принять?`)) {
-                        peerConnection = new RTCPeerConnection(rtcConfig);
-                        const stream = await navigator.mediaDevices.getUserMedia({ video: data.type === 'video', audio: true });
-                        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+        function uListenForCalls() {
+            onValue(ref(db, `v15/calls/${uGlobalUser.uid}/data`), async snap => {
+                const d = snap.val();
+                if(d && d.off && !uRTCPeer) {
+                    if(confirm(`Звонок от ${d.name}. Ответить?`)) {
+                        uRTCPeer = new RTCPeerConnection(rtcConf);
+                        const s = await navigator.mediaDevices.getUserMedia({ video: d.tp === 'video', audio: true });
+                        s.getTracks().forEach(t => uRTCPeer.addTrack(t, s));
                         
-                        document.getElementById('u-v-local').srcObject = stream;
-                        document.getElementById('u-call-view').style.display = 'flex';
-                        
-                        peerConnection.ontrack = (e) => document.getElementById('u-v-remote').srcObject = e.streams[0];
-                        peerConnection.onicecandidate = (e) => {
-                            if(e.candidate) push(ref(db, `titanium/v12/calls/${data.from}/ice`), e.candidate.toJSON());
+                        document.getElementById('u-local-stream').srcObject = s;
+                        document.getElementById('u-call-ui').style.display = 'flex';
+                        uRTCPeer.ontrack = (e) => document.getElementById('u-remote-stream').srcObject = e.streams[0];
+                        uRTCPeer.onicecandidate = (e) => {
+                            if(e.candidate) push(ref(db, `v15/calls/${d.from}/ice`), e.candidate.toJSON());
                         };
 
-                        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-                        const answer = await peerConnection.createAnswer();
-                        await peerConnection.setLocalDescription(answer);
-                        
-                        set(ref(db, `titanium/v12/calls/${data.from}/answer`), answer);
-                        
-                        onValue(ref(db, `titanium/v12/calls/${currentUser.uid}/ice`), (iceSnap) => {
-                            iceSnap.forEach(child => {
-                                peerConnection.addIceCandidate(new RTCIceCandidate(child.val()));
-                            });
+                        await uRTCPeer.setRemoteDescription(new RTCSessionDescription(d.off));
+                        const ans = await uRTCPeer.createAnswer();
+                        await uRTCPeer.setLocalDescription(ans);
+                        set(ref(db, `v15/calls/${d.from}/ans`), ans);
+
+                        onValue(ref(db, `v15/calls/${uGlobalUser.uid}/ice`), sn => {
+                            sn.forEach(c => uRTCPeer.addIceCandidate(new RTCIceCandidate(c.val())));
                         });
                     } else {
-                        remove(ref(db, `titanium/v12/calls/${currentUser.uid}`));
+                        remove(ref(db, `v15/calls/${uGlobalUser.uid}`));
                     }
                 }
             });
         }
 
-        // --- ВСПОМОГАТЕЛЬНЫЙ UI (БЛОК 6) ---
-        window.uEndCall = () => location.reload();
-        window.uCloseChat = () => document.getElementById('u-scr-chat').classList.remove('u-screen-active');
-        window.uShowSettings = () => document.getElementById('u-scr-settings').classList.add('u-screen-active');
-        window.uCloseSettings = () => document.getElementById('u-scr-settings').classList.remove('u-screen-active');
-        window.uToggleStickers = () => {
-            const p = document.getElementById('u-stickers');
-            p.style.display = p.style.display === 'grid' ? 'none' : 'grid';
+        // --- БЛОК 6: ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+        window.uHangup = () => location.reload();
+        window.uBackToList = () => document.getElementById('u-scr-chat').classList.remove('u-screen-active');
+        window.uLogout = () => signOut(auth).then(() => location.reload());
+        window.uCheckInput = () => {
+            const has = document.getElementById('u-msg-input').innerText.trim().length > 0;
+            document.getElementById('u-send-btn').classList.toggle('hidden', !has);
+            document.getElementById('u-mic-btn').classList.toggle('hidden', has);
         };
-        window.uUpdateUI = () => {
-            const hasText = document.getElementById('u-msg-input').innerText.trim().length > 0;
-            document.getElementById('u-btn-voice').classList.toggle('hidden', hasText);
-            document.getElementById('u-btn-send').classList.toggle('hidden', !hasText);
-        };
-        window.uSendMedia = (type, url) => uSubmitToFirebase(type, url);
     </script>
 </body>
 </html>
