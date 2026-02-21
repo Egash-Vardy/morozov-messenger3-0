@@ -3,163 +3,355 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Morozov Ultra v13.0 | TITAN INFRASTRUCTURE</title>
+    <title>Morozov Ultra v13.5 | TITAN FULL-CORE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     
     <style>
+        /* --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ЦВЕТА --- */
         :root {
-            --bg: #010204; --surf: #0d1117; --brd: #30363d; --txt: #c9d1d9;
-            --acc: #2f81f7; --acc-gl: rgba(47, 129, 247, 0.4); --red: #f85149;
-            --green: #3fb950; --gold: #d29922; --cyan: #39ff14;
+            --u-bg: #010204;
+            --u-surf: #0d1117;
+            --u-border: #30363d;
+            --u-text: #c9d1d9;
+            --u-accent: #2f81f7;
+            --u-accent-glow: rgba(47, 129, 247, 0.4);
+            --u-red: #f85149;
+            --u-green: #3fb950;
+            --u-gold: #d29922;
         }
 
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--txt); font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; height: 100vh; }
-
-        /* --- SCREENS & TRANSITIONS --- */
-        .scr { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1); z-index: 10; transform-origin: center; }
-        .scr-h { transform: scale(1.1) translateY(20px); opacity: 0; pointer-events: none; visibility: hidden; }
-        .scr-a { transform: scale(1) translateY(0); opacity: 1; z-index: 50; pointer-events: auto; visibility: visible; }
-
-        /* --- TITAN UI COMPONENTS --- */
-        .u-card { background: var(--surf); border: 1px solid var(--brd); border-radius: 28px; transition: 0.4s; position: relative; overflow: hidden; }
-        .u-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03)); pointer-events: none; }
+        /* --- БАЗОВЫЕ СТИЛИ --- */
+        * { 
+            box-sizing: border-box; 
+            outline: none; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none;
+        }
         
-        .u-input { width: 100%; padding: 20px; background: #010409; border: 1px solid var(--brd); border-radius: 22px; color: white; transition: 0.3s; font-size: 16px; font-family: 'Inter'; }
-        .u-input:focus { border-color: var(--acc); box-shadow: 0 0 25px var(--acc-gl); }
+        body, html { 
+            height: 100%; width: 100%; margin: 0; padding: 0; 
+            background: var(--u-bg); color: var(--u-text); 
+            font-family: 'Inter', sans-serif; overflow: hidden;
+        }
 
-        .u-btn { background: var(--acc); color: white; border-radius: 22px; font-weight: 900; padding: 20px; transition: 0.3s; box-shadow: 0 15px 35px rgba(47, 129, 247, 0.2); border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-        .u-btn:active { transform: scale(0.94); filter: brightness(1.2); }
+        /* --- СИСТЕМА ЭКРАНОВ (SCREENS) --- */
+        .u-screen {
+            position: fixed; inset: 0; background: var(--u-bg); z-index: 10;
+            display: flex; flex-direction: column; 
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+            transform-origin: center;
+        }
+        .u-screen-hidden { 
+            transform: scale(1.1) translateY(30px); 
+            opacity: 0; 
+            pointer-events: none; 
+            visibility: hidden; 
+        }
+        .u-screen-active { 
+            transform: scale(1) translateY(0); 
+            opacity: 1; 
+            z-index: 50; 
+            pointer-events: auto; 
+            visibility: visible; 
+        }
 
-        /* --- ADVANCED MESSAGING --- */
-        .msg-list { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 10px; background: radial-gradient(circle at top, #0d1117 0%, #010204 100%); }
-        .bub { max-width: 85%; padding: 15px 20px; border-radius: 24px; font-size: 14.5px; position: relative; animation: msgSlide 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); line-height: 1.6; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        @keyframes msgSlide { from { opacity: 0; transform: translateX(20px) scale(0.9); } }
-        .bub-m { align-self: flex-end; background: linear-gradient(135deg, #238636, #2ea043); color: white; border-bottom-right-radius: 4px; }
-        .bub-h { align-self: flex-start; background: var(--surf); border: 1px solid var(--brd); border-bottom-left-radius: 4px; }
-
-        /* --- VIDEO CALL "TITAN ENGINE" --- */
-        .call-scr { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
-        #v-remote { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) brightness(1.1); }
-        #v-local { position: absolute; top: 40px; right: 25px; width: 120px; height: 180px; border-radius: 24px; border: 2px solid rgba(255,255,255,0.3); object-fit: cover; z-index: 10001; background: #111; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        /* --- ТИТАН UI ЭЛЕМЕНТЫ --- */
+        .titan-card {
+            background: var(--u-surf);
+            border: 1px solid var(--u-border);
+            border-radius: 32px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
         
-        .v-controls { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 10002; }
-        .v-btn { width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: 0.3s; backdrop-blur: 10px; }
-        .v-btn-red { background: var(--red); color: white; box-shadow: 0 0 30px rgba(248, 81, 73, 0.5); }
-        .v-btn-gray { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .titan-input {
+            width: 100%;
+            padding: 20px;
+            background: #010409;
+            border: 1px solid var(--u-border);
+            border-radius: 24px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .titan-input:focus {
+            border-color: var(--u-accent);
+            box-shadow: 0 0 25px var(--u-accent-glow);
+            transform: translateY(-2px);
+        }
 
-        /* --- UTILS --- */
-        .glitch { animation: glitch 1s linear infinite; }
-        @keyframes glitch { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
-        .toast-container { position: fixed; top: 30px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 100000; pointer-events: none; }
-        .toast { background: var(--surf); border: 1px solid var(--acc); color: white; padding: 14px 28px; border-radius: 50px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); animation: toastIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
-        @keyframes toastIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .titan-btn {
+            background: var(--u-accent);
+            color: white;
+            border-radius: 24px;
+            font-weight: 900;
+            padding: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.3s;
+            box-shadow: 0 15px 35px rgba(47, 129, 247, 0.25);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .titan-btn:active { transform: scale(0.94); filter: brightness(1.1); }
+        .titan-btn-red { background: var(--u-red); box-shadow: 0 10px 25px rgba(248, 81, 73, 0.3); }
+
+        /* --- МЕССЕДЖИНГ --- */
+        .chat-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: radial-gradient(circle at center, #0d1117 0%, #010204 100%);
+        }
+        
+        .bubble {
+            max-width: 85%;
+            padding: 16px 20px;
+            border-radius: 26px;
+            font-size: 15px;
+            line-height: 1.6;
+            position: relative;
+            animation: bubbleAppear 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        @keyframes bubbleAppear {
+            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .bubble-me {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .bubble-he {
+            align-self: flex-start;
+            background: var(--u-surf);
+            border: 1px solid var(--u-border);
+            color: var(--u-text);
+            border-bottom-left-radius: 4px;
+        }
+
+        /* --- ВИДЕОСВЯЗЬ (TITAN CALL ENGINE) --- */
+        .call-layer {
+            position: fixed; inset: 0;
+            background: #000;
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+        }
+        #v-remote {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #v-local {
+            position: absolute;
+            top: 50px;
+            right: 25px;
+            width: 120px;
+            height: 180px;
+            border-radius: 24px;
+            border: 2px solid rgba(255,255,255,0.2);
+            object-fit: cover;
+            z-index: 10001;
+            background: #111;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .call-controls {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 24px;
+            z-index: 10002;
+        }
+        .ctrl-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: white;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .ctrl-btn-hangup { background: var(--u-red); box-shadow: 0 0 30px rgba(248, 81, 73, 0.5); border: none; }
+
+        /* --- ВСПОМОГАТЕЛЬНЫЕ ЭЛЕМЕНТЫ --- */
+        .toast-box {
+            position: fixed; top: 30px; left: 0; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            pointer-events: none; z-index: 100000;
+        }
+        .u-toast {
+            background: var(--u-surf);
+            border: 1px solid var(--u-accent);
+            padding: 14px 28px;
+            border-radius: 50px;
+            color: white;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: toastSlide 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+        @keyframes toastSlide { from { transform: translateY(-40px); opacity: 0; } }
+
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .online { background: var(--u-green); box-shadow: 0 0 10px var(--u-green); }
+        .offline { background: #484f58; }
+
+        /* Анимация пульсации для звонка */
+        .pulse { animation: pulseAnim 2s infinite; }
+        @keyframes pulseAnim { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="toast-container" id="toast-root"></div>
+    <div id="toast-root" class="toast-box"></div>
 
-    <div id="scr-gate" class="scr scr-a justify-center items-center px-10">
+    <div id="scr-gate" class="u-screen u-screen-active justify-center items-center px-10">
         <div class="w-full max-w-md">
-            <div class="text-center mb-14">
-                <div class="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[35%] mx-auto flex items-center justify-center shadow-[0_0_50px_rgba(47,129,247,0.4)] mb-8 rotate-12">
-                    <i class="fas fa-shield-halved text-4xl text-white"></i>
+            <div class="text-center mb-16">
+                <div class="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[35%] mx-auto flex items-center justify-center shadow-2xl mb-8 rotate-12">
+                    <i class="fas fa-atom text-4xl text-white"></i>
                 </div>
                 <h1 class="text-6xl font-black italic tracking-tighter text-white">ULTRA <span class="text-blue-500">TITAN</span></h1>
-                <div class="flex items-center justify-center gap-2 mt-4">
-                    <span class="h-px w-8 bg-blue-500/30"></span>
-                    <p class="text-[9px] font-mono opacity-40 tracking-[0.6em] uppercase">Security Level: Maximum</p>
-                    <span class="h-px w-8 bg-blue-500/30"></span>
-                </div>
+                <p class="text-[9px] font-mono opacity-40 mt-6 tracking-[0.6em] uppercase">Hyper-Secure Infrastructure v13.5</p>
             </div>
 
-            <div class="space-y-5 bg-[var(--surf)] p-10 rounded-[50px] border border-[var(--brd)] shadow-2xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50"></div>
-                <input id="g-email" type="email" placeholder="Access Email" class="u-input">
-                <input id="g-pass" type="password" placeholder="Cryptographic Key" class="u-input">
-                <div id="g-ext" class="hidden animate-slideDown"><input id="g-nick" type="text" placeholder="Identity Handle" class="u-input"></div>
-                
-                <button onclick="handleAuth()" class="u-btn w-full mt-6 flex items-center justify-center gap-3">
-                    <i class="fas fa-key"></i> <span id="g-btn-txt">Initialize Node</span>
-                </button>
-                <button onclick="toggleAuth()" id="g-tog" class="w-full text-[10px] font-black opacity-30 uppercase tracking-[0.4em] pt-8 hover:opacity-100 transition-all">Request New Node Access</button>
+            <div class="titan-card">
+                <div class="space-y-5">
+                    <input id="auth-email" type="email" placeholder="Identity Email" class="titan-input">
+                    <input id="auth-pass" type="password" placeholder="Cryptographic Key" class="titan-input">
+                    <div id="reg-fields" class="hidden animate-fadeIn">
+                        <input id="auth-nick" type="text" placeholder="Display Handle" class="titan-input">
+                    </div>
+
+                    <button id="auth-main-btn" onclick="handleAuth()" class="titan-btn w-full mt-4">
+                        <i class="fas fa-satellite"></i> <span>Initialize Link</span>
+                    </button>
+                    
+                    <button onclick="toggleRegMode()" id="auth-switch" class="w-full text-[10px] font-black opacity-30 uppercase tracking-[0.4em] pt-8 hover:opacity-100 transition-all text-center">
+                        Request New Access Node
+                    </button>
+                </div>
             </div>
-            <p id="g-err" class="text-red-500 text-[10px] font-black text-center mt-10 uppercase tracking-[0.3em] h-4"></p>
+            <div id="auth-log" class="text-red-500 text-[10px] font-black text-center mt-10 uppercase tracking-[0.3em] h-4"></div>
         </div>
     </div>
 
-    <div id="scr-main" class="scr scr-h">
-        <header class="h-24 px-8 flex items-center justify-between border-b border-[var(--brd)] bg-[var(--surf)]/90 backdrop-blur-2xl z-50">
-            <button onclick="nav('sett')" class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition">
-                <i class="fas fa-fingerprint opacity-50 text-xl"></i>
+    <div id="scr-main" class="u-screen u-screen-hidden">
+        <header class="h-24 px-8 flex items-center justify-between border-b border-[var(--u-border)] bg-[var(--u-surf)]/80 backdrop-blur-2xl z-50">
+            <button onclick="nav('settings')" class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fas fa-user-shield opacity-50"></i>
             </button>
             <div class="flex flex-col items-center">
                 <span class="font-black italic text-2xl tracking-tighter text-white">ULTRA <span class="text-blue-500">TITAN</span></span>
-                <span class="text-[8px] font-black text-blue-400 uppercase tracking-[0.3em] animate-pulse">Mesh Synchronized</span>
+                <span class="text-[8px] font-black text-blue-400 uppercase tracking-widest mt-1">Status: Network Synchronized</span>
             </div>
-            <button onclick="addAgent()" class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-[0_10px_25px_rgba(47,129,247,0.4)] text-white">
-                <i class="fas fa-plus-circle text-xl"></i>
+            <button onclick="addAgent()" class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-xl">
+                <i class="fas fa-user-plus text-xl"></i>
             </button>
         </header>
 
-        <div class="flex-1 overflow-y-auto px-8 py-10 space-y-6">
-            <div class="flex items-center gap-6"><p class="text-[10px] font-black opacity-20 uppercase tracking-[0.5em]">Active Nodes</p><div class="h-px flex-1 bg-[var(--brd)]"></div></div>
-            <div id="agent-list" class="space-y-4"></div>
-            <div id="agent-empty" class="hidden flex flex-col items-center justify-center py-40 opacity-10">
-                <i class="fas fa-satellite-dish text-8xl mb-6"></i>
-                <p class="font-black uppercase text-sm tracking-[0.5em]">No Signal Detected</p>
+        <div class="flex-1 overflow-y-auto px-8 py-10">
+            <div class="flex items-center gap-6 mb-10">
+                <p class="text-[10px] font-black opacity-20 uppercase tracking-[0.5em]">Active Communication Nodes</p>
+                <div class="h-px flex-1 bg-[var(--u-border)]"></div>
+            </div>
+            
+            <div id="hub-list" class="space-y-4"></div>
+            <div id="hub-empty" class="hidden flex flex-col items-center justify-center py-40 opacity-10">
+                <i class="fas fa-broadcast-tower text-8xl mb-8"></i>
+                <p class="font-black uppercase text-sm tracking-[0.5em]">Scanning for Signals...</p>
             </div>
         </div>
     </div>
 
-    <div id="scr-chat" class="scr scr-h">
-        <header class="h-24 px-8 flex items-center justify-between border-b border-[var(--brd)] bg-[var(--surf)] z-50">
+    <div id="scr-chat" class="u-screen u-screen-hidden">
+        <header class="h-24 px-8 flex items-center justify-between border-b border-[var(--u-border)] bg-[var(--u-surf)] z-50">
             <div class="flex items-center gap-5">
                 <button onclick="nav('main')" class="text-2xl opacity-30 hover:opacity-100 transition"><i class="fas fa-arrow-left-long"></i></button>
-                <div id="c-av" class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center font-black text-2xl shadow-xl">?</div>
+                <div id="ch-av" class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center font-black text-2xl">?</div>
                 <div>
-                    <div id="c-name" class="font-black text-lg text-white tracking-tight">...</div>
+                    <div id="ch-name" class="font-black text-lg text-white">...</div>
                     <div class="flex items-center gap-2 mt-1">
-                        <div id="c-dot" class="w-2 h-2 rounded-full bg-gray-600"></div>
-                        <span id="c-stat-txt" class="text-[9px] font-black opacity-40 uppercase tracking-widest">Encrypted Link</span>
+                        <div id="ch-dot" class="status-dot offline"></div>
+                        <span id="ch-stat-txt" class="text-[9px] font-black opacity-40 uppercase tracking-[0.2em]">Encrypted</span>
                     </div>
                 </div>
             </div>
-            <div class="flex gap-4">
-                <button onclick="startCall(true)" class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-blue-500 hover:bg-blue-500 hover:text-white transition"><i class="fas fa-video text-xl"></i></button>
-            </div>
+            <button onclick="initializeCall()" class="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-2xl hover:bg-blue-500 hover:text-white transition-all shadow-lg">
+                <i class="fas fa-video"></i>
+            </button>
         </header>
 
-        <div id="c-feed" class="msg-list"></div>
+        <div id="msg-feed" class="chat-feed"></div>
 
-        <div class="p-6 bg-[var(--surf)] border-t border-[var(--brd)] pb-12">
+        <div class="p-6 bg-[var(--u-surf)] border-t border-[var(--u-border)] pb-12">
             <div class="flex items-end gap-4 max-w-5xl mx-auto">
-                <div id="c-input" contenteditable="true" class="flex-1 bg-[var(--bg)] p-5 rounded-[25px] max-h-40 overflow-y-auto text-sm border border-[var(--brd)] focus:border-blue-500 transition-all outline-none" placeholder="Enter transmission data..."></div>
-                <button onclick="sendMsg()" class="w-16 h-16 bg-blue-600 rounded-[22px] flex items-center justify-center shadow-2xl active:scale-90 transition-all text-white">
+                <div id="msg-input" contenteditable="true" class="flex-1 bg-[var(--u-bg)] p-5 rounded-[28px] max-h-40 overflow-y-auto text-sm border border-[var(--u-border)] outline-none focus:border-blue-500 transition-all" placeholder="Message..."></div>
+                <button onclick="transmitMessage()" class="w-16 h-16 bg-blue-600 rounded-[24px] flex items-center justify-center shadow-2xl active:scale-90 transition-all text-white">
                     <i class="fas fa-paper-plane text-xl"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="call-scr" class="call-scr">
+    <div id="scr-settings" class="u-screen u-screen-hidden">
+        <header class="h-24 px-8 flex items-center gap-8 border-b border-[var(--u-border)]">
+            <button onclick="nav('main')"><i class="fas fa-arrow-left opacity-30"></i></button>
+            <span class="font-black text-xs uppercase tracking-[0.4em]">Node Configuration</span>
+        </header>
+        <div class="flex-1 overflow-y-auto p-12 flex flex-col items-center">
+            <div id="st-av" class="w-32 h-32 bg-blue-600 rounded-[40%] flex items-center justify-center text-5xl font-black mb-8 border-4 border-white/10 shadow-2xl">?</div>
+            <h2 id="st-nick" class="text-3xl font-black italic tracking-tighter">...</h2>
+            <p id="st-mail" class="text-[10px] font-mono opacity-20 uppercase tracking-[0.5em] mt-3">...</p>
+            
+            <div class="w-full mt-16 space-y-6">
+                <div class="p-6 titan-card flex justify-between items-center"><span class="font-bold text-xs uppercase tracking-widest">Quantum Encryption</span><div class="w-10 h-5 bg-blue-600 rounded-full"></div></div>
+                <button onclick="terminateSession()" class="w-full p-6 bg-red-500/10 text-red-500 border border-red-500/20 rounded-[30px] font-black text-xs uppercase tracking-widest mt-12">Destroy Session Link</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="call-ui" class="call-layer">
         <video id="v-remote" autoplay playsinline></video>
         <video id="v-local" autoplay muted playsinline></video>
         
-        <div class="absolute top-16 left-0 w-full text-center z-[10003]">
-            <div id="call-av" class="w-20 h-20 bg-blue-600 rounded-[35%] mx-auto flex items-center justify-center text-3xl font-black mb-4 border-2 border-white/20 shadow-2xl">?</div>
-            <h2 id="call-p-name" class="text-3xl font-black text-white italic tracking-tighter">...</h2>
-            <div class="text-[10px] font-mono text-blue-400 mt-4 tracking-[0.5em] glitch">TITAN P2P ENCRYPTION ACTIVE</div>
+        <div class="absolute top-20 left-0 w-full text-center z-[10003]">
+            <div id="call-p-av" class="w-24 h-24 bg-blue-600 rounded-[40%] mx-auto flex items-center justify-center text-4xl font-black mb-6 border-4 border-white/10 shadow-2xl">?</div>
+            <h2 id="call-p-name" class="text-4xl font-black text-white italic tracking-tighter">...</h2>
+            <div class="text-[10px] font-mono text-blue-400 mt-6 tracking-[0.6em] pulse">TITAN P2P ENCRYPTION ACTIVE</div>
         </div>
 
-        <div class="v-controls">
-            <button onclick="toggleMic()" id="m-btn" class="v-btn v-btn-gray"><i class="fas fa-microphone"></i></button>
-            <button onclick="endCall()" class="v-btn v-btn-red"><i class="fas fa-phone-slash"></i></button>
-            <button onclick="toggleCam()" id="v-btn" class="v-btn v-btn-gray"><i class="fas fa-camera-rotate"></i></button>
+        <div class="call-controls">
+            <button onclick="toggleAudio()" id="mic-btn" class="ctrl-btn"><i class="fas fa-microphone"></i></button>
+            <button onclick="closeConnection()" class="ctrl-btn ctrl-btn-hangup"><i class="fas fa-phone-slash"></i></button>
+            <button onclick="toggleVideo()" id="cam-btn" class="ctrl-btn"><i class="fas fa-camera"></i></button>
         </div>
     </div>
 
@@ -168,7 +360,8 @@
         import { getDatabase, ref, push, set, onValue, update, get, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const config = {
+        // CONFIGURATION
+        const fbConfig = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
@@ -176,137 +369,167 @@
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        const app = initializeApp(config);
+        const app = initializeApp(fbConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        let user = null, pNode = null, room = null, isReg = false;
-        let peer = null, localStream = null;
+        // GLOBAL STATE
+        let currentUser = null, partner = null, activeRoom = null, isRegMode = false;
+        let rtcPeer = null, streamLocal = null;
 
-        // --- CORE NAVIGATION ---
-        window.nav = (id) => {
-            ['gate','main','chat'].forEach(s => {
+        // --- NAVIGATION ENGINE ---
+        window.nav = (target) => {
+            const screens = ['gate', 'main', 'chat', 'settings'];
+            screens.forEach(s => {
                 const el = document.getElementById(`scr-${s}`);
-                if(s === id) el.classList.replace('scr-h', 'scr-a');
-                else el.classList.replace('scr-a', 'scr-h');
+                if(s === target) el.classList.replace('u-screen-hidden', 'u-screen-active');
+                else el.classList.replace('u-screen-active', 'u-screen-hidden');
             });
+            
+            if(target === 'settings' && auth.currentUser) {
+                const u = auth.currentUser;
+                document.getElementById('st-nick').innerText = u.displayName || "Agent";
+                document.getElementById('st-mail').innerText = u.email;
+                document.getElementById('st-av').innerText = (u.displayName ? u.displayName[0] : "A").toUpperCase();
+            }
         };
 
-        window.toast = (m) => {
+        window.showToast = (msg) => {
             const root = document.getElementById('toast-root');
-            const t = document.createElement('div'); t.className = 'toast'; t.innerText = m;
-            root.appendChild(t);
-            setTimeout(() => t.remove(), 4000);
+            const toast = document.createElement('div');
+            toast.className = 'u-toast';
+            toast.innerText = msg;
+            root.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
         };
 
-        // --- AUTH & TITAN BRIDGE ---
-        window.toggleAuth = () => {
-            isReg = !isReg;
-            document.getElementById('g-ext').classList.toggle('hidden', !isReg);
-            document.getElementById('g-btn-txt').innerText = isReg ? "Generate Node" : "Initialize Node";
-            document.getElementById('g-tog').innerText = isReg ? "Return to Login" : "Request New Node Access";
+        // --- AUTHENTICATION & SYNC BRIDGE ---
+        window.toggleRegMode = () => {
+            isRegMode = !isRegMode;
+            document.getElementById('reg-fields').classList.toggle('hidden', !isRegMode);
+            document.getElementById('auth-main-btn').querySelector('span').innerText = isRegMode ? "Create Identity" : "Initialize Link";
+            document.getElementById('auth-switch').innerText = isRegMode ? "Already verified? Connect Node" : "Request New Access Node";
         };
 
         window.handleAuth = async () => {
-            const e = document.getElementById('g-email').value.trim();
-            const p = document.getElementById('g-pass').value.trim();
-            const n = document.getElementById('g-nick').value.trim();
-            const log = document.getElementById('g-err');
+            const email = document.getElementById('auth-email').value.trim();
+            const pass = document.getElementById('auth-pass').value.trim();
+            const nick = document.getElementById('auth-nick').value.trim();
+            const log = document.getElementById('auth-log');
 
-            if(!e || p.length < 6) { log.innerText = "SECURITY BREACH: INVALID DATA"; return; }
+            if(!email || pass.length < 6) { 
+                log.innerText = "SECURITY ERROR: INVALID CREDENTIALS"; 
+                return; 
+            }
+            
             log.innerText = "ESTABLISHING SECURE TUNNEL...";
 
             try {
-                if(isReg) {
-                    const res = await createUserWithEmailAndPassword(auth, e, p);
-                    await updateProfile(res.user, { displayName: n || "Agent" });
-                    await set(ref(db, `v13/users/${res.user.uid}`), { name: n || "Agent", email: e, uid: res.user.uid, ts: Date.now() });
+                if(isRegMode) {
+                    const res = await createUserWithEmailAndPassword(auth, email, pass);
+                    await updateProfile(res.user, { displayName: nick || "Agent" });
+                    // Store in global v13 directory
+                    await set(ref(db, `v13/users/${res.user.uid}`), { name: nick || "Agent", email, uid: res.user.uid, ts: Date.now() });
                 } else {
-                    const res = await signInWithEmailAndPassword(auth, e, p);
-                    await update(ref(db, `v13/users/${res.user.uid}`), { lastLogin: Date.now(), name: res.user.displayName });
+                    const res = await signInWithEmailAndPassword(auth, email, pass);
+                    // Force update/migration to v13 branch
+                    await update(ref(db, `v13/users/${res.user.uid}`), { name: res.user.displayName, email: res.user.email, lastSeen: Date.now() });
                 }
-            } catch(e) { log.innerText = "PROTOCOL ERROR: " + e.code.toUpperCase(); }
+            } catch(e) { 
+                log.innerText = "PROTOCOL FAILED: " + e.code.toUpperCase(); 
+            }
         };
 
         onAuthStateChanged(auth, u => {
-            if(u) { 
-                user = u; nav('main'); initTitan();
+            if(u) {
+                currentUser = u;
+                nav('main');
+                initTitanNetwork();
+                // Presence System
                 const statusRef = ref(db, `v13/status/${u.uid}`);
                 set(statusRef, "online");
                 onDisconnect(statusRef).set("offline");
-                toast("Identity Verified: " + u.displayName);
-            } else { nav('gate'); }
+                showToast("Identity Verified: " + u.displayName);
+            } else {
+                nav('gate');
+            }
         });
 
-        // --- TITAN HUB LOGIC ---
-        function initTitan() {
-            onValue(ref(db, `v13/social/${user.uid}`), snap => {
-                const list = document.getElementById('agent-list');
-                const empty = document.getElementById('agent-empty');
+        // --- SOCIAL HUB & SIGNALING ---
+        function initTitanNetwork() {
+            onValue(ref(db, `v13/social/${currentUser.uid}`), snap => {
+                const list = document.getElementById('hub-list');
+                const empty = document.getElementById('hub-empty');
                 list.innerHTML = "";
-                let has = false;
-                snap.forEach(f => {
-                    has = true;
-                    const d = f.val();
+                let hasNodes = false;
+                
+                snap.forEach(node => {
+                    hasNodes = true;
+                    const d = node.val();
                     const el = document.createElement('div');
-                    el.className = "u-card p-6 flex items-center justify-between cursor-pointer group";
+                    el.className = "titan-card flex items-center justify-between cursor-pointer group hover:bg-[#161b22] transition-all";
                     el.innerHTML = `
                         <div class="flex items-center gap-5">
                             <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg group-hover:scale-110 transition-transform">${d.name[0]}</div>
                             <div>
-                                <div class="font-black text-white tracking-tight">${d.name}</div>
-                                <div class="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em] mt-1">Titan Mesh Active</div>
+                                <div class="font-black text-white text-lg tracking-tight">${d.name}</div>
+                                <div class="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em] mt-1">Titan Link Active</div>
                             </div>
                         </div>
                         <i class="fas fa-chevron-right opacity-10 group-hover:opacity-100 group-hover:translate-x-2 transition-all"></i>
                     `;
-                    el.onclick = () => openChat(d);
+                    el.onclick = () => openChannel(d);
                     list.appendChild(el);
                 });
-                empty.classList.toggle('hidden', has);
+                empty.classList.toggle('hidden', hasNodes);
             });
-            listenCalls();
+            listenForIncomingSignals();
         }
 
         window.addAgent = async () => {
-            const mail = prompt("Enter Target Node Email:");
-            if(!mail || mail.toLowerCase() === user.email.toLowerCase()) return;
+            const mail = prompt("Target Node Email:");
+            if(!mail || mail.toLowerCase() === currentUser.email.toLowerCase()) return;
             
-            toast("Scanning Global Mesh...");
+            showToast("Searching Global Mesh...");
             const users = await get(ref(db, `v13/users`));
             let found = null;
             users.forEach(u => { if(u.val().email.toLowerCase() === mail.toLowerCase()) found = u.val(); });
 
             if(found) {
-                await update(ref(db, `v13/social/${user.uid}/${found.uid}`), { id: found.uid, name: found.name });
-                await update(ref(db, `v13/social/${found.uid}/${user.uid}`), { id: user.uid, name: user.displayName });
-                toast("Handshake Successful.");
-            } else { toast("Node not found in directory."); }
+                await update(ref(db, `v13/social/${currentUser.uid}/${found.uid}`), { id: found.uid, name: found.name });
+                await update(ref(db, `v13/social/${found.uid}/${currentUser.uid}`), { id: currentUser.uid, name: currentUser.displayName });
+                showToast("Handshake Complete.");
+            } else {
+                showToast("Node not found.");
+            }
         };
 
-        // --- CHAT SYSTEM ---
-        window.openChat = (p) => {
-            pNode = p;
-            room = [user.uid, p.id].sort().join("_SYNC_");
+        // --- CHAT TERMINAL ENGINE ---
+        window.openChannel = (p) => {
+            partner = p;
+            activeRoom = [currentUser.uid, p.id].sort().join("_X_");
             nav('chat');
-            document.getElementById('c-name').innerText = p.name;
-            document.getElementById('c-av').innerText = p.name[0];
+            document.getElementById('ch-name').innerText = p.name;
+            document.getElementById('ch-av').innerText = p.name[0];
 
+            // Status Monitor
             onValue(ref(db, `v13/status/${p.id}`), s => {
                 const isOn = s.val() === "online";
-                document.getElementById('c-dot').className = `w-2.5 h-2.5 rounded-full ${isOn ? 'bg-green-500 shadow-[0_0_10px_#3fb950]' : 'bg-gray-700'}`;
-                document.getElementById('c-stat-txt').innerText = isOn ? "Active Node" : "Node Offline";
-                document.getElementById('c-stat-txt').classList.toggle('text-green-500', isOn);
+                const dot = document.getElementById('ch-dot');
+                dot.className = `status-dot ${isOn ? 'online' : 'offline'}`;
+                document.getElementById('ch-stat-txt').innerText = isOn ? "Node Active" : "Node Offline";
+                document.getElementById('ch-stat-txt').classList.toggle('text-green-500', isOn);
             });
 
-            onValue(ref(db, `v13/rooms/${room}/msgs`), snap => {
-                const feed = document.getElementById('c-feed');
+            // Feed Sync
+            onValue(ref(db, `v13/rooms/${activeRoom}/msgs`), snap => {
+                const feed = document.getElementById('msg-feed');
                 feed.innerHTML = "";
                 snap.forEach(m => {
                     const d = m.val();
-                    const isMe = d.sid === user.uid;
+                    const isMe = d.sid === currentUser.uid;
                     const b = document.createElement('div');
-                    b.className = `bub ${isMe ? 'bub-m' : 'bub-h'}`;
+                    b.className = `bubble ${isMe ? 'bubble-me' : 'bubble-he'}`;
                     b.innerText = d.txt;
                     feed.appendChild(b);
                 });
@@ -314,72 +537,106 @@
             });
         };
 
-        window.sendMsg = () => {
-            const inp = document.getElementById('c-input');
+        window.transmitMessage = () => {
+            const inp = document.getElementById('msg-input');
             const txt = inp.innerText.trim();
             if(!txt) return;
-            push(ref(db, `v13/rooms/${room}/msgs`), { sid: user.uid, txt, ts: Date.now() });
+            push(ref(db, `v13/rooms/${activeRoom}/msgs`), { 
+                sid: currentUser.uid, 
+                txt, 
+                ts: Date.now() 
+            });
             inp.innerText = "";
         };
 
         // --- TITAN MEDIA ENGINE (WEBRTC) ---
-        window.startCall = async (isCaller = true) => {
-            document.getElementById('call-scr').style.display = 'flex';
-            document.getElementById('call-p-name').innerText = pNode.name;
-            document.getElementById('call-av').innerText = pNode.name[0];
+        window.initializeCall = async (isCaller = true) => {
+            document.getElementById('call-ui').style.display = 'flex';
+            document.getElementById('call-p-name').innerText = partner.name;
+            document.getElementById('call-p-av').innerText = partner.name[0];
 
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            document.getElementById('v-local').srcObject = localStream;
+            try {
+                streamLocal = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                document.getElementById('v-local').srcObject = streamLocal;
 
-            peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-            localStream.getTracks().forEach(t => peer.addTrack(t, localStream));
-
-            peer.ontrack = e => document.getElementById('v-remote').srcObject = e.streams[0];
-            peer.onicecandidate = e => e.candidate && push(ref(db, `v13/calls/${pNode.id}/ice`), e.candidate.toJSON());
-
-            if(isCaller) {
-                const offer = await peer.createOffer();
-                await peer.setLocalDescription(offer);
-                await set(ref(db, `v13/calls/${pNode.id}/sig`), { offer, from: user.uid, name: user.displayName });
-                
-                onValue(ref(db, `v13/calls/${pNode.id}/ans`), async snap => {
-                    if(snap.val() && !peer.currentRemoteDescription) await peer.setRemoteDescription(new RTCSessionDescription(snap.val()));
+                rtcPeer = new RTCPeerConnection({ 
+                    iceServers: [{ urls: "stun:stun.l.google.com:19302" }] 
                 });
+
+                streamLocal.getTracks().forEach(track => rtcPeer.addTrack(track, streamLocal));
+
+                rtcPeer.ontrack = (e) => {
+                    document.getElementById('v-remote').srcObject = e.streams[0];
+                };
+
+                rtcPeer.onicecandidate = (e) => {
+                    if(e.candidate) {
+                        push(ref(db, `v13/calls/${partner.id}/ice`), e.candidate.toJSON());
+                    }
+                };
+
+                if(isCaller) {
+                    const offer = await rtcPeer.createOffer();
+                    await rtcPeer.setLocalDescription(offer);
+                    await set(ref(db, `v13/calls/${partner.id}/sig`), { 
+                        offer, 
+                        from: currentUser.uid, 
+                        name: currentUser.displayName 
+                    });
+                    
+                    onValue(ref(db, `v13/calls/${partner.id}/ans`), async snap => {
+                        if(snap.val() && !rtcPeer.currentRemoteDescription) {
+                            await rtcPeer.setRemoteDescription(new RTCSessionDescription(snap.val()));
+                        }
+                    });
+                }
+            } catch(e) {
+                showToast("Media Access Denied");
+                closeConnection();
             }
         };
 
-        function listenCalls() {
-            onValue(ref(db, `v13/calls/${user.uid}/sig`), async snap => {
-                const d = snap.val();
-                if(d && d.offer && !peer) {
-                    if(confirm("INCOMING TITAN LINK FROM: " + d.name)) {
-                        pNode = { id: d.from, name: d.name };
-                        await startCall(false);
-                        await peer.setRemoteDescription(new RTCSessionDescription(d.offer));
-                        const ans = await peer.createAnswer();
-                        await peer.setLocalDescription(ans);
-                        await set(ref(db, `v13/calls/${d.from}/ans`), ans);
-                        onValue(ref(db, `v13/calls/${user.uid}/ice`), s => s.forEach(c => peer.addIceCandidate(new RTCIceCandidate(c.val()))));
-                    } else { await remove(ref(db, `v13/calls/${user.uid}`)); }
+        function listenForIncomingSignals() {
+            onValue(ref(db, `v13/calls/${currentUser.uid}/sig`), async snap => {
+                const data = snap.val();
+                if(data && data.offer && !rtcPeer) {
+                    if(confirm("INCOMING TITAN LINK: " + data.name)) {
+                        partner = { id: data.from, name: data.name };
+                        await initializeCall(false);
+                        await rtcPeer.setRemoteDescription(new RTCSessionDescription(data.offer));
+                        const answer = await rtcPeer.createAnswer();
+                        await rtcPeer.setLocalDescription(answer);
+                        await set(ref(db, `v13/calls/${data.from}/ans`), answer);
+                        
+                        onValue(ref(db, `v13/calls/${currentUser.uid}/ice`), s => {
+                            s.forEach(c => rtcPeer.addIceCandidate(new RTCIceCandidate(c.val())));
+                        });
+                    } else {
+                        await remove(ref(db, `v13/calls/${currentUser.uid}`));
+                    }
                 }
             });
         }
 
-        window.endCall = () => location.reload();
-
-        window.toggleMic = () => {
-            const t = localStream.getAudioTracks()[0];
-            t.enabled = !t.enabled;
-            document.getElementById('m-btn').classList.toggle('bg-red-500', !t.enabled);
-            toast(t.enabled ? "Microphone Active" : "Microphone Muted");
+        window.toggleAudio = () => {
+            const track = streamLocal.getAudioTracks()[0];
+            track.enabled = !track.enabled;
+            document.getElementById('mic-btn').classList.toggle('titan-btn-red', !track.enabled);
+            showToast(track.enabled ? "Mic Active" : "Mic Muted");
         };
 
-        window.toggleCam = () => {
-            const t = localStream.getVideoTracks()[0];
-            t.enabled = !t.enabled;
-            document.getElementById('v-btn').classList.toggle('bg-red-500', !t.enabled);
-            toast(t.enabled ? "Camera Active" : "Camera Muted");
+        window.toggleVideo = () => {
+            const track = streamLocal.getVideoTracks()[0];
+            track.enabled = !track.enabled;
+            document.getElementById('cam-btn').classList.toggle('titan-btn-red', !track.enabled);
+            showToast(track.enabled ? "Cam Active" : "Cam Off");
         };
+
+        window.closeConnection = () => {
+            location.reload(); // Самый надежный способ очистить WebRTC сессию
+        };
+
+        window.terminateSession = () => signOut(auth).then(() => location.reload());
     </script>
 </body>
 </html>
