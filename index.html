@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <title>Morozov Ultra</title>
+    <title>Morozov Ultra Pro</title>
     <style>
-        /* Базовые стили */
-        html, body { height: 100%; margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; transition: background 0.3s; }
+        :root { --blue: #3390ec; }
+        html, body { height: 100%; margin: 0; overflow: hidden; font-family: 'Segoe UI', Roboto, sans-serif; transition: background 0.3s; }
         .hidden { display: none !important; }
-        
-        /* Светлая тема (по умолчанию) */
+
+        /* СВЕТЛАЯ ТЕМА */
         body.light-theme { background: #f0f2f5; color: #000; }
         .light-theme .header { background: #517da2; color: white; }
         .light-theme .side-menu { background: white; color: #333; }
         .light-theme #chat-window { background: #e5ddd5; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
         .light-theme .msg-mine { background: #effdde; color: #000; }
         .light-theme .msg-their { background: #ffffff; color: #000; }
-        .light-theme input { background: #f0f2f5; color: black; border: 1px solid #ddd; }
+        .light-theme input { background: #ffffff; color: #000; border: 1px solid #ccc; }
 
         /* ТЕМНАЯ ТЕМА */
         body.dark-theme { background: #0f1721; color: #fff; }
@@ -28,23 +28,52 @@
         .dark-theme .msg-mine { background: #2b5278; color: white; }
         .dark-theme .msg-their { background: #182533; color: white; }
         .dark-theme input { background: #242f3d !important; color: white !important; border: 1px solid #384657 !important; }
-        .dark-theme .friend-item { border-bottom: 1px solid #2b3948; }
 
-        /* Общие элементы */
-        .msg { max-width: 80%; padding: 10px 14px; border-radius: 15px; margin-bottom: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        /* СТИЛИ СООБЩЕНИЙ */
+        #chat-window { display: flex; flex-direction: column; padding: 10px; gap: 4px; overflow-y: auto; }
+        .msg { max-width: 80%; padding: 8px 12px; border-radius: 16px; position: relative; font-size: 15px; display: flex; flex-direction: column; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+        .msg-mine { align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg-their { align-self: flex-start; border-bottom-left-radius: 4px; }
+        
+        .msg-info { display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 10px; opacity: 0.6; margin-top: 2px; }
+        .read-icon { color: #40a7e3; }
+
+        /* ВИДЕО */
         #v-remote { width: 100%; height: 100%; object-fit: cover; background: #000; }
-        #v-local { position: absolute; top: 20px; right: 20px; width: 100px; height: 150px; border-radius: 12px; border: 2px solid #3390ec; object-fit: cover; z-index: 10; transform: scaleX(-1); }
+        #v-local { position: absolute; top: 20px; right: 20px; width: 90px; height: 130px; border-radius: 10px; border: 2px solid var(--blue); object-fit: cover; z-index: 10; transform: scaleX(-1); }
     </style>
 </head>
-<body class="light-theme"> <audio id="dial-tone" loop src="https://www.soundjay.com/phone/sounds/phone-calling-1.mp3"></audio>
+<body class="light-theme">
 
-    <div id="auth-screen" class="fixed inset-0 z-[9999] bg-[#2b5278] flex items-center justify-center p-6 text-center">
-        <div class="bg-white text-black w-full max-w-sm rounded-3xl p-8 shadow-2xl">
+    <audio id="dial-tone" loop src="https://www.soundjay.com/phone/sounds/phone-calling-1.mp3"></audio>
+
+    <div id="auth-screen" class="fixed inset-0 z-[9999] bg-[#2b5278] flex items-center justify-center p-6">
+        <div class="bg-white p-8 rounded-3xl w-full max-w-sm shadow-2xl text-center">
             <h2 class="text-3xl font-bold mb-6 text-[#2b5278]">Morozov Ultra</h2>
-            <input id="auth-name" type="text" placeholder="Твоё Имя" class="w-full p-4 mb-3 rounded-xl outline-none">
+            <input id="auth-name" type="text" placeholder="Имя" class="w-full p-4 mb-3 rounded-xl outline-none">
             <input id="auth-email" type="email" placeholder="Email" class="w-full p-4 mb-3 rounded-xl outline-none">
             <input id="auth-pass" type="password" placeholder="Пароль" class="w-full p-4 mb-6 rounded-xl outline-none">
             <button onclick="window.handleAuth()" class="w-full bg-[#3390ec] text-white py-4 rounded-xl font-bold">ВОЙТИ</button>
+        </div>
+    </div>
+
+    <div id="side-menu" class="side-menu hidden fixed inset-0 z-[5000] flex flex-col">
+        <div class="p-8 border-b border-gray-500/10">
+            <div class="flex flex-col items-center">
+                <div class="w-20 h-20 bg-[#3390ec] rounded-full flex items-center justify-center text-3xl font-bold mb-3 text-white" id="user-avatar">?</div>
+                <input id="settings-name" type="text" class="bg-transparent text-center font-bold text-xl outline-none border-b border-transparent focus:border-blue-500" value="...">
+                <button onclick="window.saveName()" class="text-[10px] text-blue-500 uppercase mt-2">Сохранить имя</button>
+            </div>
+        </div>
+        <div class="p-4 flex flex-col gap-2">
+            <button onclick="window.toggleTheme()" class="flex items-center gap-4 p-4 hover:bg-black/5 rounded-2xl"><i class="fas fa-moon text-purple-500"></i> Темная тема</button>
+            <button onclick="window.openAddFriendModal()" class="flex items-center gap-4 p-4 hover:bg-black/5 rounded-2xl"><i class="fas fa-user-plus text-blue-500"></i> Добавить друга</button>
+            <div class="p-4 bg-gray-500/5 rounded-2xl mt-4">
+                <p class="text-[10px] opacity-50 uppercase">Мой ID:</p>
+                <p id="my-uid-display" class="text-[11px] font-mono text-blue-500 break-all select-all"></p>
+            </div>
+            <button onclick="window.logout()" class="mt-auto p-4 text-red-500 text-left"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            <button onclick="window.toggleMenu()" class="p-2 opacity-30 text-sm">Закрыть</button>
         </div>
     </div>
 
@@ -54,52 +83,27 @@
             <span class="font-bold">Морозов Ультра</span>
             <div class="w-10"></div>
         </header>
-        <div id="c-list" class="flex-1 overflow-y-auto p-2"></div>
-    </div>
-
-    <div id="side-menu" class="side-menu hidden fixed inset-0 z-[5000] flex flex-col">
-        <div class="p-8 border-b border-gray-700/20">
-            <div class="flex flex-col items-center mb-6">
-                <div class="w-20 h-20 bg-[#3390ec] rounded-full flex items-center justify-center text-3xl font-bold mb-3 text-white" id="user-avatar">?</div>
-                <input id="settings-name" type="text" class="bg-transparent text-center font-bold text-xl border-none outline-none focus:ring-1 ring-blue-500 rounded" value="...">
-                <button onclick="window.saveName()" class="text-[10px] text-blue-500 uppercase mt-1">Сохранить имя</button>
-            </div>
-        </div>
-        
-        <div class="p-4 flex flex-col gap-2">
-            <button onclick="window.toggleTheme()" class="flex items-center gap-4 p-4 hover:bg-black/5 rounded-2xl transition-all">
-                <i class="fas fa-moon text-purple-500"></i> Переключить тему
-            </button>
-            
-            <button onclick="window.openAddFriendModal()" class="flex items-center gap-4 p-4 hover:bg-black/5 rounded-2xl">
-                <i class="fas fa-user-plus text-blue-500"></i> Добавить друга
-            </button>
-            
-            <div class="bg-gray-500/10 p-4 rounded-2xl mt-4">
-                <p class="text-[10px] uppercase opacity-60">Твой ID:</p>
-                <div id="my-uid-display" class="text-[11px] font-mono break-all text-blue-500 select-all">...</div>
-            </div>
-
-            <button onclick="window.logout()" class="flex items-center gap-4 p-4 text-red-500 mt-auto"><i class="fas fa-sign-out-alt"></i> Выйти</button>
-            <button onclick="window.toggleMenu()" class="p-4 text-center text-sm opacity-50">Закрыть</button>
-        </div>
+        <div id="c-list" class="flex-1 overflow-y-auto"></div>
     </div>
 
     <div id="chat-screen" class="hidden fixed inset-0 z-[4000] flex flex-col bg-inherit">
         <header class="header h-16 flex items-center justify-between px-4">
             <div class="flex items-center gap-3">
                 <button onclick="window.closeChat()" class="text-xl p-2"><i class="fas fa-arrow-left"></i></button>
-                <span id="chat-target-name" class="font-bold"></span>
+                <div>
+                    <div id="chat-target-name" class="font-bold leading-none"></div>
+                    <div id="typing-status" class="text-[10px] text-blue-400 h-3"></div>
+                </div>
             </div>
             <div class="flex gap-4">
                 <button onclick="window.startCall('audio')" class="p-2"><i class="fas fa-phone"></i></button>
                 <button onclick="window.startCall('video')" class="p-2"><i class="fas fa-video"></i></button>
             </div>
         </header>
-        <div id="chat-window" class="flex-1 overflow-y-auto p-4 flex flex-col"></div>
-        <div class="p-4 bg-inherit flex items-center gap-3 pb-8">
-            <input id="m-input" type="text" onkeydown="if(event.key==='Enter') window.sendMsg()" class="flex-1 h-12 rounded-full px-6 outline-none" placeholder="Сообщение...">
-            <button onclick="window.sendMsg()" class="w-12 h-12 bg-[#3390ec] text-white rounded-full flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
+        <div id="chat-window" class="flex-1"></div>
+        <div class="p-3 bg-inherit flex items-center gap-3 pb-8">
+            <input id="m-input" type="text" oninput="window.sendTyping()" class="flex-1 h-11 rounded-full px-5 outline-none" placeholder="Сообщение...">
+            <button onclick="window.sendMsg()" class="w-11 h-11 bg-[#3390ec] text-white rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -109,30 +113,30 @@
         <div id="incoming-ui" class="absolute inset-0 bg-[#1c2733] flex flex-col items-center justify-center text-white hidden z-50">
             <h2 class="text-2xl font-bold mb-10">Вам звонят...</h2>
             <div class="flex gap-10">
-                <button onclick="window.acceptCall()" class="w-20 h-20 bg-green-500 rounded-full text-3xl"><i class="fas fa-phone"></i></button>
-                <button onclick="window.endCall()" class="w-20 h-20 bg-red-500 rounded-full text-3xl"><i class="fas fa-times"></i></button>
+                <button onclick="window.acceptCall()" class="w-20 h-20 bg-green-500 rounded-full text-3xl shadow-2xl"><i class="fas fa-phone"></i></button>
+                <button onclick="window.endCall()" class="w-20 h-20 bg-red-500 rounded-full text-3xl shadow-2xl"><i class="fas fa-times"></i></button>
             </div>
         </div>
         <div class="absolute bottom-12 left-0 right-0 flex justify-center z-40">
-            <button onclick="window.endCall()" class="w-16 h-16 bg-red-600 rounded-full text-white text-2xl flex items-center justify-center"><i class="fas fa-phone-slash"></i></button>
+            <button onclick="window.endCall()" class="w-16 h-16 bg-red-600 rounded-full text-white text-2xl flex items-center justify-center shadow-2xl"><i class="fas fa-phone-slash"></i></button>
         </div>
     </div>
 
-    <div id="add-friend-modal" class="hidden fixed inset-0 z-[6000] bg-black/50 flex items-center justify-center p-6 text-black">
-        <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl">
-            <h3 class="text-xl font-bold mb-4">Новый контакт</h3>
+    <div id="add-friend-modal" class="hidden fixed inset-0 z-[6000] bg-black/60 flex items-center justify-center p-6 text-black">
+        <div class="bg-white w-full max-w-xs rounded-3xl p-6">
+            <h3 class="text-xl font-bold mb-4">Добавить друга</h3>
             <input id="friend-name-input" type="text" placeholder="Имя" class="w-full p-3 mb-3 border rounded-xl outline-none">
-            <input id="friend-uid-input" type="text" placeholder="UID" class="w-full p-3 mb-4 border rounded-xl outline-none text-xs">
+            <input id="friend-uid-input" type="text" placeholder="UID друга" class="w-full p-3 mb-4 border rounded-xl outline-none text-xs">
             <div class="flex gap-2">
                 <button onclick="window.closeAddFriendModal()" class="flex-1 py-3 text-gray-400">ОТМЕНА</button>
-                <button onclick="window.confirmAddFriend()" class="flex-1 bg-[#3390ec] text-white py-3 rounded-xl">ДОБАВИТЬ</button>
+                <button onclick="window.confirmAddFriend()" class="flex-1 bg-[#3390ec] text-white py-3 rounded-xl font-bold">ДОБАВИТЬ</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, remove, get, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, remove, get, onChildAdded, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -149,22 +153,19 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        let currentUser = null, activeFriend = null, pc = null, localStream = null;
+        let currentUser = null, activeFriend = null, pc = null, localStream = null, typingTimeout;
 
-        // --- ЛОГИКА ТЕМЫ ---
+        // --- ТЕМА ---
         window.toggleTheme = () => {
             const isDark = document.body.classList.toggle('dark-theme');
             document.body.classList.toggle('light-theme', !isDark);
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
         };
-
-        // Загрузка темы при старте
         if(localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-theme');
-            document.body.classList.remove('light-theme');
+            document.body.classList.add('dark-theme'); document.body.classList.remove('light-theme');
         }
 
-        // AUTH & PROFILE
+        // --- ВХОД ---
         window.handleAuth = async () => {
             const n = document.getElementById('auth-name').value, e = document.getElementById('auth-email').value, p = document.getElementById('auth-pass').value;
             if(!e || !p) return;
@@ -188,15 +189,13 @@
 
         window.saveName = async () => {
             const newName = document.getElementById('settings-name').value;
-            if(newName) { await updateProfile(auth.currentUser, { displayName: newName }); alert("Имя обновлено!"); }
+            if(newName) { await updateProfile(auth.currentUser, { displayName: newName }); alert("Сохранено!"); }
         };
 
-        // UI & FRIENDS
+        // --- ДРУЗЬЯ ---
         window.toggleMenu = () => document.getElementById('side-menu').classList.toggle('hidden');
-        window.closeChat = () => document.getElementById('chat-screen').classList.add('hidden');
         window.openAddFriendModal = () => { document.getElementById('add-friend-modal').classList.remove('hidden'); window.toggleMenu(); };
         window.closeAddFriendModal = () => document.getElementById('add-friend-modal').classList.add('hidden');
-        
         window.confirmAddFriend = () => {
             const n = document.getElementById('friend-name-input').value, id = document.getElementById('friend-uid-input').value;
             if(n && id) {
@@ -212,39 +211,68 @@
             const l = document.getElementById('c-list'); l.innerHTML = "";
             JSON.parse(localStorage.getItem('f_list') || "[]").forEach(f => {
                 const d = document.createElement('div');
-                d.className = "friend-item p-4 flex items-center gap-4 cursor-pointer active:opacity-50";
+                d.className = "p-4 border-b border-gray-500/10 flex items-center gap-4 cursor-pointer active:opacity-50";
                 d.innerHTML = `<div class="w-12 h-12 bg-[#3390ec] rounded-full flex items-center justify-center text-white font-bold">${f.name[0]}</div><b>${f.name}</b>`;
                 d.onclick = () => window.openChat(f);
                 l.appendChild(d);
             });
         };
 
-        // CHAT & CALLS
+        // --- ЧАТ И СООБЩЕНИЯ ---
         window.openChat = (friend) => {
             activeFriend = friend;
             document.getElementById('chat-screen').classList.remove('hidden');
             document.getElementById('chat-target-name').innerText = friend.name;
             const chatWin = document.getElementById('chat-window'), chatID = [currentUser.uid, friend.uid].sort().join("_");
+            
+            // Слушаем сообщения
             onValue(ref(db, 'chats/' + chatID), (s) => {
                 chatWin.innerHTML = "";
                 s.forEach(child => {
                     const m = child.val();
+                    const date = m.timestamp ? new Date(m.timestamp) : new Date();
+                    const time = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
                     const d = document.createElement('div');
                     d.className = `msg ${m.sender === currentUser.uid ? 'msg-mine' : 'msg-their'}`;
-                    d.innerText = m.text;
+                    d.innerHTML = `
+                        <div>${m.text}</div>
+                        <div class="msg-info">
+                            <span>${time}</span>
+                            ${m.sender === currentUser.uid ? `<span class="read-icon"><i class="fas ${m.read ? 'fa-check-double' : 'fa-check'}"></i></span>` : ''}
+                        </div>
+                    `;
+                    
+                    if(m.sender !== currentUser.uid && !m.read) set(ref(db, `chats/${chatID}/${child.key}/read`), true);
                     chatWin.appendChild(d);
                 });
-                chatWin.scrollTop = 99999;
+                chatWin.scrollTop = chatWin.scrollHeight;
+            });
+
+            // Слушаем статус "Печатает"
+            onValue(ref(db, `typing/${friend.uid}/${currentUser.uid}`), (s) => {
+                document.getElementById('typing-status').innerText = s.val() ? "печатает..." : "";
             });
         };
 
         window.sendMsg = () => {
             const i = document.getElementById('m-input'); if(!i.value.trim()) return;
             const chatID = [currentUser.uid, activeFriend.uid].sort().join("_");
-            push(ref(db, 'chats/' + chatID), { sender: currentUser.uid, text: i.value });
+            push(ref(db, 'chats/' + chatID), { sender: currentUser.uid, text: i.value, timestamp: Date.now(), read: false });
             i.value = "";
+            set(ref(db, `typing/${currentUser.uid}/${activeFriend.uid}`), false);
         };
 
+        window.sendTyping = () => {
+            if(!activeFriend) return;
+            set(ref(db, `typing/${currentUser.uid}/${activeFriend.uid}`), true);
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => set(ref(db, `typing/${currentUser.uid}/${activeFriend.uid}`), false), 2000);
+        };
+
+        window.closeChat = () => { document.getElementById('chat-screen').classList.add('hidden'); activeFriend = null; };
+
+        // --- ЗВОНКИ ---
         async function setupMedia(mode) {
             pc = new RTCPeerConnection({ iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] });
             localStream = await navigator.mediaDevices.getUserMedia({ video: mode === 'video', audio: true });
