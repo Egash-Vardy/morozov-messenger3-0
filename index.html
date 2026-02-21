@@ -3,512 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Morozov Ultra v11.5 | Heavy Duty Infrastructure</title>
+    <title>Morozov Ultra v13.0 | TITAN INFRASTRUCTURE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CORE DESIGN SYSTEM --- */
         :root {
-            --u-bg: #05070a;
-            --u-surf: #0d1117;
-            --u-border: #21262d;
-            --u-text: #c9d1d9;
-            --u-accent: #2f81f7;
-            --u-accent-glow: rgba(47, 129, 247, 0.4);
-            --u-me: #238636;
-            --u-he: #161b22;
-            --u-red: #f85149;
-            --u-gold: #d29922;
+            --bg: #010204; --surf: #0d1117; --brd: #30363d; --txt: #c9d1d9;
+            --acc: #2f81f7; --acc-gl: rgba(47, 129, 247, 0.4); --red: #f85149;
+            --green: #3fb950; --gold: #d29922; --cyan: #39ff14;
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body, html { 
-            height: 100%; width: 100%; margin: 0; padding: 0; 
-            background: var(--u-bg); color: var(--u-text); 
-            font-family: 'Inter', sans-serif; overflow: hidden;
-        }
+        body { background: var(--bg); color: var(--txt); font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; height: 100vh; }
 
-        /* --- SCREEN MANAGEMENT --- */
-        .u-screen {
-            position: fixed; inset: 0; background: var(--u-bg); z-index: 10;
-            display: flex; flex-direction: column; 
-            transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s ease;
-        }
-        .u-screen-hidden { transform: scale(1.1); opacity: 0; pointer-events: none; visibility: hidden; }
-        .u-screen-active { transform: scale(1); opacity: 1; z-index: 50; pointer-events: auto; visibility: visible; }
+        /* --- SCREENS & TRANSITIONS --- */
+        .scr { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1); z-index: 10; transform-origin: center; }
+        .scr-h { transform: scale(1.1) translateY(20px); opacity: 0; pointer-events: none; visibility: hidden; }
+        .scr-a { transform: scale(1) translateY(0); opacity: 1; z-index: 50; pointer-events: auto; visibility: visible; }
 
-        /* --- MESSAGING & BUBBLES --- */
-        .u-feed { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 8px; background: #010409; }
-        .u-bubble { 
-            max-width: 85%; padding: 14px 18px; border-radius: 22px; font-size: 14.5px; 
-            line-height: 1.5; position: relative; word-wrap: break-word;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            animation: bubblePop 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.2);
-        }
-        @keyframes bubblePop { from { opacity: 0; transform: scale(0.8) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        /* --- TITAN UI COMPONENTS --- */
+        .u-card { background: var(--surf); border: 1px solid var(--brd); border-radius: 28px; transition: 0.4s; position: relative; overflow: hidden; }
+        .u-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03)); pointer-events: none; }
         
-        .u-bubble-me { align-self: flex-end; background: var(--u-me); color: white; border-bottom-right-radius: 4px; }
-        .u-bubble-he { align-self: flex-start; background: var(--u-he); border: 1px solid var(--u-border); border-bottom-left-radius: 4px; }
+        .u-input { width: 100%; padding: 20px; background: #010409; border: 1px solid var(--brd); border-radius: 22px; color: white; transition: 0.3s; font-size: 16px; font-family: 'Inter'; }
+        .u-input:focus { border-color: var(--acc); box-shadow: 0 0 25px var(--acc-gl); }
 
-        .u-meta { display: flex; align-items: center; justify-content: flex-end; gap: 5px; font-size: 9px; margin-top: 5px; opacity: 0.5; font-family: 'JetBrains Mono', monospace; }
+        .u-btn { background: var(--acc); color: white; border-radius: 22px; font-weight: 900; padding: 20px; transition: 0.3s; box-shadow: 0 15px 35px rgba(47, 129, 247, 0.2); border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .u-btn:active { transform: scale(0.94); filter: brightness(1.2); }
 
-        /* --- AUDIO VISUALIZER --- */
-        .rec-wave { display: flex; align-items: center; gap: 3px; height: 30px; padding: 0 10px; }
-        .wave-bar { width: 3px; background: var(--u-accent); border-radius: 10px; transition: height 0.1s ease; }
+        /* --- ADVANCED MESSAGING --- */
+        .msg-list { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 10px; background: radial-gradient(circle at top, #0d1117 0%, #010204 100%); }
+        .bub { max-width: 85%; padding: 15px 20px; border-radius: 24px; font-size: 14.5px; position: relative; animation: msgSlide 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); line-height: 1.6; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        @keyframes msgSlide { from { opacity: 0; transform: translateX(20px) scale(0.9); } }
+        .bub-m { align-self: flex-end; background: linear-gradient(135deg, #238636, #2ea043); color: white; border-bottom-right-radius: 4px; }
+        .bub-h { align-self: flex-start; background: var(--surf); border: 1px solid var(--brd); border-bottom-left-radius: 4px; }
 
-        /* --- UI COMPONENTS --- */
-        .u-header { height: 85px; padding: 0 24px; background: var(--u-surf); border-bottom: 1px solid var(--u-border); display: flex; align-items: center; justify-content: space-between; z-index: 100; }
-        .u-btn { background: var(--u-accent); color: white; border-radius: 20px; font-weight: 800; display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 8px 20px var(--u-accent-glow); }
-        .u-btn:active { transform: scale(0.92); }
-        .u-input { width: 100%; padding: 18px; background: var(--u-bg); border: 1px solid var(--u-border); border-radius: 22px; color: white; transition: 0.3s; font-size: 14px; }
-        .u-input:focus { border-color: var(--u-accent); box-shadow: 0 0 0 4px var(--u-accent-glow); }
+        /* --- VIDEO CALL "TITAN ENGINE" --- */
+        .call-scr { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
+        #v-remote { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) brightness(1.1); }
+        #v-local { position: absolute; top: 40px; right: 25px; width: 120px; height: 180px; border-radius: 24px; border: 2px solid rgba(255,255,255,0.3); object-fit: cover; z-index: 10001; background: #111; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        
+        .v-controls { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 10002; }
+        .v-btn { width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: 0.3s; backdrop-blur: 10px; }
+        .v-btn-red { background: var(--red); color: white; box-shadow: 0 0 30px rgba(248, 81, 73, 0.5); }
+        .v-btn-gray { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
 
-        /* --- TOAST NOTIFICATIONS --- */
-        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; pointer-events: none; }
-        .u-toast { background: var(--u-surf); border: 1px solid var(--u-border); padding: 12px 24px; border-radius: 50px; color: white; font-size: 12px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: toastIn 0.5s ease both; }
-        @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- VIDEO CALL --- */
-        .v-call-layer { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
-        #v-remote { width: 100%; height: 100%; object-fit: cover; }
-        #v-local { position: absolute; top: 40px; right: 25px; width: 110px; height: 160px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; z-index: 1001; background: #111; }
+        /* --- UTILS --- */
+        .glitch { animation: glitch 1s linear infinite; }
+        @keyframes glitch { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+        .toast-container { position: fixed; top: 30px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 100000; pointer-events: none; }
+        .toast { background: var(--surf); border: 1px solid var(--acc); color: white; padding: 14px 28px; border-radius: 50px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); animation: toastIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
+        @keyframes toastIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="toast-container"></div>
+    <div class="toast-container" id="toast-root"></div>
 
-    <div id="scr-gate" class="u-screen z-[9999] justify-center items-center px-10">
-        <div class="w-full max-w-sm">
-            <div class="text-center mb-12">
-                <div class="w-20 h-20 bg-blue-600 rounded-[30%] mx-auto flex items-center justify-center mb-6 shadow-2xl rotate-12">
-                    <i class="fas fa-bolt-lightning text-3xl text-white"></i>
+    <div id="scr-gate" class="scr scr-a justify-center items-center px-10">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-14">
+                <div class="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[35%] mx-auto flex items-center justify-center shadow-[0_0_50px_rgba(47,129,247,0.4)] mb-8 rotate-12">
+                    <i class="fas fa-shield-halved text-4xl text-white"></i>
                 </div>
-                <h1 class="text-5xl font-black italic tracking-tighter text-white">ULTRA <span class="text-blue-500">X</span></h1>
-                <p class="text-[9px] font-mono opacity-20 mt-4 tracking-[0.5em] uppercase">Enterprise Infrastructure v11.5</p>
-            </div>
-
-            <div class="bg-[var(--u-surf)] p-8 rounded-[45px] border border-[var(--u-border)] shadow-2xl relative overflow-hidden">
-                <div class="space-y-4">
-                    <input id="gate-email" type="email" placeholder="Access Email" class="u-input">
-                    <input id="gate-pass" type="password" placeholder="Encryption Key" class="u-input">
-                    
-                    <div id="reg-ext" class="hidden space-y-4 animate-fadeIn">
-                        <input id="gate-nick" type="text" placeholder="Identity Name" class="u-input">
-                    </div>
-
-                    <button id="gate-btn" onclick="handleAuth()" class="u-btn w-full p-5 mt-4">
-                        <span id="gate-btn-text">INITIALIZE NODE</span>
-                    </button>
-
-                    <button onclick="toggleAuth()" id="gate-switch" class="w-full text-[10px] font-black opacity-30 uppercase tracking-[0.3em] pt-6 hover:opacity-100 transition-all text-center">
-                        Generate New Identity
-                    </button>
+                <h1 class="text-6xl font-black italic tracking-tighter text-white">ULTRA <span class="text-blue-500">TITAN</span></h1>
+                <div class="flex items-center justify-center gap-2 mt-4">
+                    <span class="h-px w-8 bg-blue-500/30"></span>
+                    <p class="text-[9px] font-mono opacity-40 tracking-[0.6em] uppercase">Security Level: Maximum</p>
+                    <span class="h-px w-8 bg-blue-500/30"></span>
                 </div>
             </div>
-            <div id="gate-error" class="text-red-500 text-[10px] font-black text-center mt-8 uppercase h-4 tracking-widest"></div>
+
+            <div class="space-y-5 bg-[var(--surf)] p-10 rounded-[50px] border border-[var(--brd)] shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50"></div>
+                <input id="g-email" type="email" placeholder="Access Email" class="u-input">
+                <input id="g-pass" type="password" placeholder="Cryptographic Key" class="u-input">
+                <div id="g-ext" class="hidden animate-slideDown"><input id="g-nick" type="text" placeholder="Identity Handle" class="u-input"></div>
+                
+                <button onclick="handleAuth()" class="u-btn w-full mt-6 flex items-center justify-center gap-3">
+                    <i class="fas fa-key"></i> <span id="g-btn-txt">Initialize Node</span>
+                </button>
+                <button onclick="toggleAuth()" id="g-tog" class="w-full text-[10px] font-black opacity-30 uppercase tracking-[0.4em] pt-8 hover:opacity-100 transition-all">Request New Node Access</button>
+            </div>
+            <p id="g-err" class="text-red-500 text-[10px] font-black text-center mt-10 uppercase tracking-[0.3em] h-4"></p>
         </div>
     </div>
 
-    <div id="scr-main" class="u-screen u-screen-hidden">
-        <header class="u-header">
-            <button onclick="nav('settings')" class="w-12 h-12 rounded-2xl bg-[var(--u-bg)] border border-[var(--u-border)] flex items-center justify-center">
-                <i class="fas fa-sliders opacity-40"></i>
+    <div id="scr-main" class="scr scr-h">
+        <header class="h-24 px-8 flex items-center justify-between border-b border-[var(--brd)] bg-[var(--surf)]/90 backdrop-blur-2xl z-50">
+            <button onclick="nav('sett')" class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition">
+                <i class="fas fa-fingerprint opacity-50 text-xl"></i>
             </button>
-            <div class="text-center">
-                <span class="font-black italic text-xl tracking-tighter">ULTRA <span class="text-blue-500">CORE</span></span>
-                <div class="flex items-center justify-center gap-1.5 mt-0.5">
-                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-[8px] font-black opacity-30 uppercase tracking-widest">Mesh Link Active</span>
-                </div>
+            <div class="flex flex-col items-center">
+                <span class="font-black italic text-2xl tracking-tighter text-white">ULTRA <span class="text-blue-500">TITAN</span></span>
+                <span class="text-[8px] font-black text-blue-400 uppercase tracking-[0.3em] animate-pulse">Mesh Synchronized</span>
             </div>
-            <button onclick="searchAgent()" class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
-                <i class="fas fa-plus"></i>
+            <button onclick="addAgent()" class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-[0_10px_25px_rgba(47,129,247,0.4)] text-white">
+                <i class="fas fa-plus-circle text-xl"></i>
             </button>
         </header>
-        
-        <div class="flex-1 overflow-y-auto px-6 py-8">
-            <div class="flex items-center justify-between mb-8">
-                <p class="text-[10px] font-black opacity-20 uppercase tracking-[0.5em]">Connected Nodes</p>
-                <div class="h-px flex-1 bg-[var(--u-border)] ml-6"></div>
-            </div>
-            <div id="hub-list" class="space-y-3"></div>
-            <div id="hub-empty" class="hidden flex flex-col items-center justify-center py-32 opacity-10">
-                <i class="fas fa-wind text-7xl mb-6"></i>
-                <p class="font-black text-xs uppercase tracking-[0.5em]">Silence in Frequency</p>
+
+        <div class="flex-1 overflow-y-auto px-8 py-10 space-y-6">
+            <div class="flex items-center gap-6"><p class="text-[10px] font-black opacity-20 uppercase tracking-[0.5em]">Active Nodes</p><div class="h-px flex-1 bg-[var(--brd)]"></div></div>
+            <div id="agent-list" class="space-y-4"></div>
+            <div id="agent-empty" class="hidden flex flex-col items-center justify-center py-40 opacity-10">
+                <i class="fas fa-satellite-dish text-8xl mb-6"></i>
+                <p class="font-black uppercase text-sm tracking-[0.5em]">No Signal Detected</p>
             </div>
         </div>
     </div>
 
-    <div id="scr-chat" class="u-screen u-screen-hidden">
-        <header class="u-header">
-            <div class="flex items-center gap-4">
-                <button onclick="nav('main')" class="text-xl opacity-30"><i class="fas fa-chevron-left"></i></button>
-                <div id="ch-av" class="w-11 h-11 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-xl shadow-xl">?</div>
+    <div id="scr-chat" class="scr scr-h">
+        <header class="h-24 px-8 flex items-center justify-between border-b border-[var(--brd)] bg-[var(--surf)] z-50">
+            <div class="flex items-center gap-5">
+                <button onclick="nav('main')" class="text-2xl opacity-30 hover:opacity-100 transition"><i class="fas fa-arrow-left-long"></i></button>
+                <div id="c-av" class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center font-black text-2xl shadow-xl">?</div>
                 <div>
-                    <div id="ch-name" class="font-bold text-sm">...</div>
-                    <div id="ch-typing" class="hidden flex items-center gap-1">
-                        <span class="text-[9px] text-blue-500 font-black uppercase tracking-tighter">Typing</span>
-                        <div class="flex gap-0.5"><div class="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div><div class="w-1 h-1 bg-blue-500 rounded-full animate-bounce delay-75"></div></div>
+                    <div id="c-name" class="font-black text-lg text-white tracking-tight">...</div>
+                    <div class="flex items-center gap-2 mt-1">
+                        <div id="c-dot" class="w-2 h-2 rounded-full bg-gray-600"></div>
+                        <span id="c-stat-txt" class="text-[9px] font-black opacity-40 uppercase tracking-widest">Encrypted Link</span>
                     </div>
-                    <div id="ch-status" class="text-[9px] text-green-500 font-black uppercase opacity-60">Secure Connection</div>
                 </div>
             </div>
-            <button onclick="startCall()" class="text-blue-500 text-2xl"><i class="fas fa-video"></i></button>
+            <div class="flex gap-4">
+                <button onclick="startCall(true)" class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-blue-500 hover:bg-blue-500 hover:text-white transition"><i class="fas fa-video text-xl"></i></button>
+            </div>
         </header>
 
-        <div id="ch-feed" class="u-feed"></div>
+        <div id="c-feed" class="msg-list"></div>
 
-        <div class="p-4 bg-[var(--u-surf)] border-t border-[var(--u-border)] pb-10">
-            <div class="flex items-end gap-3">
-                <button id="mic-btn" class="w-14 h-14 rounded-2xl bg-[var(--u-bg)] border border-[var(--u-border)] text-red-500 flex items-center justify-center transition-all">
-                    <i class="fas fa-microphone text-xl"></i>
+        <div class="p-6 bg-[var(--surf)] border-t border-[var(--brd)] pb-12">
+            <div class="flex items-end gap-4 max-w-5xl mx-auto">
+                <div id="c-input" contenteditable="true" class="flex-1 bg-[var(--bg)] p-5 rounded-[25px] max-h-40 overflow-y-auto text-sm border border-[var(--brd)] focus:border-blue-500 transition-all outline-none" placeholder="Enter transmission data..."></div>
+                <button onclick="sendMsg()" class="w-16 h-16 bg-blue-600 rounded-[22px] flex items-center justify-center shadow-2xl active:scale-90 transition-all text-white">
+                    <i class="fas fa-paper-plane text-xl"></i>
                 </button>
-                <div id="ch-input" contenteditable="true" class="flex-1 bg-[var(--u-bg)] p-4 rounded-2xl max-h-40 overflow-y-auto text-sm border border-[var(--u-border)]" placeholder="Transmit data..." oninput="reportTyping()"></div>
-                <button onclick="pushMsg()" class="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-2xl active:scale-90 transition">
-                    <i class="fas fa-paper-plane text-lg"></i>
-                </button>
-            </div>
-            <div id="audio-viz" class="hidden mt-4 flex items-center justify-center bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20">
-                <div class="rec-wave" id="wave-container"></div>
-                <span class="text-[10px] font-black text-blue-500 uppercase ml-4">Recording Signal...</span>
             </div>
         </div>
     </div>
 
-    <div id="scr-settings" class="u-screen u-screen-hidden">
-        <header class="u-header">
-            <button onclick="nav('main')"><i class="fas fa-arrow-left opacity-30"></i></button>
-            <span class="font-black text-[10px] uppercase tracking-[0.4em]">Configuration Node</span>
-            <div class="w-10"></div>
-        </header>
-
-        <div class="flex-1 overflow-y-auto pb-20">
-            <div class="p-12 flex flex-col items-center">
-                <div id="st-av" class="w-32 h-32 bg-blue-600 rounded-[40%] flex items-center justify-center text-5xl font-black mb-6 shadow-2xl border-4 border-[var(--u-bg)]">?</div>
-                <h2 id="st-name" class="text-3xl font-black tracking-tighter text-white">...</h2>
-                <div id="st-mail" class="text-[10px] font-mono opacity-20 uppercase mt-2">...</div>
-            </div>
-
-            <div class="px-8 space-y-4">
-                <div class="p-6 bg-[var(--u-surf)] rounded-[35px] border border-[var(--u-border)]">
-                    <p class="text-[10px] font-black text-blue-500 uppercase mb-6 tracking-widest">Hardware Sync</p>
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold">Haptic Feedback</span>
-                            <div class="w-10 h-5 bg-blue-600 rounded-full relative"><div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div></div>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold">Biometric Security</span>
-                            <div class="w-10 h-5 bg-blue-600 rounded-full relative"><div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div></div>
-                        </div>
-                    </div>
-                </div>
-                <button onclick="terminate()" class="w-full p-6 bg-red-500/10 border border-red-500/20 rounded-[35px] text-red-500 font-black uppercase text-xs">Terminate Link</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="call-layer" class="v-call-layer">
+    <div id="call-scr" class="call-scr">
         <video id="v-remote" autoplay playsinline></video>
         <video id="v-local" autoplay muted playsinline></video>
-        <div class="absolute inset-0 flex flex-col justify-between items-center py-24 bg-gradient-to-b from-black/60 via-transparent to-black/80">
-            <div class="text-center">
-                <div id="call-av" class="w-24 h-24 bg-blue-600 rounded-[40%] mx-auto flex items-center justify-center text-4xl font-black mb-6 border-4 border-white/20 shadow-2xl">?</div>
-                <h2 id="call-partner" class="text-3xl font-black text-white italic">...</h2>
-                <div class="text-[10px] font-mono text-blue-400 mt-4 tracking-[0.5em] animate-pulse">P2P ENCRYPTED CALL</div>
-            </div>
-            <button onclick="location.reload()" class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center text-3xl text-white shadow-2xl active:scale-75 transition">
-                <i class="fas fa-phone-slash"></i>
-            </button>
+        
+        <div class="absolute top-16 left-0 w-full text-center z-[10003]">
+            <div id="call-av" class="w-20 h-20 bg-blue-600 rounded-[35%] mx-auto flex items-center justify-center text-3xl font-black mb-4 border-2 border-white/20 shadow-2xl">?</div>
+            <h2 id="call-p-name" class="text-3xl font-black text-white italic tracking-tighter">...</h2>
+            <div class="text-[10px] font-mono text-blue-400 mt-4 tracking-[0.5em] glitch">TITAN P2P ENCRYPTION ACTIVE</div>
+        </div>
+
+        <div class="v-controls">
+            <button onclick="toggleMic()" id="m-btn" class="v-btn v-btn-gray"><i class="fas fa-microphone"></i></button>
+            <button onclick="endCall()" class="v-btn v-btn-red"><i class="fas fa-phone-slash"></i></button>
+            <button onclick="toggleCam()" id="v-btn" class="v-btn v-btn-gray"><i class="fas fa-camera-rotate"></i></button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, update, get, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, update, get, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // CONFIG (Same for all Morozov Ultra nodes)
-        const fbConfig = {
+        const config = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
             projectId: "morozov-ultra",
-            storageBucket: "morozov-ultra.firebasestorage.app",
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        const app = initializeApp(fbConfig);
+        const app = initializeApp(config);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // SYSTEM STATE
-        let me = null;
-        let pNode = null;
-        let room = null;
-        let isReg = false;
-        let peer = null;
-        let tT = null;
+        let user = null, pNode = null, room = null, isReg = false;
+        let peer = null, localStream = null;
 
         // --- CORE NAVIGATION ---
         window.nav = (id) => {
-            const screens = ['gate', 'main', 'chat', 'settings'];
-            screens.forEach(s => {
+            ['gate','main','chat'].forEach(s => {
                 const el = document.getElementById(`scr-${s}`);
-                if(s === id) el.classList.replace('u-screen-hidden', 'u-screen-active');
-                else el.classList.replace('u-screen-active', 'u-screen-hidden');
+                if(s === id) el.classList.replace('scr-h', 'scr-a');
+                else el.classList.replace('scr-a', 'scr-h');
             });
-            if(id === 'settings' && auth.currentUser) {
-                const u = auth.currentUser;
-                document.getElementById('st-name').innerText = u.displayName || "Agent";
-                document.getElementById('st-mail').innerText = u.email;
-                document.getElementById('st-av').innerText = (u.displayName ? u.displayName[0] : "A").toUpperCase();
-            }
         };
 
-        window.toast = (msg) => {
-            const c = document.getElementById('toast-container');
-            const t = document.createElement('div');
-            t.className = 'u-toast';
-            t.innerText = msg;
-            c.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+        window.toast = (m) => {
+            const root = document.getElementById('toast-root');
+            const t = document.createElement('div'); t.className = 'toast'; t.innerText = m;
+            root.appendChild(t);
+            setTimeout(() => t.remove(), 4000);
         };
 
-        // --- AUTH & LEGACY MIGRATION BRIDGE ---
+        // --- AUTH & TITAN BRIDGE ---
         window.toggleAuth = () => {
             isReg = !isReg;
-            document.getElementById('reg-ext').classList.toggle('hidden', !isReg);
-            document.getElementById('gate-btn-text').innerText = isReg ? "GENERATE IDENTITY" : "INITIALIZE NODE";
-            document.getElementById('gate-switch').innerText = isReg ? "Already verified? Connect" : "Generate New Identity";
+            document.getElementById('g-ext').classList.toggle('hidden', !isReg);
+            document.getElementById('g-btn-txt').innerText = isReg ? "Generate Node" : "Initialize Node";
+            document.getElementById('g-tog').innerText = isReg ? "Return to Login" : "Request New Node Access";
         };
 
         window.handleAuth = async () => {
-            const e = document.getElementById('gate-email').value.trim();
-            const p = document.getElementById('gate-pass').value.trim();
-            const n = document.getElementById('gate-nick').value.trim();
-            const log = document.getElementById('gate-error');
+            const e = document.getElementById('g-email').value.trim();
+            const p = document.getElementById('g-pass').value.trim();
+            const n = document.getElementById('g-nick').value.trim();
+            const log = document.getElementById('g-err');
 
-            if(!e || p.length < 6) { log.innerText = "DATA INTEGRITY ERROR"; return; }
-            log.innerText = "SYNCING WITH MESH...";
+            if(!e || p.length < 6) { log.innerText = "SECURITY BREACH: INVALID DATA"; return; }
+            log.innerText = "ESTABLISHING SECURE TUNNEL...";
 
             try {
                 if(isReg) {
                     const res = await createUserWithEmailAndPassword(auth, e, p);
                     await updateProfile(res.user, { displayName: n || "Agent" });
-                    // Store in v11 branch
-                    await set(ref(db, `v11/users/${res.user.uid}`), { name: n || "Agent", email: e, uid: res.user.uid, ts: Date.now() });
+                    await set(ref(db, `v13/users/${res.user.uid}`), { name: n || "Agent", email: e, uid: res.user.uid, ts: Date.now() });
                 } else {
                     const res = await signInWithEmailAndPassword(auth, e, p);
-                    // LEGACY BRIDGE: If user not in v11, migrate from v10 or force create
-                    const check = await get(ref(db, `v11/users/${res.user.uid}`));
-                    if(!check.exists()) {
-                        await set(ref(db, `v11/users/${res.user.uid}`), {
-                            name: res.user.displayName || "Agent",
-                            email: res.user.email,
-                            uid: res.user.uid,
-                            ts: Date.now()
-                        });
-                    }
+                    await update(ref(db, `v13/users/${res.user.uid}`), { lastLogin: Date.now(), name: res.user.displayName });
                 }
-            } catch(err) { log.innerText = "ERR: " + err.code.toUpperCase(); }
+            } catch(e) { log.innerText = "PROTOCOL ERROR: " + e.code.toUpperCase(); }
         };
 
         onAuthStateChanged(auth, u => {
-            if(u) { me = u; nav('main'); initSocial(); toast("Welcome, Agent"); }
-            else { nav('gate'); }
+            if(u) { 
+                user = u; nav('main'); initTitan();
+                const statusRef = ref(db, `v13/status/${u.uid}`);
+                set(statusRef, "online");
+                onDisconnect(statusRef).set("offline");
+                toast("Identity Verified: " + u.displayName);
+            } else { nav('gate'); }
         });
 
-        // --- SOCIAL INFRASTRUCTURE ---
-        function initSocial() {
-            onValue(ref(db, `v11/social/${me.uid}`), snap => {
-                const list = document.getElementById('hub-list');
-                const empty = document.getElementById('hub-empty');
+        // --- TITAN HUB LOGIC ---
+        function initTitan() {
+            onValue(ref(db, `v13/social/${user.uid}`), snap => {
+                const list = document.getElementById('agent-list');
+                const empty = document.getElementById('agent-empty');
                 list.innerHTML = "";
                 let has = false;
-                snap.forEach(c => {
+                snap.forEach(f => {
                     has = true;
-                    const d = c.val();
-                    const div = document.createElement('div');
-                    div.className = "p-5 bg-[var(--u-surf)] rounded-[30px] border border-[var(--u-border)] flex items-center justify-between cursor-pointer active:scale-95 transition-all";
-                    div.innerHTML = `
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg">${d.name[0]}</div>
+                    const d = f.val();
+                    const el = document.createElement('div');
+                    el.className = "u-card p-6 flex items-center justify-between cursor-pointer group";
+                    el.innerHTML = `
+                        <div class="flex items-center gap-5">
+                            <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg group-hover:scale-110 transition-transform">${d.name[0]}</div>
                             <div>
-                                <div class="font-bold text-sm text-white">${d.name}</div>
-                                <div class="text-[9px] opacity-20 uppercase font-black tracking-widest">Quantum Link Active</div>
+                                <div class="font-black text-white tracking-tight">${d.name}</div>
+                                <div class="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em] mt-1">Titan Mesh Active</div>
                             </div>
                         </div>
-                        <i class="fas fa-chevron-right opacity-10"></i>
+                        <i class="fas fa-chevron-right opacity-10 group-hover:opacity-100 group-hover:translate-x-2 transition-all"></i>
                     `;
-                    div.onclick = () => openChat(d);
-                    list.appendChild(div);
+                    el.onclick = () => openChat(d);
+                    list.appendChild(el);
                 });
                 empty.classList.toggle('hidden', has);
             });
-            listenSignals();
+            listenCalls();
         }
 
-        window.searchAgent = async () => {
-            const mail = prompt("Target Agent Email:");
-            if(!mail || mail.toLowerCase() === me.email.toLowerCase()) return;
+        window.addAgent = async () => {
+            const mail = prompt("Enter Target Node Email:");
+            if(!mail || mail.toLowerCase() === user.email.toLowerCase()) return;
             
-            toast("Searching Mesh...");
-            const users = await get(ref(db, `v11/users`));
+            toast("Scanning Global Mesh...");
+            const users = await get(ref(db, `v13/users`));
             let found = null;
             users.forEach(u => { if(u.val().email.toLowerCase() === mail.toLowerCase()) found = u.val(); });
 
             if(found) {
-                await update(ref(db, `v11/social/${me.uid}/${found.uid}`), { id: found.uid, name: found.name });
-                await update(ref(db, `v11/social/${found.uid}/${me.uid}`), { id: me.uid, name: me.displayName });
-                toast("Handshake Complete.");
-            } else { toast("Node not found."); }
+                await update(ref(db, `v13/social/${user.uid}/${found.uid}`), { id: found.uid, name: found.name });
+                await update(ref(db, `v13/social/${found.uid}/${user.uid}`), { id: user.uid, name: user.displayName });
+                toast("Handshake Successful.");
+            } else { toast("Node not found in directory."); }
         };
 
-        // --- MESSAGING ENGINE ---
+        // --- CHAT SYSTEM ---
         window.openChat = (p) => {
             pNode = p;
-            room = [me.uid, p.id].sort().join("_X_");
+            room = [user.uid, p.id].sort().join("_SYNC_");
             nav('chat');
-            document.getElementById('ch-name').innerText = p.name;
-            document.getElementById('ch-av').innerText = p.name[0];
-            
-            onValue(ref(db, `v11/rooms/${room}/msgs`), snap => {
-                const feed = document.getElementById('ch-feed');
+            document.getElementById('c-name').innerText = p.name;
+            document.getElementById('c-av').innerText = p.name[0];
+
+            onValue(ref(db, `v13/status/${p.id}`), s => {
+                const isOn = s.val() === "online";
+                document.getElementById('c-dot').className = `w-2.5 h-2.5 rounded-full ${isOn ? 'bg-green-500 shadow-[0_0_10px_#3fb950]' : 'bg-gray-700'}`;
+                document.getElementById('c-stat-txt').innerText = isOn ? "Active Node" : "Node Offline";
+                document.getElementById('c-stat-txt').classList.toggle('text-green-500', isOn);
+            });
+
+            onValue(ref(db, `v13/rooms/${room}/msgs`), snap => {
+                const feed = document.getElementById('c-feed');
                 feed.innerHTML = "";
                 snap.forEach(m => {
                     const d = m.val();
-                    const isMe = d.sid === me.uid;
-                    if(!isMe && d.st !== 'read') update(ref(db, `v11/rooms/${room}/msgs/${m.key}`), { st: 'read' });
-                    
-                    const t = new Date(d.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const tick = d.st === 'read' ? '<i class="fas fa-check-double text-blue-500"></i>' : '<i class="fas fa-check"></i>';
-                    
+                    const isMe = d.sid === user.uid;
                     const b = document.createElement('div');
-                    b.className = `u-bubble ${isMe ? 'u-bubble-me' : 'u-bubble-he'}`;
-                    b.innerHTML = `<div>${d.cnt}</div><div class="u-meta"><span>${t}</span>${isMe ? tick : ''}</div>`;
+                    b.className = `bub ${isMe ? 'bub-m' : 'bub-h'}`;
+                    b.innerText = d.txt;
                     feed.appendChild(b);
                 });
                 feed.scrollTop = feed.scrollHeight;
             });
-
-            onValue(ref(db, `v11/rooms/${room}/typing/${p.id}`), s => {
-                document.getElementById('ch-typing').classList.toggle('hidden', !s.val());
-                document.getElementById('ch-status').classList.toggle('hidden', s.val());
-            });
         };
 
-        window.reportTyping = () => {
-            if(!room) return;
-            set(ref(db, `v11/rooms/${room}/typing/${me.uid}`), true);
-            clearTimeout(tT);
-            tT = setTimeout(() => set(ref(db, `v11/rooms/${room}/typing/${me.uid}`), false), 2500);
-        };
-
-        window.pushMsg = () => {
-            const inp = document.getElementById('ch-input');
+        window.sendMsg = () => {
+            const inp = document.getElementById('c-input');
             const txt = inp.innerText.trim();
             if(!txt) return;
-            push(ref(db, `v11/rooms/${room}/msgs`), { sid: me.uid, cnt: txt, ts: Date.now(), st: 'sent' });
+            push(ref(db, `v13/rooms/${room}/msgs`), { sid: user.uid, txt, ts: Date.now() });
             inp.innerText = "";
-            set(ref(db, `v11/rooms/${room}/typing/${me.uid}`), false);
         };
 
-        // --- AUDIO VISUALIZER LOGIC ---
-        let micStream = null, audioCtx = null, analyzer = null;
-        const micBtn = document.getElementById('mic-btn');
-        micBtn.onclick = async () => {
-            if(!micStream) {
-                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                document.getElementById('audio-viz').classList.remove('hidden');
-                micBtn.classList.replace('bg-[var(--u-bg)]', 'bg-red-600');
-                micBtn.classList.replace('text-red-500', 'text-white');
+        // --- TITAN MEDIA ENGINE (WEBRTC) ---
+        window.startCall = async (isCaller = true) => {
+            document.getElementById('call-scr').style.display = 'flex';
+            document.getElementById('call-p-name').innerText = pNode.name;
+            document.getElementById('call-av').innerText = pNode.name[0];
+
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById('v-local').srcObject = localStream;
+
+            peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+            localStream.getTracks().forEach(t => peer.addTrack(t, localStream));
+
+            peer.ontrack = e => document.getElementById('v-remote').srcObject = e.streams[0];
+            peer.onicecandidate = e => e.candidate && push(ref(db, `v13/calls/${pNode.id}/ice`), e.candidate.toJSON());
+
+            if(isCaller) {
+                const offer = await peer.createOffer();
+                await peer.setLocalDescription(offer);
+                await set(ref(db, `v13/calls/${pNode.id}/sig`), { offer, from: user.uid, name: user.displayName });
                 
-                audioCtx = new AudioContext();
-                analyzer = audioCtx.createAnalyser();
-                const source = audioCtx.createMediaStreamSource(micStream);
-                source.connect(analyzer);
-                analyzer.fftSize = 32;
-                const bufferLength = analyzer.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-                
-                const wave = document.getElementById('wave-container');
-                wave.innerHTML = "";
-                for(let i=0; i<8; i++) { const b = document.createElement('div'); b.className='wave-bar'; wave.appendChild(b); }
-                
-                function draw() {
-                    if(!micStream) return;
-                    analyzer.getByteFrequencyData(dataArray);
-                    const bars = wave.querySelectorAll('.wave-bar');
-                    bars.forEach((b, i) => { 
-                        const h = (dataArray[i] / 255) * 30 + 5;
-                        b.style.height = h + 'px';
-                    });
-                    requestAnimationFrame(draw);
-                }
-                draw();
-            } else {
-                micStream.getTracks().forEach(t => t.stop());
-                micStream = null;
-                document.getElementById('audio-viz').classList.add('hidden');
-                micBtn.classList.replace('bg-red-600', 'bg-[var(--u-bg)]');
-                micBtn.classList.replace('text-white', 'text-red-500');
-                toast("Audio data discarded.");
+                onValue(ref(db, `v13/calls/${pNode.id}/ans`), async snap => {
+                    if(snap.val() && !peer.currentRemoteDescription) await peer.setRemoteDescription(new RTCSessionDescription(snap.val()));
+                });
             }
         };
 
-        // --- P2P MEDIA (WEBRTC) ---
-        window.startCall = async () => {
-            document.getElementById('call-layer').style.display = 'flex';
-            document.getElementById('call-partner').innerText = pNode.name;
-            document.getElementById('call-av').innerText = pNode.name[0];
-
-            peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-            const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            s.getTracks().forEach(t => peer.addTrack(t, s));
-            document.getElementById('v-local').srcObject = s;
-
-            peer.onicecandidate = e => e.candidate && push(ref(db, `v11/calls/${pNode.id}/ice`), e.candidate.toJSON());
-            peer.ontrack = e => document.getElementById('v-remote').srcObject = e.streams[0];
-
-            const o = await peer.createOffer();
-            await peer.setLocalDescription(o);
-            await remove(ref(db, `v11/calls/${pNode.id}`));
-            await set(ref(db, `v11/calls/${pNode.id}/sig`), { offer: o, from: me.uid, name: me.displayName });
-
-            onValue(ref(db, `v11/calls/${pNode.id}/ans`), async snap => {
-                if(snap.val() && !peer.currentRemoteDescription) await peer.setRemoteDescription(new RTCSessionDescription(snap.val()));
-            });
-        };
-
-        function listenSignals() {
-            onValue(ref(db, `v11/calls/${me.uid}/sig`), async snap => {
+        function listenCalls() {
+            onValue(ref(db, `v13/calls/${user.uid}/sig`), async snap => {
                 const d = snap.val();
                 if(d && d.offer && !peer) {
-                    if(confirm("INCOMING CALL: Agent " + d.name)) {
-                        document.getElementById('call-layer').style.display = 'flex';
-                        document.getElementById('call-partner').innerText = d.name;
-                        peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-                        const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        s.getTracks().forEach(t => peer.addTrack(t, s));
-                        document.getElementById('v-local').srcObject = s;
-                        peer.ontrack = e => document.getElementById('v-remote').srcObject = e.streams[0];
-                        peer.onicecandidate = e => e.candidate && push(ref(db, `v11/calls/${d.from}/ice`), e.candidate.toJSON());
+                    if(confirm("INCOMING TITAN LINK FROM: " + d.name)) {
+                        pNode = { id: d.from, name: d.name };
+                        await startCall(false);
                         await peer.setRemoteDescription(new RTCSessionDescription(d.offer));
-                        const a = await peer.createAnswer();
-                        await peer.setLocalDescription(a);
-                        set(ref(db, `v11/calls/${d.from}/ans`), a);
-                        onValue(ref(db, `v11/calls/${me.uid}/ice`), iS => iS.forEach(c => peer.addIceCandidate(new RTCIceCandidate(c.val()))));
-                    } else { remove(ref(db, `v11/calls/${me.uid}`)); }
+                        const ans = await peer.createAnswer();
+                        await peer.setLocalDescription(ans);
+                        await set(ref(db, `v13/calls/${d.from}/ans`), ans);
+                        onValue(ref(db, `v13/calls/${user.uid}/ice`), s => s.forEach(c => peer.addIceCandidate(new RTCIceCandidate(c.val()))));
+                    } else { await remove(ref(db, `v13/calls/${user.uid}`)); }
                 }
             });
         }
 
-        window.terminate = () => signOut(auth).then(() => location.reload());
+        window.endCall = () => location.reload();
+
+        window.toggleMic = () => {
+            const t = localStream.getAudioTracks()[0];
+            t.enabled = !t.enabled;
+            document.getElementById('m-btn').classList.toggle('bg-red-500', !t.enabled);
+            toast(t.enabled ? "Microphone Active" : "Microphone Muted");
+        };
+
+        window.toggleCam = () => {
+            const t = localStream.getVideoTracks()[0];
+            t.enabled = !t.enabled;
+            document.getElementById('v-btn').classList.toggle('bg-red-500', !t.enabled);
+            toast(t.enabled ? "Camera Active" : "Camera Muted");
+        };
     </script>
 </body>
 </html>
