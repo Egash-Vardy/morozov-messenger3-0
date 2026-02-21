@@ -2,74 +2,91 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <title>Morozov Ultra Calls Pro</title>
+    <title>Morozov Ultra</title>
     <style>
-        html, body { height: 100%; margin: 0; overflow: hidden; font-family: sans-serif; }
+        /* Базовые стили */
+        html, body { height: 100%; margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; transition: background 0.3s; }
         .hidden { display: none !important; }
-        #chat-window { background-color: #e5ddd5; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
-        #v-remote { width: 100%; height: 100%; object-fit: cover; background: #1a1a1a; }
-        #v-local { position: absolute; top: 20px; right: 20px; width: 100px; height: 140px; border-radius: 10px; border: 2px solid white; object-fit: cover; z-index: 10; transform: scaleX(-1); }
-        .msg { max-width: 80%; padding: 10px; border-radius: 15px; margin-bottom: 5px; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
-        .msg-mine { background: #effdde; align-self: flex-end; }
-        .msg-their { background: #fff; align-self: flex-start; }
+        
+        /* Светлая тема (по умолчанию) */
+        body.light-theme { background: #f0f2f5; color: #000; }
+        .light-theme .header { background: #517da2; color: white; }
+        .light-theme .side-menu { background: white; color: #333; }
+        .light-theme #chat-window { background: #e5ddd5; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
+        .light-theme .msg-mine { background: #effdde; color: #000; }
+        .light-theme .msg-their { background: #ffffff; color: #000; }
+        .light-theme input { background: #f0f2f5; color: black; border: 1px solid #ddd; }
+
+        /* ТЕМНАЯ ТЕМА */
+        body.dark-theme { background: #0f1721; color: #fff; }
+        .dark-theme .header { background: #1c2733; color: white; border-bottom: 1px solid #2b3948; }
+        .dark-theme .side-menu { background: #17212b; color: white; }
+        .dark-theme #chat-window { background: #0e1621; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; opacity: 0.9; }
+        .dark-theme .msg-mine { background: #2b5278; color: white; }
+        .dark-theme .msg-their { background: #182533; color: white; }
+        .dark-theme input { background: #242f3d !important; color: white !important; border: 1px solid #384657 !important; }
+        .dark-theme .friend-item { border-bottom: 1px solid #2b3948; }
+
+        /* Общие элементы */
+        .msg { max-width: 80%; padding: 10px 14px; border-radius: 15px; margin-bottom: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        #v-remote { width: 100%; height: 100%; object-fit: cover; background: #000; }
+        #v-local { position: absolute; top: 20px; right: 20px; width: 100px; height: 150px; border-radius: 12px; border: 2px solid #3390ec; object-fit: cover; z-index: 10; transform: scaleX(-1); }
     </style>
 </head>
-<body class="bg-gray-100">
-
-    <audio id="dial-tone" loop src="https://www.soundjay.com/phone/sounds/phone-calling-1.mp3"></audio>
+<body class="light-theme"> <audio id="dial-tone" loop src="https://www.soundjay.com/phone/sounds/phone-calling-1.mp3"></audio>
 
     <div id="auth-screen" class="fixed inset-0 z-[9999] bg-[#2b5278] flex items-center justify-center p-6 text-center">
         <div class="bg-white text-black w-full max-w-sm rounded-3xl p-8 shadow-2xl">
             <h2 class="text-3xl font-bold mb-6 text-[#2b5278]">Morozov Ultra</h2>
-            <input id="auth-name" type="text" placeholder="Твоё Имя" class="w-full p-4 mb-3 border rounded-xl outline-none">
-            <input id="auth-email" type="email" placeholder="Email" class="w-full p-4 mb-3 border rounded-xl outline-none">
-            <input id="auth-pass" type="password" placeholder="Пароль" class="w-full p-4 mb-6 border rounded-xl outline-none">
+            <input id="auth-name" type="text" placeholder="Твоё Имя" class="w-full p-4 mb-3 rounded-xl outline-none">
+            <input id="auth-email" type="email" placeholder="Email" class="w-full p-4 mb-3 rounded-xl outline-none">
+            <input id="auth-pass" type="password" placeholder="Пароль" class="w-full p-4 mb-6 rounded-xl outline-none">
             <button onclick="window.handleAuth()" class="w-full bg-[#3390ec] text-white py-4 rounded-xl font-bold">ВОЙТИ</button>
         </div>
     </div>
 
-    <div id="main-app" class="hidden flex flex-col h-full bg-white">
-        <header class="bg-[#517da2] h-16 flex items-center justify-between px-4 text-white shadow-md">
+    <div id="main-app" class="hidden flex flex-col h-full">
+        <header class="header h-16 flex items-center justify-between px-4 shadow-md">
             <button onclick="window.toggleMenu()" class="text-xl p-2"><i class="fas fa-bars"></i></button>
             <span class="font-bold">Морозов Ультра</span>
             <div class="w-10"></div>
         </header>
-        <div id="c-list" class="flex-1 overflow-y-auto"></div>
+        <div id="c-list" class="flex-1 overflow-y-auto p-2"></div>
     </div>
 
-    <div id="add-friend-modal" class="hidden fixed inset-0 z-[6000] bg-black/50 flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl text-center">
-            <h3 class="text-xl font-bold mb-4">Новый контакт</h3>
-            <input id="friend-name-input" type="text" placeholder="Имя друга" class="w-full p-3 mb-3 border rounded-xl outline-none bg-gray-50">
-            <input id="friend-uid-input" type="text" placeholder="UID друга" class="w-full p-3 mb-4 border rounded-xl outline-none bg-gray-50 text-xs font-mono">
-            <div class="flex gap-2">
-                <button onclick="window.closeAddFriendModal()" class="flex-1 py-3 text-gray-400 font-bold">ОТМЕНА</button>
-                <button onclick="window.confirmAddFriend()" class="flex-1 bg-[#3390ec] text-white py-3 rounded-xl font-bold">ДОБАВИТЬ</button>
+    <div id="side-menu" class="side-menu hidden fixed inset-0 z-[5000] flex flex-col">
+        <div class="p-8 border-b border-gray-700/20">
+            <div class="flex flex-col items-center mb-6">
+                <div class="w-20 h-20 bg-[#3390ec] rounded-full flex items-center justify-center text-3xl font-bold mb-3 text-white" id="user-avatar">?</div>
+                <input id="settings-name" type="text" class="bg-transparent text-center font-bold text-xl border-none outline-none focus:ring-1 ring-blue-500 rounded" value="...">
+                <button onclick="window.saveName()" class="text-[10px] text-blue-500 uppercase mt-1">Сохранить имя</button>
             </div>
         </div>
-    </div>
-
-    <div id="side-menu" class="hidden fixed inset-0 z-[5000] bg-white flex flex-col">
-        <div class="bg-[#517da2] p-6 text-white">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center text-2xl font-bold" id="user-avatar">?</div>
-                <div>
-                    <div class="font-bold text-lg" id="display-name">...</div>
-                    <div id="my-uid-display" class="text-[10px] opacity-60 font-mono break-all cursor-pointer" onclick="window.copyMyID()">Нажми чтобы скопировать ID</div>
-                </div>
-            </div>
-        </div>
+        
         <div class="p-4 flex flex-col gap-2">
-            <button onclick="window.openAddFriendModal()" class="flex items-center gap-4 p-4 hover:bg-gray-100 rounded-xl"><i class="fas fa-user-plus text-blue-500"></i> Добавить друга</button>
-            <button onclick="window.logout()" class="flex items-center gap-4 p-4 text-red-500 hover:bg-red-50 rounded-xl mt-auto"><i class="fas fa-sign-out-alt"></i> Выход</button>
+            <button onclick="window.toggleTheme()" class="flex items-center gap-4 p-4 hover:bg-black/5 rounded-2xl transition-all">
+                <i class="fas fa-moon text-purple-500"></i> Переключить тему
+            </button>
+            
+            <button onclick="window.openAddFriendModal()" class="flex items-center gap-4 p-4 hover:bg-black/5 rounded-2xl">
+                <i class="fas fa-user-plus text-blue-500"></i> Добавить друга
+            </button>
+            
+            <div class="bg-gray-500/10 p-4 rounded-2xl mt-4">
+                <p class="text-[10px] uppercase opacity-60">Твой ID:</p>
+                <div id="my-uid-display" class="text-[11px] font-mono break-all text-blue-500 select-all">...</div>
+            </div>
+
+            <button onclick="window.logout()" class="flex items-center gap-4 p-4 text-red-500 mt-auto"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            <button onclick="window.toggleMenu()" class="p-4 text-center text-sm opacity-50">Закрыть</button>
         </div>
     </div>
 
-    <div id="chat-screen" class="hidden fixed inset-0 z-[4000] bg-white flex flex-col">
-        <header class="bg-[#517da2] h-16 flex items-center justify-between px-4 text-white">
+    <div id="chat-screen" class="hidden fixed inset-0 z-[4000] flex flex-col bg-inherit">
+        <header class="header h-16 flex items-center justify-between px-4">
             <div class="flex items-center gap-3">
                 <button onclick="window.closeChat()" class="text-xl p-2"><i class="fas fa-arrow-left"></i></button>
                 <span id="chat-target-name" class="font-bold"></span>
@@ -79,9 +96,9 @@
                 <button onclick="window.startCall('video')" class="p-2"><i class="fas fa-video"></i></button>
             </div>
         </header>
-        <div id="chat-window" class="flex-1 overflow-y-auto p-4 flex flex-col gap-1"></div>
-        <div class="p-4 bg-white border-t flex items-center gap-3 pb-8">
-            <input id="m-input" type="text" onkeydown="if(event.key==='Enter') window.sendMsg()" class="flex-1 bg-gray-100 h-12 rounded-full px-6 outline-none" placeholder="Сообщение...">
+        <div id="chat-window" class="flex-1 overflow-y-auto p-4 flex flex-col"></div>
+        <div class="p-4 bg-inherit flex items-center gap-3 pb-8">
+            <input id="m-input" type="text" onkeydown="if(event.key==='Enter') window.sendMsg()" class="flex-1 h-12 rounded-full px-6 outline-none" placeholder="Сообщение...">
             <button onclick="window.sendMsg()" class="w-12 h-12 bg-[#3390ec] text-white rounded-full flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -89,18 +106,27 @@
     <div id="call-screen" class="fixed inset-0 bg-black z-[10000] hidden flex flex-col">
         <video id="v-remote" autoplay playsinline></video>
         <video id="v-local" autoplay playsinline muted></video>
-        
-        <div id="incoming-ui" class="absolute inset-0 bg-[#2b5278] flex flex-col items-center justify-center text-white hidden z-50">
-            <div class="w-24 h-24 bg-blue-400 rounded-full mb-4 flex items-center justify-center text-4xl font-bold animate-bounce">!</div>
-            <h2 class="text-2xl font-bold mb-8">Вам звонят!</h2>
+        <div id="incoming-ui" class="absolute inset-0 bg-[#1c2733] flex flex-col items-center justify-center text-white hidden z-50">
+            <h2 class="text-2xl font-bold mb-10">Вам звонят...</h2>
             <div class="flex gap-10">
-                <button onclick="window.acceptCall()" class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-3xl shadow-lg"><i class="fas fa-phone"></i></button>
-                <button onclick="window.endCall()" class="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center text-3xl shadow-lg"><i class="fas fa-times"></i></button>
+                <button onclick="window.acceptCall()" class="w-20 h-20 bg-green-500 rounded-full text-3xl"><i class="fas fa-phone"></i></button>
+                <button onclick="window.endCall()" class="w-20 h-20 bg-red-500 rounded-full text-3xl"><i class="fas fa-times"></i></button>
             </div>
         </div>
-
         <div class="absolute bottom-12 left-0 right-0 flex justify-center z-40">
-            <button onclick="window.endCall()" class="w-16 h-16 bg-red-600 rounded-full text-white text-2xl shadow-2xl flex items-center justify-center"><i class="fas fa-phone-slash"></i></button>
+            <button onclick="window.endCall()" class="w-16 h-16 bg-red-600 rounded-full text-white text-2xl flex items-center justify-center"><i class="fas fa-phone-slash"></i></button>
+        </div>
+    </div>
+
+    <div id="add-friend-modal" class="hidden fixed inset-0 z-[6000] bg-black/50 flex items-center justify-center p-6 text-black">
+        <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl">
+            <h3 class="text-xl font-bold mb-4">Новый контакт</h3>
+            <input id="friend-name-input" type="text" placeholder="Имя" class="w-full p-3 mb-3 border rounded-xl outline-none">
+            <input id="friend-uid-input" type="text" placeholder="UID" class="w-full p-3 mb-4 border rounded-xl outline-none text-xs">
+            <div class="flex gap-2">
+                <button onclick="window.closeAddFriendModal()" class="flex-1 py-3 text-gray-400">ОТМЕНА</button>
+                <button onclick="window.confirmAddFriend()" class="flex-1 bg-[#3390ec] text-white py-3 rounded-xl">ДОБАВИТЬ</button>
+            </div>
         </div>
     </div>
 
@@ -124,20 +150,26 @@
         const auth = getAuth(app);
 
         let currentUser = null, activeFriend = null, pc = null, localStream = null;
-        const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
 
-        // AUTH
+        // --- ЛОГИКА ТЕМЫ ---
+        window.toggleTheme = () => {
+            const isDark = document.body.classList.toggle('dark-theme');
+            document.body.classList.toggle('light-theme', !isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        };
+
+        // Загрузка темы при старте
+        if(localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+            document.body.classList.remove('light-theme');
+        }
+
+        // AUTH & PROFILE
         window.handleAuth = async () => {
-            const n = document.getElementById('auth-name').value;
-            const e = document.getElementById('auth-email').value;
-            const p = document.getElementById('auth-pass').value;
+            const n = document.getElementById('auth-name').value, e = document.getElementById('auth-email').value, p = document.getElementById('auth-pass').value;
             if(!e || !p) return;
-            try {
-                await signInWithEmailAndPassword(auth, e, p);
-            } catch {
-                const res = await createUserWithEmailAndPassword(auth, e, p);
-                if(n) await updateProfile(res.user, { displayName: n });
-            }
+            try { await signInWithEmailAndPassword(auth, e, p); } 
+            catch { const res = await createUserWithEmailAndPassword(auth, e, p); if(n) await updateProfile(res.user, { displayName: n }); }
             location.reload();
         };
 
@@ -147,28 +179,29 @@
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 document.getElementById('my-uid-display').innerText = user.uid;
-                document.getElementById('display-name').innerText = user.displayName || "Пользователь";
+                document.getElementById('settings-name').value = user.displayName || "Без имени";
                 document.getElementById('user-avatar').innerText = (user.displayName || "P")[0].toUpperCase();
                 window.renderFriends();
                 listenForCalls();
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
             }
         });
 
-        // UI FUNCTIONS
+        window.saveName = async () => {
+            const newName = document.getElementById('settings-name').value;
+            if(newName) { await updateProfile(auth.currentUser, { displayName: newName }); alert("Имя обновлено!"); }
+        };
+
+        // UI & FRIENDS
         window.toggleMenu = () => document.getElementById('side-menu').classList.toggle('hidden');
         window.closeChat = () => document.getElementById('chat-screen').classList.add('hidden');
         window.openAddFriendModal = () => { document.getElementById('add-friend-modal').classList.remove('hidden'); window.toggleMenu(); };
         window.closeAddFriendModal = () => document.getElementById('add-friend-modal').classList.add('hidden');
-        window.copyMyID = () => { navigator.clipboard.writeText(currentUser.uid); };
-
+        
         window.confirmAddFriend = () => {
-            const n = document.getElementById('friend-name-input').value;
-            const id = document.getElementById('friend-uid-input').value;
+            const n = document.getElementById('friend-name-input').value, id = document.getElementById('friend-uid-input').value;
             if(n && id) {
                 let f = JSON.parse(localStorage.getItem('f_list') || "[]");
-                f.push({name: n, uid: id.trim()});
+                f.push({name: n.trim(), uid: id.trim()});
                 localStorage.setItem('f_list', JSON.stringify(f));
                 window.renderFriends();
                 window.closeAddFriendModal();
@@ -179,19 +212,19 @@
             const l = document.getElementById('c-list'); l.innerHTML = "";
             JSON.parse(localStorage.getItem('f_list') || "[]").forEach(f => {
                 const d = document.createElement('div');
-                d.className = "p-4 border-b flex items-center gap-4 cursor-pointer active:bg-gray-100";
-                d.innerHTML = `<div class="w-12 h-12 bg-[#517da2] rounded-full flex items-center justify-center text-white font-bold">${f.name[0]}</div><b>${f.name}</b>`;
+                d.className = "friend-item p-4 flex items-center gap-4 cursor-pointer active:opacity-50";
+                d.innerHTML = `<div class="w-12 h-12 bg-[#3390ec] rounded-full flex items-center justify-center text-white font-bold">${f.name[0]}</div><b>${f.name}</b>`;
                 d.onclick = () => window.openChat(f);
                 l.appendChild(d);
             });
         };
 
+        // CHAT & CALLS
         window.openChat = (friend) => {
             activeFriend = friend;
             document.getElementById('chat-screen').classList.remove('hidden');
             document.getElementById('chat-target-name').innerText = friend.name;
-            const chatWin = document.getElementById('chat-window');
-            const chatID = [currentUser.uid, friend.uid].sort().join("_");
+            const chatWin = document.getElementById('chat-window'), chatID = [currentUser.uid, friend.uid].sort().join("_");
             onValue(ref(db, 'chats/' + chatID), (s) => {
                 chatWin.innerHTML = "";
                 s.forEach(child => {
@@ -212,15 +245,12 @@
             i.value = "";
         };
 
-        // --- REAL-TIME CALLS PRO ---
-        
         async function setupMedia(mode) {
-            pc = new RTCPeerConnection(servers);
+            pc = new RTCPeerConnection({ iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] });
             localStream = await navigator.mediaDevices.getUserMedia({ video: mode === 'video', audio: true });
             localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
             document.getElementById('v-local').srcObject = localStream;
             pc.ontrack = (e) => document.getElementById('v-remote').srcObject = e.streams[0];
-            
             pc.onicecandidate = (e) => {
                 if (e.candidate) {
                     const target = activeFriend ? activeFriend.uid : window.callerID;
@@ -233,25 +263,16 @@
             document.getElementById('call-screen').classList.remove('hidden');
             document.getElementById('dial-tone').play();
             await setupMedia(mode);
-
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
-
-            const callRef = ref(db, 'calls/' + activeFriend.uid);
-            await set(callRef, { offer, from: currentUser.uid, fromName: currentUser.displayName, mode });
-
-            // Ждем ответа
+            await set(ref(db, 'calls/' + activeFriend.uid), { offer, from: currentUser.uid, mode });
             onValue(ref(db, `calls/${activeFriend.uid}/answer`), async (s) => {
                 if (s.exists() && pc.signalingState !== "stable") {
                     document.getElementById('dial-tone').pause();
                     await pc.setRemoteDescription(new RTCSessionDescription(s.val()));
                 }
             });
-
-            // Слушаем ICE кандидатов от друга
-            onChildAdded(ref(db, `calls/${currentUser.uid}/candidates`), (s) => {
-                if (pc) pc.addIceCandidate(new RTCIceCandidate(s.val()));
-            });
+            onChildAdded(ref(db, `calls/${currentUser.uid}/candidates`), (s) => { if (pc) pc.addIceCandidate(new RTCIceCandidate(s.val())); });
         };
 
         function listenForCalls() {
@@ -261,49 +282,28 @@
                     document.getElementById('call-screen').classList.remove('hidden');
                     document.getElementById('incoming-ui').classList.remove('hidden');
                     document.getElementById('dial-tone').play();
-                } else if (!s.exists() && pc) {
-                    // Если звонок удален из базы - завершаем у себя
-                    window.endCall();
-                }
+                } else if (!s.exists() && pc) { window.endCall(); }
             });
         }
 
         window.acceptCall = async () => {
             document.getElementById('incoming-ui').classList.add('hidden');
             document.getElementById('dial-tone').pause();
-            
             const snap = await get(ref(db, 'calls/' + currentUser.uid));
-            const callData = snap.val();
-            await setupMedia(callData.mode);
-
-            await pc.setRemoteDescription(new RTCSessionDescription(callData.offer));
+            await setupMedia(snap.val().mode);
+            await pc.setRemoteDescription(new RTCSessionDescription(snap.val().offer));
             const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
-
             await set(ref(db, `calls/${currentUser.uid}/answer`), answer);
-
-            // Слушаем ICE кандидатов от звонящего
-            onChildAdded(ref(db, `calls/${currentUser.uid}/candidates`), (s) => {
-                if (pc) pc.addIceCandidate(new RTCIceCandidate(s.val()));
-            });
+            onChildAdded(ref(db, `calls/${currentUser.uid}/candidates`), (s) => { if (pc) pc.addIceCandidate(new RTCIceCandidate(s.val())); });
         };
 
         window.endCall = () => {
-            if(pc) {
-                pc.close();
-                pc = null;
-            }
-            if(localStream) {
-                localStream.getTracks().forEach(t => t.stop());
-                localStream = null;
-            }
+            if(pc) { pc.close(); pc = null; }
+            if(localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
             document.getElementById('dial-tone').pause();
             document.getElementById('call-screen').classList.add('hidden');
-            document.getElementById('incoming-ui').classList.add('hidden');
-            
-            // Удаляем данные звонка из базы
             remove(ref(db, 'calls/' + currentUser.uid));
-            if(activeFriend) remove(ref(db, 'calls/' + activeFriend.uid));
         };
 
         window.logout = () => signOut(auth).then(() => location.reload());
