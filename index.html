@@ -3,287 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Morozov Ultra Pro | Core Infrastructure v5.5</title>
+    <title>Morozov Ultra v7.0 | Ultimate Infrastructure</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Montserrat:wght@900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
-        /* ================================================
-           SECTION 1: GLOBAL DESIGN SYSTEM & VARIABLES
-           ================================================
+        /* ================================================================
+           1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ДИЗАЙН-СИСТЕМА
+           ================================================================
         */
         :root {
-            --u-bg: #0e1621;
-            --u-surf: #17212b;
-            --u-border: #242f3d;
-            --u-text: #ffffff;
-            --u-accent: #0088cc;
-            --u-chat: #070d14;
-            --u-me: #2b5278;
-            --u-he: #182533;
-            --u-green: #31d84d;
-            --u-red: #ff4d4d;
-            --u-anim-speed: 0.5s;
-            --u-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
+            --u-bg: #0b0f14;
+            --u-surf: #161b22;
+            --u-border: #30363d;
+            --u-text: #f0f6fc;
+            --u-accent: #2f81f7;
+            --u-chat: #010409;
+            --u-me: #238636;
+            --u-he: #21262d;
+            --u-green: #39d353;
+            --u-red: #f85149;
+            --u-gold: #d29922;
+            --u-tick-read: #2f81f7;
+            --u-tick-sent: #8b949e;
+            --u-anim-fast: 0.2s;
+            --u-anim-slow: 0.5s;
         }
 
+        /* Темы оформления */
         .theme-arctic {
-            --u-bg: #f2f2f7; --u-surf: #ffffff; --u-border: #d1d1d6;
-            --u-text: #000000; --u-accent: #007aff; --u-chat: #e5e5ea;
-            --u-me: #007aff; --u-he: #ffffff; --u-green: #34c759;
+            --u-bg: #f6f8fa; --u-surf: #ffffff; --u-border: #d0d7de;
+            --u-text: #24292f; --u-accent: #0969da; --u-chat: #f6f8fa;
+            --u-me: #0969da; --u-he: #ffffff; --u-green: #1a7f37;
+            --u-tick-read: #ffffff;
         }
 
         .theme-matrix {
             --u-bg: #000000; --u-surf: #0a0a0a; --u-border: #00ff41;
             --u-text: #00ff41; --u-accent: #00ff41; --u-chat: #000000;
             --u-me: #003300; --u-he: #001100; --u-green: #00ff41;
+            --u-tick-read: #00ff41;
         }
 
-        /* Base Typography & Normalization */
+        /* Общие настройки */
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body, html { 
             height: 100%; width: 100%; margin: 0; padding: 0; 
             background: var(--u-bg); color: var(--u-text); 
             font-family: 'Inter', sans-serif; overflow: hidden;
-            transition: background 0.4s ease, color 0.4s ease;
+            transition: background var(--u-anim-fast) ease;
         }
 
-        .font-ultra { font-family: 'Montserrat', sans-serif; letter-spacing: -0.05em; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-
-        /* ================================================
-           SECTION 2: ANIMATIONS & LAYERS
-           ================================================
+        /* ================================================================
+           2. АНИМАЦИИ И ПЕРЕХОДЫ ЭКРАНОВ
+           ================================================================
         */
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse-border { 0% { border-color: var(--u-border); } 50% { border-color: var(--u-accent); } 100% { border-color: var(--u-border); } }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(47, 129, 247, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(47, 129, 247, 0); } 100% { box-shadow: 0 0 0 0 rgba(47, 129, 247, 0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .u-screen {
             position: fixed; inset: 0; background: var(--u-bg); z-index: 10;
-            display: flex; flex-direction: column; transition: var(--u-anim-speed) var(--u-curve);
+            display: flex; flex-direction: column; 
+            transition: var(--u-anim-slow) cubic-bezier(0.19, 1, 0.22, 1);
             will-change: transform, opacity;
         }
-        .u-screen-hidden { transform: translateX(100%); opacity: 0; pointer-events: none; }
-        .u-screen-active { transform: translateX(0); opacity: 1; z-index: 50; pointer-events: auto; }
+        .u-screen-hidden { transform: scale(1.1); opacity: 0; pointer-events: none; visibility: hidden; }
+        .u-screen-active { transform: scale(1); opacity: 1; z-index: 50; pointer-events: auto; visibility: visible; }
 
-        /* ================================================
-           SECTION 3: REUSABLE COMPONENTS
-           ================================================
+        /* ================================================================
+           3. КОМПОНЕНТЫ ИНТЕРФЕЙСА (UI)
+           ================================================================
         */
         .u-header {
-            height: 72px; padding: 0 24px; background: var(--u-surf);
+            height: 80px; padding: 0 24px; background: var(--u-surf);
             border-bottom: 1px solid var(--u-border);
             display: flex; align-items: center; justify-content: space-between;
-            z-index: 100;
+            z-index: 100; backdrop-filter: blur(10px);
         }
 
-        .u-btn-icon {
-            width: 44px; height: 44px; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            background: var(--u-bg); border: 1px solid var(--u-border);
-            transition: 0.2s; cursor: pointer;
-        }
-        .u-btn-icon:active { transform: scale(0.9); background: var(--u-border); }
-
-        .u-avatar-circle {
-            width: 52px; height: 52px; border-radius: 18px;
-            background: linear-gradient(135deg, var(--u-accent), #00c6ff);
+        .u-avatar {
+            width: 48px; height: 48px; border-radius: 16px;
+            background: linear-gradient(135deg, var(--u-accent), #8250df);
             display: flex; align-items: center; justify-content: center;
             color: white; font-weight: 800; font-size: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            text-transform: uppercase;
         }
 
-        .u-badge-new {
-            background: var(--u-red); color: white; padding: 2px 6px;
-            border-radius: 6px; font-size: 10px; font-weight: 900;
-        }
-
-        /* Chat Specifics */
-        .u-message-area { flex: 1; overflow-y: auto; padding: 20px; background: var(--u-chat); display: flex; flex-direction: column; gap: 10px; }
         .u-bubble { 
-            max-width: 78%; padding: 12px 16px; border-radius: 20px; font-size: 15px; 
-            line-height: 1.4; position: relative; animation: fadeIn 0.3s ease;
+            max-width: 85%; padding: 12px 16px; border-radius: 22px; font-size: 15px; 
+            line-height: 1.4; position: relative; margin-bottom: 4px;
+            animation: slideUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) both;
         }
         .u-bubble-me { align-self: flex-end; background: var(--u-me); color: white; border-bottom-right-radius: 4px; }
         .u-bubble-he { align-self: flex-start; background: var(--u-he); color: var(--u-text); border-bottom-left-radius: 4px; border: 1px solid var(--u-border); }
 
-        /* Input Control */
-        .u-input-wrap {
-            padding: 16px; background: var(--u-surf); border-top: 1px solid var(--u-border);
-            display: flex; items-center; gap: 12px;
-        }
-        .u-editable {
-            flex: 1; min-h: 48px; max-h: 120px; background: var(--u-bg); border: 1px solid var(--u-border);
-            border-radius: 18px; padding: 12px 16px; font-size: 14px; overflow-y: auto;
+        .u-meta {
+            display: flex; align-items: center; justify-content: flex-end;
+            gap: 6px; font-size: 10px; margin-top: 6px; opacity: 0.6;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* ================================================
-           SECTION 4: LOADING & STATES
-           ================================================
-        */
-        .u-loader-ring { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--u-accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
-        
+        /* Кнопки */
+        .u-btn-primary {
+            background: var(--u-accent); color: white; padding: 16px;
+            border-radius: 20px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 1px; transition: 0.3s; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(47, 129, 247, 0.3);
+        }
+        .u-btn-primary:active { transform: scale(0.95); opacity: 0.8; }
+
+        /* Поля ввода */
+        .u-input {
+            width: 100%; padding: 18px; background: var(--u-bg);
+            border: 1px solid var(--u-border); border-radius: 20px;
+            color: var(--u-text); transition: 0.3s;
+        }
+        .u-input:focus { border-color: var(--u-accent); box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.1); }
+
+        /* Видео контейнеры */
+        #v-remote { width: 100%; height: 100%; object-fit: cover; background: #000; }
+        #v-local { 
+            position: absolute; top: 40px; right: 24px; width: 120px; height: 180px; 
+            border-radius: 24px; border: 2px solid rgba(255,255,255,0.2); 
+            object-fit: cover; z-index: 1000; background: #111;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .loader-ring { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--u-accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--u-border); border-radius: 10px; }
     </style>
 </head>
 <body class="theme-midnight">
 
-    <div id="scr-gate" class="u-screen z-[9999] justify-center items-center px-8">
+    <div id="scr-gate" class="u-screen z-[9999] justify-center items-center px-8 bg-[#0b0f14]">
         <div class="w-full max-w-sm">
-            <div class="text-center mb-12 animate-pulse">
-                <h1 class="text-7xl font-ultra italic text-blue-500">ULTRA</h1>
-                <p class="font-mono text-[10px] uppercase tracking-[0.6em] opacity-30 mt-3">Infrastructure Mesh v5.5</p>
+            <div class="text-center mb-10">
+                <h1 class="text-7xl font-black italic text-blue-500 tracking-tighter animate-pulse">ULTRA</h1>
+                <p class="font-mono text-[10px] uppercase tracking-[0.5em] opacity-30 mt-4">Security Protocol v7.0.4</p>
             </div>
 
-            <div class="bg-[var(--u-surf)] p-8 rounded-[45px] border border-[var(--u-border)] shadow-2xl">
-                <div class="space-y-4" id="gate-form">
-                    <div class="group">
-                        <input id="gate-email" type="email" placeholder="Access Email" class="w-full p-5 bg-[var(--u-bg)] rounded-3xl border border-[var(--u-border)] focus:border-blue-500 transition-all text-sm">
+            <div class="bg-[var(--u-surf)] p-10 rounded-[50px] border border-[var(--u-border)] shadow-2xl relative overflow-hidden">
+                <div class="space-y-4 relative z-10">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black opacity-30 ml-4 uppercase">Network Address</label>
+                        <input id="gate-email" type="email" placeholder="agent@network.com" class="u-input">
                     </div>
-                    <div class="group">
-                        <input id="gate-pass" type="password" placeholder="Secure Token (Password)" class="w-full p-5 bg-[var(--u-bg)] rounded-3xl border border-[var(--u-border)] focus:border-blue-500 transition-all text-sm">
-                    </div>
-                    <div id="gate-reg-extra" class="hidden animate-fadeIn">
-                        <input id="gate-nick" type="text" placeholder="Callsign (Display Name)" class="w-full p-5 bg-blue-500/5 rounded-3xl border border-blue-500/20 focus:border-blue-500 transition-all text-sm">
+                    
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black opacity-30 ml-4 uppercase">Access Key</label>
+                        <input id="gate-pass" type="password" placeholder="••••••••" class="u-input">
                     </div>
 
-                    <button id="gate-btn-main" onclick="handleAuthAction()" class="w-full bg-blue-600 hover:bg-blue-500 text-white p-5 rounded-3xl font-black shadow-xl transform active:scale-95 transition-all flex justify-center items-center">
-                        <span id="gate-btn-text">INITIALIZE SESSION</span>
+                    <div id="gate-reg-extra" class="hidden space-y-1 animate-fadeIn">
+                        <label class="text-[10px] font-black opacity-30 ml-4 uppercase">Agent Callsign</label>
+                        <input id="gate-nick" type="text" placeholder="Egor Morozov" class="u-input border-blue-500/30">
+                    </div>
+
+                    <button id="gate-btn-main" onclick="executeSecurityHandshake()" class="u-btn-primary w-full mt-6">
+                        <span id="gate-btn-label">INITIALIZE SESSION</span>
                     </button>
 
-                    <button onclick="toggleGateMode()" id="gate-btn-switch" class="w-full text-[10px] font-black opacity-30 uppercase tracking-[0.2em] pt-6 hover:opacity-100 transition">
-                        No active credentials? Generate Access
+                    <button onclick="toggleGateMode()" id="gate-btn-toggle" class="w-full text-[10px] font-black opacity-30 uppercase tracking-[0.2em] pt-6 hover:opacity-100 transition-all">
+                        Request New Identity Certificate
                     </button>
                 </div>
-                <div id="gate-feedback" class="text-[10px] font-bold text-red-500 text-center mt-6 uppercase leading-tight"></div>
             </div>
+            <div id="gate-feedback" class="text-red-500 text-[10px] font-black text-center mt-8 uppercase leading-tight min-h-[20px]"></div>
         </div>
     </div>
 
     <div id="scr-main" class="u-screen u-screen-hidden">
         <header class="u-header">
-            <button onclick="navTo('settings')" class="u-btn-icon"><i class="fas fa-th-large"></i></button>
-            <div class="text-center">
-                <div class="font-ultra text-lg">MOROZOV <span class="text-blue-500">PRO</span></div>
-                <div class="text-[8px] font-black opacity-30 tracking-[0.4em] uppercase">Network Online</div>
+            <button onclick="navigate('settings')" class="w-12 h-12 rounded-2xl bg-[var(--u-bg)] border border-[var(--u-border)] flex items-center justify-center text-xl active:scale-90 transition-all">
+                <i class="fas fa-sliders-h"></i>
+            </button>
+            <div class="flex flex-col items-center">
+                <span class="font-black italic text-xl">MOROZOV <span class="text-blue-500">ULTRA</span></span>
+                <div class="flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-[8px] font-black opacity-30 uppercase tracking-widest">Nodes Online</span>
+                </div>
             </div>
-            <button onclick="triggerFriendSearch()" class="u-btn-icon text-blue-500"><i class="fas fa-user-plus"></i></button>
+            <button onclick="broadcastLinkRequest()" class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg active:scale-90 transition-all">
+                <i class="fas fa-plus"></i>
+            </button>
         </header>
 
-        <div class="flex-1 overflow-auto">
-            <div id="hub-requests" class="hidden">
-                <div class="px-6 py-4 bg-blue-600/5 flex justify-between items-center border-b border-blue-500/10">
-                    <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Inbound Handshakes</span>
-                    <span id="req-badge" class="u-badge-new">0</span>
-                </div>
-                <div id="list-requests"></div>
+        <div class="flex-1 overflow-y-auto px-6 py-8">
+            <div id="hub-requests-area" class="hidden mb-10">
+                <p class="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] mb-4">Pending Handshakes</p>
+                <div id="list-requests" class="space-y-3"></div>
             </div>
 
-            <div class="px-6 py-6 flex items-center justify-between">
-                <span class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em]">Encrypted Nodes</span>
+            <div class="flex items-center justify-between mb-6">
+                <p class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em]">Encrypted Channels</p>
                 <div class="h-px flex-1 bg-[var(--u-border)] ml-6"></div>
             </div>
-            <div id="list-contacts" class="px-2"></div>
-            
-            <div id="main-empty" class="hidden flex flex-col items-center justify-center py-32 opacity-10">
-                <i class="fas fa-satellite-dish text-6xl mb-4"></i>
-                <p class="font-black text-xs uppercase tracking-widest">Searching for signals...</p>
+
+            <div id="list-friends" class="space-y-3"></div>
+
+            <div id="main-empty-state" class="hidden flex flex-col items-center justify-center py-32 opacity-10">
+                <i class="fas fa-wind text-6xl mb-6"></i>
+                <p class="font-black text-xs uppercase tracking-[0.4em]">Empty Frequency</p>
             </div>
         </div>
     </div>
 
     <div id="scr-chat" class="u-screen u-screen-hidden">
         <header class="u-header">
-            <div class="flex items-center">
-                <button onclick="navTo('main')" class="mr-4 opacity-40"><i class="fas fa-chevron-left text-xl"></i></button>
-                <div id="chat-av" class="u-avatar-circle w-10 h-10 mr-3 !rounded-xl text-sm">?</div>
+            <div class="flex items-center gap-4">
+                <button onclick="navigate('main')" class="text-xl opacity-30 hover:opacity-100 transition"><i class="fas fa-arrow-left"></i></button>
+                <div id="chat-av" class="u-avatar !w-11 !h-11">?</div>
                 <div>
-                    <div id="chat-title" class="font-bold text-sm">Secure Line</div>
+                    <div id="chat-partner-name" class="font-bold text-sm">Loading Node...</div>
                     <div class="flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                        <span class="text-[9px] font-black opacity-30 uppercase">Live Connection</span>
+                        <span class="text-[9px] font-black text-blue-500 uppercase">P2P Encrypted</span>
                     </div>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="initCall('video')" class="u-btn-icon !bg-transparent border-none opacity-30"><i class="fas fa-video"></i></button>
-                <button onclick="initCall('voice')" class="u-btn-icon !bg-transparent border-none opacity-30"><i class="fas fa-phone"></i></button>
+            <div class="flex items-center gap-2">
+                <button onclick="initiateMediaCall('video')" class="w-10 h-10 flex items-center justify-center text-blue-500 text-xl"><i class="fas fa-video"></i></button>
+                <button onclick="initiateMediaCall('voice')" class="w-10 h-10 flex items-center justify-center text-blue-500 text-xl"><i class="fas fa-phone-alt"></i></button>
             </div>
         </header>
 
-        <div id="chat-messages" class="u-message-area"></div>
+        <div id="chat-scroll-area" class="flex-1 overflow-y-auto p-4 flex flex-col space-y-2 bg-[var(--u-chat)]">
+            </div>
 
-        <div class="u-input-wrap">
-            <label class="u-btn-icon border-none text-blue-500">
+        <div class="p-4 bg-[var(--u-surf)] border-t border-[var(--u-border)] flex items-end gap-3 pb-8">
+            <button class="w-12 h-12 rounded-2xl bg-[var(--u-bg)] border border-[var(--u-border)] text-blue-500 flex items-center justify-center">
                 <i class="fas fa-paperclip"></i>
-                <input type="file" class="hidden" onchange="uploadMedia(this)" accept="image/*">
-            </label>
-            <div id="chat-input-box" contenteditable="true" class="u-editable" oninput="toggleSendUI()"></div>
-            <button id="btn-send-msg" onclick="pushMessage()" class="hidden w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                <i class="fas fa-paper-plane text-xs"></i>
+            </button>
+            <div id="chat-input-field" contenteditable="true" class="flex-1 bg-[var(--u-bg)] p-4 rounded-2xl max-h-40 overflow-y-auto text-sm border border-[var(--u-border)] focus:border-blue-500 transition-all" placeholder="Enter secure data..."></div>
+            <button id="btn-msg-push" onclick="pushSecureData()" class="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-xl active:scale-90 transition-all">
+                <i class="fas fa-paper-plane text-lg"></i>
             </button>
         </div>
     </div>
 
     <div id="scr-settings" class="u-screen u-screen-hidden">
         <header class="u-header">
-            <button onclick="navTo('main')" class="u-btn-icon"><i class="fas fa-arrow-left"></i></button>
-            <span class="font-ultra text-xs uppercase tracking-widest">Configuration</span>
-            <div class="w-10"></div>
+            <button onclick="navigate('main')" class="w-12 h-12 rounded-2xl bg-[var(--u-bg)] flex items-center justify-center"><i class="fas fa-chevron-left"></i></button>
+            <span class="font-black text-xs uppercase tracking-[0.3em]">System Config</span>
+            <div class="w-12"></div>
         </header>
 
-        <div class="flex-1 overflow-auto">
+        <div class="flex-1 overflow-y-auto">
             <div class="p-12 flex flex-col items-center">
-                <div id="st-avatar" class="w-28 h-28 bg-blue-600 rounded-[40%] flex items-center justify-center text-5xl font-black mb-6 shadow-2xl border-4 border-[var(--u-bg)]">?</div>
-                <h2 id="st-nickname" class="text-3xl font-ultra tracking-tighter">Identity</h2>
-                <div id="st-email-text" class="text-[10px] font-mono opacity-30 uppercase mt-2 tracking-widest">...</div>
+                <div id="st-profile-av" class="w-32 h-32 bg-blue-600 rounded-[40%] flex items-center justify-center text-5xl font-black mb-6 shadow-2xl border-4 border-[var(--u-bg)] animate-pulse">?</div>
+                <h2 id="st-profile-nick" class="text-3xl font-black tracking-tighter">Unknown Agent</h2>
+                <div id="st-profile-mail" class="text-[10px] font-mono opacity-30 uppercase mt-2 tracking-widest">agent@null.void</div>
                 
-                <div class="mt-8 flex gap-3">
-                    <button onclick="editIdentity()" class="px-6 py-3 bg-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg">Change Name</button>
-                    <button onclick="copyUID()" class="px-6 py-3 bg-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/5">Copy UID</button>
+                <div class="flex gap-3 mt-8">
+                    <button onclick="modifyIdentity()" class="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition">Change Name</button>
+                    <button onclick="copyAccessUID()" class="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition">Copy UID</button>
                 </div>
             </div>
 
             <div class="px-8 space-y-8 pb-10">
                 <div class="space-y-4">
-                    <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Visual Matrix</p>
+                    <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest ml-2">Visual Core</p>
                     <div class="grid grid-cols-3 gap-4">
-                        <div onclick="applyTheme('midnight')" class="h-14 bg-[#0e1621] rounded-2xl border-2 border-white/5 flex items-center justify-center"><i class="fas fa-moon opacity-10"></i></div>
-                        <div onclick="applyTheme('arctic')" class="h-14 bg-white rounded-2xl border-2 border-black/5 flex items-center justify-center"><i class="fas fa-sun text-black opacity-10"></i></div>
-                        <div onclick="applyTheme('matrix')" class="h-14 bg-black rounded-2xl border-2 border-[#00ff41]/20 flex items-center justify-center"><i class="fas fa-code text-[#00ff41] opacity-20"></i></div>
+                        <button onclick="applyVisualTheme('midnight')" class="h-16 bg-[#0b0f14] rounded-3xl border-2 border-white/5 flex items-center justify-center"><i class="fas fa-moon text-blue-500"></i></button>
+                        <button onclick="applyVisualTheme('arctic')" class="h-16 bg-white rounded-3xl border-2 border-black/5 flex items-center justify-center"><i class="fas fa-sun text-orange-500"></i></button>
+                        <button onclick="applyVisualTheme('matrix')" class="h-16 bg-black rounded-3xl border-2 border-[#00ff41]/30 flex items-center justify-center"><i class="fas fa-code text-[#00ff41]"></i></button>
                     </div>
                 </div>
 
-                <div class="space-y-3">
-                    <p class="text-[10px] font-black text-red-500 uppercase tracking-widest">Danger Zone</p>
-                    <button onclick="terminateSession()" class="w-full p-5 bg-red-500/10 border border-red-500/20 rounded-3xl flex items-center justify-between text-red-500">
-                        <span class="font-black text-xs uppercase italic">Terminate Connection</span>
-                        <i class="fas fa-power-off"></i>
+                <div class="space-y-4">
+                    <p class="text-[10px] font-black text-red-500 uppercase tracking-widest ml-2">Session Control</p>
+                    <button onclick="terminateAgentSession()" class="w-full p-6 bg-red-500/10 border border-red-500/20 rounded-[30px] flex items-center justify-between text-red-500 active:scale-95 transition-all">
+                        <div class="text-left">
+                            <p class="font-black text-xs uppercase italic">Terminate Connection</p>
+                            <p class="text-[9px] opacity-60">Disconnect from secure mesh</p>
+                        </div>
+                        <i class="fas fa-power-off text-xl"></i>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="overlay-call" class="fixed inset-0 bg-black z-[10000] hidden flex-col overflow-hidden">
-        <video id="v-remote" class="w-full h-full object-cover" autoplay playsinline></video>
-        <video id="v-local" class="absolute top-12 right-6 w-32 h-48 rounded-3xl border-2 border-white/20 object-cover shadow-2xl bg-zinc-900" autoplay muted playsinline></video>
+    <div id="overlay-media" class="fixed inset-0 bg-black z-[10000] hidden flex-col overflow-hidden">
+        <video id="v-remote" autoplay playsinline></video>
+        <video id="v-local" autoplay muted playsinline></video>
         
-        <div class="absolute inset-0 flex flex-col justify-between items-center py-20 bg-gradient-to-b from-black/40 via-transparent to-black/80">
+        <div class="absolute inset-0 flex flex-col justify-between items-center py-20 bg-gradient-to-b from-black/60 via-transparent to-black/90">
             <div class="text-center">
-                <div id="call-avatar" class="w-24 h-24 bg-blue-600 rounded-full mx-auto flex items-center justify-center text-4xl font-black mb-6 border-4 border-white/10 shadow-2xl">?</div>
-                <h2 id="call-target-name" class="text-3xl font-ultra text-white uppercase italic tracking-tighter">Establishing...</h2>
-                <div class="text-[10px] font-mono text-blue-400 mt-4 tracking-widest animate-pulse">ENCRYPTED P2P HANDSHAKE</div>
+                <div id="media-call-av" class="w-28 h-28 bg-blue-600 rounded-[45%] mx-auto flex items-center justify-center text-4xl font-black mb-6 border-4 border-white/10 shadow-2xl">?</div>
+                <h2 id="media-call-name" class="text-3xl font-black text-white uppercase italic tracking-tighter">Requesting...</h2>
+                <div class="text-[10px] font-mono text-blue-400 mt-4 tracking-[0.4em] animate-pulse">ENCRYPTING P2P CHANNEL</div>
             </div>
 
-            <button onclick="location.reload()" class="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center text-3xl text-white shadow-[0_0_60px_rgba(239,68,68,0.4)] active:scale-75 transition-all">
-                <i class="fas fa-phone-slash"></i>
-            </button>
+            <div class="flex gap-6">
+                <button onclick="location.reload()" class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center text-3xl text-white shadow-2xl active:scale-75 transition-all">
+                    <i class="fas fa-phone-slash"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -292,7 +314,7 @@
         import { getDatabase, ref, push, set, onValue, update, get, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // FIREBASE CONFIGURATION
+        // FIREBASE INFRASTRUCTURE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
@@ -306,41 +328,42 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // SYSTEM STATE
-        let selfAgent = null;
-        let activePartner = null;
-        let isRegMode = false;
-        let currentRoom = null;
-        let peerConnection = null;
+        // GLOBAL STATE MANAGER
+        let activeAgent = null;
+        let p2pPartner = null;
+        let currentRoomId = null;
+        let isRegistration = false;
+        let peerConn = null;
+        const rtcConf = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
-        // --- MODULE: NAVIGATION ---
-        window.navTo = (id) => {
-            console.log(`[NAV] Syncing screen: ${id}`);
+        // 1. NAVIGATION ENGINE
+        window.navigate = (target) => {
+            console.log(`[CORE] Switching to screen: ${target}`);
             const screens = ['gate', 'main', 'chat', 'settings'];
             screens.forEach(s => {
                 const el = document.getElementById(`scr-${s}`);
-                if (el) {
-                    if (s === id) el.classList.replace('u-screen-hidden', 'u-screen-active');
-                    else el.classList.replace('u-screen-active', 'u-screen-hidden');
-                }
+                if (s === target) el.classList.replace('u-screen-hidden', 'u-screen-active');
+                else el.classList.replace('u-screen-active', 'u-screen-hidden');
             });
-            // Update Settings Profile if navigated
-            if (id === 'settings' && selfAgent) {
-                document.getElementById('st-nickname').innerText = selfAgent.displayName || "Agent";
-                document.getElementById('st-email-text').innerText = selfAgent.email;
-                document.getElementById('st-avatar').innerText = (selfAgent.displayName ? selfAgent.displayName[0] : "A").toUpperCase();
+
+            // Auto-refresh settings if opened
+            if (target === 'settings' && auth.currentUser) {
+                const u = auth.currentUser;
+                document.getElementById('st-profile-nick').innerText = u.displayName || "Agent";
+                document.getElementById('st-profile-mail').innerText = u.email;
+                document.getElementById('st-profile-av').innerText = (u.displayName ? u.displayName[0] : "A").toUpperCase();
             }
         };
 
-        // --- MODULE: AUTHENTICATION ---
+        // 2. SECURITY & AUTHENTICATION HANDLER
         window.toggleGateMode = () => {
-            isRegMode = !isRegMode;
-            document.getElementById('gate-reg-extra').classList.toggle('hidden', !isRegMode);
-            document.getElementById('gate-btn-text').innerText = isRegMode ? "CREATE NEW IDENTITY" : "INITIALIZE SESSION";
-            document.getElementById('gate-btn-switch').innerText = isRegMode ? "Already verified? Access Terminal" : "No active credentials? Generate Access";
+            isRegistration = !isRegistration;
+            document.getElementById('gate-reg-extra').classList.toggle('hidden', !isRegistration);
+            document.getElementById('gate-btn-label').innerText = isRegistration ? "CREATE IDENTITY" : "INITIALIZE SESSION";
+            document.getElementById('gate-btn-toggle').innerText = isRegistration ? "Already a verified agent? Access" : "Request New Identity Certificate";
         };
 
-        window.handleAuthAction = async () => {
+        window.executeSecurityHandshake = async () => {
             const email = document.getElementById('gate-email').value.trim();
             const pass = document.getElementById('gate-pass').value.trim();
             const nick = document.getElementById('gate-nick').value.trim();
@@ -348,30 +371,32 @@
             const btn = document.getElementById('gate-btn-main');
 
             if (!email || pass.length < 6) {
-                feedback.innerText = "CRITICAL: INVALID DATA LENGTH";
+                feedback.innerText = "SECURITY ALERT: INVALID CREDENTIALS LENGTH";
                 return;
             }
 
-            feedback.innerText = "PROCESSING...";
+            feedback.innerText = "PROCESSING ENCRYPTION...";
             btn.disabled = true;
-            btn.innerHTML = `<div class="u-loader-ring"></div>`;
+            btn.innerHTML = `<div class="loader-ring"></div>`;
 
             try {
-                if (isRegMode) {
+                if (isRegistration) {
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
+                    // Crucial: Immediate profile sync
                     await updateProfile(res.user, { displayName: nick || "Agent" });
-                    await set(ref(db, `v55/users/${res.user.uid}`), {
+                    await set(ref(db, `v70/users/${res.user.uid}`), {
                         name: nick || "Agent",
                         email: email,
                         uid: res.user.uid,
-                        created: Date.now()
+                        timestamp: Date.now()
                     });
                 } else {
                     await signInWithEmailAndPassword(auth, email, pass);
                 }
             } catch (err) {
-                console.error(err);
-                feedback.innerText = `ERROR: ${err.code.split('/')[1].replace(/-/g, ' ')}`;
+                console.error("[AUTH ERROR]", err.code);
+                if (err.code === 'auth/email-already-in-use') feedback.innerText = "ACCESS DENIED: IDENTITY ALREADY EXISTS. USE LOGIN.";
+                else feedback.innerText = "PROTOCOL ERROR: " + err.code.replace('auth/', '').replace(/-/g, ' ').toUpperCase();
                 btn.innerHTML = `<span>RETRY</span>`;
                 btn.disabled = false;
             }
@@ -379,231 +404,226 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                selfAgent = user;
+                activeAgent = user;
                 document.getElementById('scr-gate').style.display = 'none';
-                initSocialMesh();
-                navTo('main');
+                initializeSocialMesh();
+                navigate('main');
             } else {
                 document.getElementById('scr-gate').style.display = 'flex';
-                navTo('gate');
+                navigate('gate');
             }
         });
 
-        // --- MODULE: SOCIAL CORE ---
-        function initSocialMesh() {
-            console.log("[CORE] Initializing Social Mesh...");
-            const socialRef = ref(db, `v55/social/${selfAgent.uid}`);
+        // 3. SOCIAL MESH & NETWORKING
+        function initializeSocialMesh() {
+            console.log("[MESH] Initializing Data Streams...");
+            const meshRef = ref(db, `v70/social/${activeAgent.uid}`);
             
-            onValue(socialRef, (snap) => {
-                const listC = document.getElementById('list-contacts');
+            onValue(meshRef, (snapshot) => {
+                const listF = document.getElementById('list-friends');
                 const listR = document.getElementById('list-requests');
-                const hubR = document.getElementById('hub-requests');
-                const badgeR = document.getElementById('req-badge');
-                const empty = document.getElementById('main-empty');
+                const hubR = document.getElementById('hub-requests-area');
+                const empty = document.getElementById('main-empty-state');
 
-                listC.innerHTML = ""; listR.innerHTML = "";
-                let countR = 0; let countC = 0;
+                listF.innerHTML = ""; listR.innerHTML = "";
+                let countR = 0; let countF = 0;
 
-                snap.forEach(child => {
+                snapshot.forEach(child => {
                     const data = child.val();
                     if (data.status === 'request') {
                         countR++;
                         const div = document.createElement('div');
-                        div.className = "p-4 flex items-center justify-between border-b border-white/5 bg-blue-500/5";
+                        div.className = "p-4 flex items-center justify-between border border-blue-500/20 bg-blue-500/5 rounded-3xl animate-pulse";
                         div.innerHTML = `
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-bold">${data.name[0]}</div>
-                                <div class="text-xs font-bold">${data.name}</div>
+                                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-bold font-ultra">${data.name[0]}</div>
+                                <div class="text-xs font-black uppercase">${data.name}</div>
                             </div>
-                            <button onclick="acceptHandshake('${data.id}', '${data.name}')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">Accept</button>
+                            <button onclick="confirmHandshake('${data.id}', '${data.name}')" class="bg-blue-600 text-white px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest">Accept</button>
                         `;
                         listR.appendChild(div);
                     } else if (data.status === 'active') {
-                        countC++;
+                        countF++;
                         const div = document.createElement('div');
-                        div.className = "flex items-center p-4 hover:bg-white/5 rounded-3xl transition-all mb-1 cursor-pointer group";
+                        div.className = "flex items-center p-5 bg-[var(--u-surf)] border border-[var(--u-border)] rounded-[30px] hover:border-blue-500/50 transition-all cursor-pointer group mb-1";
                         div.innerHTML = `
-                            <div class="u-avatar-circle !w-12 !h-12 !rounded-2xl mr-4 group-hover:scale-105 transition-all">${data.name[0]}</div>
+                            <div class="u-avatar group-hover:scale-110 transition-all mr-5">${data.name[0]}</div>
                             <div class="flex-1">
                                 <div class="font-bold text-sm">${data.name}</div>
-                                <div class="text-[9px] font-black opacity-20 uppercase tracking-widest">Secure Node</div>
+                                <div class="text-[9px] font-black opacity-20 uppercase tracking-widest">Secure Node Established</div>
                             </div>
-                            <i class="fas fa-chevron-right text-[10px] opacity-10"></i>
+                            <i class="fas fa-chevron-right text-[10px] opacity-10 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
                         `;
-                        div.onclick = () => openChatTerminal(data);
-                        listC.appendChild(div);
+                        div.onclick = () => openSecureTerminal(data);
+                        listF.appendChild(div);
                     }
                 });
 
                 hubR.classList.toggle('hidden', countR === 0);
-                badgeR.innerText = countR;
-                empty.classList.toggle('hidden', (countC + countR) > 0);
+                empty.classList.toggle('hidden', (countF + countR) > 0);
             });
 
-            listenInboundCalls();
+            listenForIncomingMediaCalls();
         }
 
-        window.triggerFriendSearch = async () => {
-            const mail = prompt("Enter Target Node Email:");
-            if (!mail || mail === selfAgent.email) return;
+        window.broadcastLinkRequest = async () => {
+            const targetMail = prompt("Enter Target Agent Email:");
+            if (!targetMail || targetMail === activeAgent.email) return;
 
-            const usersSnap = await get(ref(db, `v55/users`));
-            let found = null;
-            usersSnap.forEach(u => { if(u.val().email === mail) found = u.val(); });
+            const usersDb = await get(ref(db, `v70/users`));
+            let foundAgent = null;
+            usersDb.forEach(u => { if(u.val().email === targetMail) foundAgent = u.val(); });
 
-            if (found) {
-                await update(ref(db, `v55/social/${found.uid}/${selfAgent.uid}`), { id: selfAgent.uid, name: selfAgent.displayName, status: 'request' });
-                await update(ref(db, `v55/social/${selfAgent.uid}/${found.uid}`), { id: found.uid, name: found.name, status: 'waiting' });
-                alert("Handshake Request Broadcasted.");
+            if (foundAgent) {
+                await update(ref(db, `v70/social/${foundAgent.uid}/${activeAgent.uid}`), { id: activeAgent.uid, name: activeAgent.displayName, status: 'request' });
+                await update(ref(db, `v70/social/${activeAgent.uid}/${foundAgent.uid}`), { id: foundAgent.uid, name: foundAgent.name, status: 'waiting' });
+                alert("Handshake Signal Broadcasted Successfully.");
             } else {
-                alert("Node not found in global directory.");
+                alert("Target Agent Node not found in global directory.");
             }
         };
 
-        window.acceptHandshake = async (id, name) => {
-            const up = {};
-            up[`v55/social/${selfAgent.uid}/${id}/status`] = 'active';
-            up[`v55/social/${id}/${selfAgent.uid}/status`] = 'active';
-            await update(ref(db), up);
+        window.confirmHandshake = async (id, name) => {
+            const batch = {};
+            batch[`v70/social/${activeAgent.uid}/${id}/status`] = 'active';
+            batch[`v70/social/${id}/${activeAgent.uid}/status`] = 'active';
+            await update(ref(db), batch);
         };
 
-        // --- MODULE: CHAT TERMINAL ---
-        window.openChatTerminal = (partner) => {
-            activePartner = partner;
-            currentRoom = [selfAgent.uid, partner.id].sort().join("_X_");
-            navTo('chat');
+        // 4. TERMINAL & MESSAGING (Ticks + Time)
+        window.openSecureTerminal = (partner) => {
+            p2pPartner = partner;
+            currentRoomId = [activeAgent.uid, partner.id].sort().join("_MESH_");
+            navigate('chat');
             
-            document.getElementById('chat-title').innerText = partner.name;
+            document.getElementById('chat-partner-name').innerText = partner.name;
             document.getElementById('chat-av').innerText = partner.name[0];
             
-            onValue(ref(db, `v55/rooms/${currentRoom}`), (snap) => {
-                const box = document.getElementById('chat-messages');
+            onValue(ref(db, `v70/rooms/${currentRoomId}`), (snap) => {
+                const box = document.getElementById('chat-scroll-area');
                 box.innerHTML = "";
-                snap.forEach(m => {
-                    const d = m.val();
-                    const isMe = d.sid === selfAgent.uid;
+                snap.forEach(msg => {
+                    const d = msg.val();
+                    const isMe = d.sid === activeAgent.uid;
+                    
+                    // Logic: Mark as read if receiving
+                    if (!isMe && d.status !== 'read') {
+                        update(ref(db, `v70/rooms/${currentRoomId}/${msg.key}`), { status: 'read' });
+                    }
+
+                    const time = new Date(d.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const tickIcon = d.status === 'read' ? '<i class="fas fa-check-double text-blue-400"></i>' : '<i class="fas fa-check opacity-40"></i>';
+
                     const b = document.createElement('div');
                     b.className = `u-bubble ${isMe ? 'u-bubble-me' : 'u-bubble-he'}`;
-                    if (d.tp === 'img') b.innerHTML = `<img src="${d.cnt}" class="rounded-xl shadow-lg mb-1 max-w-full">`;
-                    else b.innerText = d.cnt;
+                    b.innerHTML = `
+                        <div>${d.cnt}</div>
+                        <div class="u-meta">
+                            <span>${time}</span>
+                            ${isMe ? tickIcon : ''}
+                        </div>
+                    `;
                     box.appendChild(b);
                 });
                 box.scrollTop = box.scrollHeight;
             });
         };
 
-        window.pushMessage = () => {
-            const input = document.getElementById('chat-input-box');
-            const txt = input.innerText.trim();
-            if (!txt || !currentRoom) return;
+        window.pushSecureData = () => {
+            const field = document.getElementById('chat-input-field');
+            const content = field.innerText.trim();
+            if (!content || !currentRoomId) return;
 
-            push(ref(db, `v55/rooms/${currentRoom}`), {
-                sid: selfAgent.uid,
-                cnt: txt,
-                tp: 'text',
-                ts: Date.now()
+            push(ref(db, `v70/rooms/${currentRoomId}`), {
+                sid: activeAgent.uid,
+                cnt: content,
+                ts: Date.now(),
+                status: 'sent'
             });
-            input.innerText = "";
-            toggleSendUI();
+            field.innerText = "";
         };
 
-        window.uploadMedia = (el) => {
-            const file = el.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                push(ref(db, `v55/rooms/${currentRoom}`), {
-                    sid: selfAgent.uid,
-                    cnt: e.target.result,
-                    tp: 'img',
-                    ts: Date.now()
-                });
-            };
-            reader.readAsDataURL(file);
+        // 5. P2P MEDIA ENGINE (WebRTC)
+        window.initiateMediaCall = async (type) => {
+            document.getElementById('overlay-media').classList.remove('hidden');
+            document.getElementById('media-call-name').innerText = p2pPartner.name;
+            document.getElementById('media-call-av').innerText = p2pPartner.name[0];
+
+            peerConn = new RTCPeerConnection(rtcConf);
+            const stream = await navigator.mediaDevices.getUserMedia({ video: type === 'video', audio: true });
+            stream.getTracks().forEach(track => peerConn.addTrack(track, stream));
+            
+            document.getElementById('v-local').srcObject = stream;
+            peerConn.onicecandidate = (e) => e.candidate && push(ref(db, `v70/calls/${p2pPartner.id}/ice`), e.candidate.toJSON());
+            peerConn.ontrack = (e) => document.getElementById('v-remote').srcObject = e.streams[0];
+
+            const offer = await peerConn.createOffer();
+            await peerConn.setLocalDescription(offer);
+            
+            // Clean slate for new call session
+            await remove(ref(db, `v70/calls/${p2pPartner.id}`));
+            await set(ref(db, `v70/calls/${p2pPartner.id}/sig`), { offer, from: activeAgent.uid, name: activeAgent.displayName });
+
+            onValue(ref(db, `v70/calls/${p2pPartner.id}/ans`), async snap => {
+                const ans = snap.val();
+                if (ans && !peerConn.currentRemoteDescription) await peerConn.setRemoteDescription(new RTCSessionDescription(ans));
+            });
         };
 
-        window.toggleSendUI = () => {
-            const hasVal = document.getElementById('chat-input-box').innerText.trim().length > 0;
-            document.getElementById('btn-send-msg').classList.toggle('hidden', !hasVal);
-        };
+        function listenForIncomingMediaCalls() {
+            onValue(ref(db, `v70/calls/${activeAgent.uid}/sig`), async snap => {
+                const data = snap.val();
+                if (data && data.offer && !peerConn) {
+                    if (confirm(`INCOMING: Node ${data.name} is requesting media handshake. Accept?`)) {
+                        document.getElementById('overlay-media').classList.remove('hidden');
+                        peerConn = new RTCPeerConnection(rtcConf);
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                        stream.getTracks().forEach(track => peerConn.addTrack(track, stream));
+                        document.getElementById('v-local').srcObject = stream;
+                        
+                        peerConn.ontrack = (e) => document.getElementById('v-remote').srcObject = e.streams[0];
+                        peerConn.onicecandidate = (e) => e.candidate && push(ref(db, `v70/calls/${data.from}/ice`), e.candidate.toJSON());
+                        
+                        await peerConn.setRemoteDescription(new RTCSessionDescription(data.offer));
+                        const answer = await peerConn.createAnswer();
+                        await peerConn.setLocalDescription(answer);
+                        set(ref(db, `v70/calls/${data.from}/ans`), answer);
 
-        // --- MODULE: SYSTEM SETTINGS ---
-        window.editIdentity = async () => {
-            const n = prompt("New Identifier:", selfAgent.displayName);
-            if (n && n.length > 2) {
-                await updateProfile(selfAgent, { displayName: n });
-                await update(ref(db, `v55/users/${selfAgent.uid}`), { name: n });
+                        onValue(ref(db, `v70/calls/${activeAgent.uid}/ice`), iSnap => iSnap.forEach(c => peerConn.addIceCandidate(new RTCIceCandidate(c.val()))));
+                    } else {
+                        remove(ref(db, `v70/calls/${activeAgent.uid}`));
+                    }
+                }
+            });
+        }
+
+        // 6. SYSTEM UTILITIES
+        window.modifyIdentity = async () => {
+            const newNick = prompt("Enter New Callsign:", activeAgent.displayName);
+            if (newNick && newNick.length > 2) {
+                await updateProfile(activeAgent, { displayName: newNick });
+                await update(ref(db, `v70/users/${activeAgent.uid}`), { name: newNick });
                 location.reload();
             }
         };
 
-        window.applyTheme = (t) => {
-            document.body.className = `theme-${t}`;
-            localStorage.setItem('mu_theme', t);
+        window.applyVisualTheme = (themeName) => {
+            document.body.className = `theme-${themeName}`;
+            localStorage.setItem('mu_theme_v7', themeName);
         };
-        applyTheme(localStorage.getItem('mu_theme') || 'midnight');
+        applyVisualTheme(localStorage.getItem('mu_theme_v7') || 'midnight');
 
-        window.copyUID = () => {
-            navigator.clipboard.writeText(selfAgent.uid);
-            alert("Unique ID Copied.");
+        window.copyAccessUID = () => {
+            navigator.clipboard.writeText(activeAgent.uid);
+            alert("Node UID copied to secure clipboard.");
         };
 
-        window.terminateSession = () => {
-            if (confirm("Shutdown Secure Session?")) {
+        window.terminateAgentSession = () => {
+            if (confirm("Shutdown all secure connections and logout?")) {
                 signOut(auth).then(() => location.reload());
             }
         };
 
-        // --- MODULE: WEBRTC CALLING ---
-        const rtcConf = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
-
-        window.initCall = async () => {
-            peerConnection = new RTCPeerConnection(rtcConf);
-            const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            s.getTracks().forEach(t => peerConnection.addTrack(t, s));
-            
-            document.getElementById('v-local').srcObject = s;
-            document.getElementById('overlay-call').style.display = 'flex';
-            document.getElementById('call-target-name').innerText = activePartner.name;
-            document.getElementById('call-avatar').innerText = activePartner.name[0];
-
-            peerConnection.onicecandidate = (e) => e.candidate && push(ref(db, `v55/calls/${activePartner.id}/ice`), e.candidate.toJSON());
-            peerConnection.ontrack = (e) => document.getElementById('v-remote').srcObject = e.streams[0];
-
-            const off = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(off);
-            set(ref(db, `v55/calls/${activePartner.id}/sig`), { off, from: selfAgent.uid, name: selfAgent.displayName });
-
-            onValue(ref(db, `v55/calls/${activePartner.id}/ans`), async snap => {
-                const ans = snap.val();
-                if (ans && !peerConnection.currentRemoteDescription) await peerConnection.setRemoteDescription(new RTCSessionDescription(ans));
-            });
-        };
-
-        function listenInboundCalls() {
-            onValue(ref(db, `v55/calls/${selfAgent.uid}/sig`), async snap => {
-                const data = snap.val();
-                if (data && data.off && !peerConnection) {
-                    if (confirm(`INCOMING: Node ${data.name} is calling. Accept?`)) {
-                        peerConnection = new RTCPeerConnection(rtcConf);
-                        const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        s.getTracks().forEach(t => peerConnection.addTrack(t, s));
-                        document.getElementById('v-local').srcObject = s;
-                        document.getElementById('overlay-call').style.display = 'flex';
-                        
-                        peerConnection.ontrack = (e) => document.getElementById('v-remote').srcObject = e.streams[0];
-                        peerConnection.onicecandidate = (e) => e.candidate && push(ref(db, `v55/calls/${data.from}/ice`), e.candidate.toJSON());
-                        
-                        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.off));
-                        const ans = await peerConnection.createAnswer();
-                        await peerConnection.setLocalDescription(ans);
-                        set(ref(db, `v55/calls/${data.from}/ans`), ans);
-
-                        onValue(ref(db, `v55/calls/${selfAgent.uid}/ice`), iSnap => iSnap.forEach(c => peerConnection.addIceCandidate(new RTCIceCandidate(c.val()))));
-                    } else remove(ref(db, `v55/calls/${selfAgent.uid}`));
-                }
-            });
-        }
     </script>
 </body>
 </html>
