@@ -3,241 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Morozov Ultra | Enterprise v4.6.0</title>
+    <title>Morozov Ultra Enterprise | Version 5.0 Global</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Montserrat:wght@900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
-    <style id="ultra-styles">
-        /* ПЕРЕМЕННЫЕ ДИНАМИЧЕСКИХ ТЕМ */
+    <style>
+        /* ================================================
+           MOROZOV ULTRA DESIGN SYSTEM (MUDS)
+           Система динамических переменных и анимаций
+           ================================================
+        */
         :root {
-            --u-bg: #0e1621; --u-surf: #17212b; --u-border: #242f3d;
-            --u-text: #ffffff; --u-accent: #0088cc; --u-chat-bg: #070d14;
-            --u-msg-me: #2b5278; --u-msg-he: #182533; --u-online: #4caf50;
+            --u-bg: #0e1621;
+            --u-surf: #17212b;
+            --u-border: #242f3d;
+            --u-text: #ffffff;
+            --u-accent: #0088cc;
+            --u-chat: #070d14;
+            --u-me: #2b5278;
+            --u-he: #182533;
+            --u-green: #31d84d;
+            --u-red: #ff4d4d;
+            --u-transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
         }
 
         .theme-arctic {
-            --u-bg: #f0f2f5; --u-surf: #ffffff; --u-border: #e0e0e0;
-            --u-text: #000000; --u-accent: #0088cc; --u-chat-bg: #e5e5e5;
-            --u-msg-me: #0088cc; --u-msg-he: #ffffff; --u-online: #2e7d32;
+            --u-bg: #f2f2f7;
+            --u-surf: #ffffff;
+            --u-border: #d1d1d6;
+            --u-text: #000000;
+            --u-accent: #007aff;
+            --u-chat: #e5e5ea;
+            --u-me: #007aff;
+            --u-he: #ffffff;
+            --u-green: #34c759;
         }
 
         .theme-matrix {
-            --u-bg: #000000; --u-surf: #0a0a0a; --u-border: #00ff41;
-            --u-text: #00ff41; --u-accent: #00ff41; --u-chat-bg: #000000;
-            --u-msg-me: #003300; --u-msg-he: #001100; --u-online: #00ff41;
+            --u-bg: #000000;
+            --u-surf: #0a0a0a;
+            --u-border: #00ff41;
+            --u-text: #00ff41;
+            --u-accent: #00ff41;
+            --u-chat: #000000;
+            --u-me: #003300;
+            --u-he: #001100;
+            --u-green: #00ff41;
         }
 
-        /* БАЗОВАЯ СТИЛИЗАЦИЯ */
+        /* Глобальные сбросы и база */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body, html { 
-            height: 100%; width: 100%; margin: 0; padding: 0;
-            background: var(--u-bg); color: var(--u-text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow: hidden; transition: background 0.3s, color 0.3s;
+            height: 100%; width: 100%; margin: 0; padding: 0; 
+            background: var(--u-bg); color: var(--u-text); 
+            font-family: 'Inter', sans-serif; overflow: hidden; 
+            transition: background 0.5s ease;
         }
 
-        .u-screen {
-            position: fixed; inset: 0; width: 100%; height: 100%;
-            background: var(--u-bg); z-index: 10; display: flex; flex-direction: column;
-            transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1), opacity 0.3s;
-        }
-        .u-screen-hidden { transform: translateX(100%); opacity: 0; pointer-events: none; }
-        .u-screen-active { transform: translateX(0); opacity: 1; z-index: 50; }
+        h1, h2 { font-family: 'Montserrat', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* ИНТЕРФЕЙС ЧАТА */
-        .u-feed {
-            flex: 1; overflow-y: auto; padding: 20px 15px;
-            background: var(--u-chat-bg);
-            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-            background-blend-mode: overlay; display: flex; flex-direction: column; gap: 12px;
+        /* Система слоев и экранов */
+        .u-screen { 
+            position: fixed; inset: 0; background: var(--u-bg); z-index: 10; 
+            display: flex; flex-direction: column; 
+            transition: var(--u-transition);
+            will-change: transform;
         }
+        .u-screen-off { transform: translateX(100%); opacity: 0; }
+        .u-screen-on { transform: translateX(0); opacity: 1; z-index: 50; }
 
-        .u-bubble {
-            max-width: 82%; padding: 12px 16px; border-radius: 20px;
-            font-size: 15px; position: relative; line-height: 1.4;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .u-bubble-me { align-self: flex-end; background: var(--u-msg-me); border-bottom-right-radius: 4px; color: white; }
-        .u-bubble-he { align-self: flex-start; background: var(--u-msg-he); border-bottom-left-radius: 4px; color: var(--u-text); border: 1px solid var(--u-border); }
-
-        /* СПЕЦИАЛЬНЫЕ ЭЛЕМЕНТЫ */
-        .u-toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--u-accent); color: white; padding: 12px 24px;
-            border-radius: 30px; z-index: 10000; font-weight: bold; font-size: 13px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: none;
+        /* Компоненты UI */
+        header { 
+            height: 70px; background: var(--u-surf); 
+            border-bottom: 1px solid var(--u-border); 
+            padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
         }
 
-        .u-loader {
-            width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.2);
-            border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
+        .u-item { 
+            background: var(--u-surf); padding: 18px 24px; 
+            border-bottom: 1px solid var(--u-border); 
+            display: flex; align-items: center; cursor: pointer; 
+            transition: background 0.2s;
+        }
+        .u-item:hover { background: rgba(255,255,255,0.03); }
+        .u-item:active { transform: scale(0.98); }
+
+        .u-avatar { 
+            width: 54px; height: 54px; border-radius: 18px; 
+            background: linear-gradient(135deg, var(--u-accent), #00c6ff); 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 800; font-size: 22px; color: white; 
+            margin-right: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Мессенджер слой */
+        .u-feed { 
+            flex: 1; overflow-y: auto; padding: 20px; 
+            background: var(--u-chat); display: flex; flex-direction: column; gap: 12px;
+            scroll-behavior: smooth;
+        }
+        
+        .u-bubble { 
+            max-width: 80%; padding: 14px 18px; border-radius: 22px; 
+            font-size: 15px; line-height: 1.5; position: relative;
+            animation: bubbleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes bubbleIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .u-bubble-me { align-self: flex-end; background: var(--u-me); color: white; border-bottom-right-radius: 4px; }
+        .u-bubble-he { align-self: flex-start; background: var(--u-he); color: var(--u-text); border-bottom-left-radius: 4px; border: 1px solid var(--u-border); }
+
+        /* Анимация загрузки */
+        .u-loader { 
+            width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.2); 
+            border-top-color: var(--u-accent); border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ВИДЕОЗВОНОК */
-        #u-call-overlay {
-            position: fixed; inset: 0; background: #000; z-index: 9000;
-            display: none; flex-direction: column;
+        /* Видеозвонки */
+        #u-call-container { 
+            position: fixed; inset: 0; background: #000; z-index: 10000; 
+            display: none; flex-direction: column; overflow: hidden;
         }
-        .u-v-remote { width: 100%; height: 100%; object-fit: cover; }
-        .u-v-local {
-            position: absolute; top: 40px; right: 20px;
-            width: 110px; height: 160px; border-radius: 15px;
-            border: 2px solid var(--u-accent); z-index: 9001;
+        .v-remote { width: 100%; height: 100%; object-fit: cover; }
+        .v-local { 
+            position: absolute; top: 40px; right: 20px; 
+            width: 120px; height: 180px; border-radius: 24px; 
+            border: 2px solid rgba(255,255,255,0.3); z-index: 10001; 
+            background: #111; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--u-border); border-radius: 10px; }
     </style>
 </head>
 <body class="theme-midnight">
 
-    <div id="u-global-toast" class="u-toast">Уведомление</div>
+    <div id="u-scr-auth" class="u-screen z-[9999] justify-center items-center p-6">
+        <div class="w-full max-w-sm">
+            <div class="text-center mb-10">
+                <h1 class="text-6xl font-black italic text-blue-500 tracking-tighter">ULTRA</h1>
+                <div class="mono text-[10px] uppercase tracking-[0.5em] mt-2 opacity-50">Secure Infrastructure v5.0</div>
+            </div>
 
-    <div id="scr-auth" class="u-screen z-[9999] justify-center items-center p-6 bg-gradient-to-br from-gray-900 to-black">
-        <div class="bg-white p-10 rounded-[45px] w-full max-w-md text-black shadow-2xl">
-            <div class="text-center mb-8">
-                <h1 class="text-5xl font-black text-blue-600 italic tracking-tighter">ULTRA</h1>
-                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-[0.3em] mt-2">Professional Infrastructure</p>
-            </div>
-            
-            <div class="space-y-4">
-                <input id="auth-email" type="email" placeholder="Email" class="w-full p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 ring-blue-500 transition-all">
-                <input id="auth-pass" type="password" placeholder="Пароль (мин. 6 знаков)" class="w-full p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 ring-blue-500 transition-all">
-                <div id="auth-reg-box" class="hidden animate-fade-in">
-                    <input id="auth-nick" type="text" placeholder="Ваше имя" class="w-full p-4 bg-gray-100 rounded-2xl outline-none border-2 border-blue-100 mb-4">
+            <div class="bg-[var(--u-surf)] p-8 rounded-[40px] border border-[var(--u-border)] shadow-2xl">
+                <div class="space-y-4" id="auth-form">
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 opacity-30"></i>
+                        <input id="auth-email" type="email" placeholder="Email Address" class="w-full p-4 pl-12 bg-[var(--u-bg)] rounded-2xl outline-none border border-[var(--u-border)] focus:border-blue-500 transition-all">
+                    </div>
+                    
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 opacity-30"></i>
+                        <input id="auth-pass" type="password" placeholder="Password" class="w-full p-4 pl-12 bg-[var(--u-bg)] rounded-2xl outline-none border border-[var(--u-border)] focus:border-blue-500 transition-all">
+                    </div>
+
+                    <div id="auth-reg-fields" class="hidden space-y-4">
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 opacity-30"></i>
+                            <input id="auth-nick" type="text" placeholder="Display Name" class="w-full p-4 pl-12 bg-[var(--u-bg)] rounded-2xl outline-none border border-[var(--u-border)] focus:border-blue-500 transition-all">
+                        </div>
+                    </div>
+
+                    <button id="auth-main-btn" onclick="executeAuthAction()" class="w-full bg-blue-600 hover:bg-blue-500 text-white p-5 rounded-2xl font-black text-lg transition-all active:scale-95 shadow-lg flex justify-center items-center gap-4">
+                        <span id="auth-btn-label">SIGN IN</span>
+                    </button>
+
+                    <button onclick="toggleAuthMode()" id="auth-switch-btn" class="w-full text-xs font-bold opacity-40 hover:opacity-100 uppercase tracking-widest pt-4 transition-all">
+                        Don't have an account? Create one
+                    </button>
                 </div>
-                
-                <button id="auth-btn" onclick="handleAuthAction()" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all flex justify-center items-center gap-3">
-                    <span>ПРОДОЛЖИТЬ</span>
-                </button>
-                
-                <button onclick="toggleAuthMode()" id="auth-mode-toggle" class="w-full text-xs font-bold text-gray-400 uppercase tracking-widest mt-4">Нет аккаунта? Создать</button>
+                <div id="auth-status-msg" class="text-red-500 text-[11px] font-bold text-center mt-4 uppercase h-4"></div>
             </div>
-            <p id="auth-error-msg" class="mt-6 text-red-500 text-xs font-bold text-center"></p>
         </div>
     </div>
 
-    <div id="scr-main" class="u-screen">
-        <header class="h-20 bg-[var(--u-surf)] flex items-center justify-between px-6 border-b border-[var(--u-border)]">
-            <button onclick="openSettingsScreen()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5"><i class="fas fa-cog text-xl"></i></button>
-            <div class="text-center">
-                <span class="font-black text-xl italic text-blue-500">MOROZOV</span>
-                <div class="text-[9px] opacity-40 font-bold uppercase tracking-widest">Ultra Network</div>
+    <div id="u-scr-main" class="u-screen">
+        <header>
+            <button onclick="navigate('settings')" class="w-12 h-12 rounded-2xl bg-[var(--u-bg)] border border-[var(--u-border)] flex items-center justify-center text-xl">
+                <i class="fas fa-th-large"></i>
+            </button>
+            <div class="flex flex-col items-center">
+                <span class="font-black text-xl italic tracking-tighter">MOROZOV <span class="text-blue-500">ULTRA</span></span>
+                <div class="text-[9px] font-bold opacity-30 uppercase tracking-[0.2em]">Social Network</div>
             </div>
-            <button onclick="triggerFriendSearch()" class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600/20 text-blue-400"><i class="fas fa-search text-xl"></i></button>
+            <button onclick="initFriendSearch()" class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-xl text-blue-500">
+                <i class="fas fa-plus"></i>
+            </button>
         </header>
 
-        <div id="main-notifications" class="bg-blue-600/10 hidden">
-            <div class="px-6 py-3 flex justify-between items-center">
-                <span class="text-[10px] font-black uppercase text-blue-400">Новые запросы</span>
-                <span id="notif-count" class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">0</span>
+        <div class="flex-1 overflow-auto">
+            <div id="section-requests" class="hidden">
+                <div class="px-6 py-4 bg-blue-600/5 flex justify-between items-center border-b border-blue-500/10">
+                    <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Incoming Requests</span>
+                    <span id="requests-badge" class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-md font-black">0</span>
+                </div>
+                <div id="list-requests" class="bg-blue-600/5"></div>
             </div>
-            <div id="pending-requests-list"></div>
-        </div>
 
-        <div id="contact-list-container" class="flex-1 overflow-auto p-4 space-y-3">
+            <div class="px-6 py-6 flex items-center justify-between">
+                <span class="text-[10px] font-black opacity-30 uppercase tracking-widest">Your Connection Mesh</span>
+                <div class="h-[1px] flex-1 bg-[var(--u-border)] ml-4"></div>
             </div>
+            <div id="list-friends" class="space-y-1"></div>
+            
+            <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 opacity-20">
+                <i class="fas fa-ghost text-5xl mb-4"></i>
+                <p class="text-sm font-bold uppercase tracking-widest">No connections found</p>
+            </div>
+        </div>
     </div>
 
-    <div id="scr-chat" class="u-screen u-screen-hidden">
-        <header class="h-16 bg-[var(--u-surf)] flex items-center px-4 border-b border-[var(--u-border)]">
-            <button onclick="closeChatSession()" class="p-2"><i class="fas fa-chevron-left text-xl"></i></button>
-            <div class="flex-1 ml-4 flex items-center gap-3">
-                <div id="chat-avatar" class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-black">?</div>
+    <div id="u-scr-chat" class="u-screen u-screen-off">
+        <header>
+            <div class="flex items-center">
+                <button onclick="navigate('main')" class="mr-4 text-xl opacity-50 hover:opacity-100 transition-all"><i class="fas fa-chevron-left"></i></button>
+                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black mr-3 shadow-lg" id="chat-header-avatar">?</div>
                 <div>
-                    <div id="chat-partner-name" class="font-bold leading-none mb-1">...</div>
-                    <div class="flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-[var(--u-online)]"></span>
-                        <span class="text-[9px] font-black opacity-50 uppercase">Secured</span>
+                    <div id="chat-header-name" class="font-bold text-sm leading-none mb-1">...</div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[var(--u-green)] animate-pulse"></span>
+                        <span class="text-[9px] font-black uppercase opacity-40">Encryption Active</span>
                     </div>
                 </div>
             </div>
-            <div class="flex gap-6 pr-2">
-                <button onclick="initiateCall('video')" class="text-gray-400 hover:text-white"><i class="fas fa-video"></i></button>
+            <div class="flex gap-4">
+                <button onclick="startVoiceCall()" class="w-10 h-10 flex items-center justify-center text-lg opacity-40 hover:opacity-100 hover:text-blue-500 transition-all"><i class="fas fa-phone"></i></button>
+                <button onclick="startVideoCall()" class="w-10 h-10 flex items-center justify-center text-lg opacity-40 hover:opacity-100 hover:text-blue-500 transition-all"><i class="fas fa-video"></i></button>
             </div>
         </header>
 
-        <div id="chat-messages-feed" class="u-feed"></div>
+        <div id="chat-feed-box" class="u-feed"></div>
 
-        <div class="p-4 bg-[var(--u-surf)] flex items-end gap-3 border-t border-[var(--u-border)]">
-            <label class="p-3 cursor-pointer text-gray-500 hover:text-blue-500 transition-colors">
-                <i class="fas fa-plus-circle text-2xl"></i>
-                <input type="file" class="hidden" onchange="handleFileUpload(this)" accept="image/*">
+        <div class="p-4 bg-[var(--u-surf)] border-t border-[var(--u-border)] flex items-end gap-3">
+            <label class="w-12 h-12 flex items-center justify-center bg-[var(--u-bg)] rounded-2xl border border-[var(--u-border)] cursor-pointer text-blue-500 active:scale-90 transition-all shadow-inner">
+                <i class="fas fa-paperclip text-lg"></i>
+                <input type="file" class="hidden" onchange="sendImageMedia(this)" accept="image/*">
             </label>
-            <div id="chat-input-field" contenteditable="true" class="flex-1 bg-[var(--u-bg)] p-3 rounded-2xl outline-none max-h-32 overflow-y-auto text-sm border border-[var(--u-border)]" oninput="toggleSendIcon()"></div>
-            <button id="chat-send-btn" onclick="dispatchMessage()" class="hidden w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg transform active:scale-90 transition">
+            <div id="chat-input" contenteditable="true" placeholder="Secure Message..." class="flex-1 min-h-[48px] max-h-[150px] bg-[var(--u-bg)] p-3 px-4 rounded-2xl outline-none overflow-y-auto text-sm border border-[var(--u-border)] focus:border-blue-500/50 transition-all" oninput="toggleSendBtn()"></div>
+            <button id="chat-send-btn" onclick="sendMessageData()" class="hidden w-12 h-12 bg-blue-600 text-white rounded-2xl items-center justify-center shadow-lg transform active:scale-90 transition-all">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
 
-    <div id="scr-settings" class="u-screen u-screen-hidden">
-        <header class="h-16 bg-[var(--u-surf)] flex items-center px-6 border-b border-[var(--u-border)]">
-            <button onclick="closeSettingsScreen()"><i class="fas fa-arrow-left text-xl mr-6"></i></button>
-            <span class="font-black text-xl uppercase tracking-tighter">Настройки Профиля</span>
+    <div id="u-scr-settings" class="u-screen u-screen-off">
+        <header>
+            <button onclick="navigate('main')" class="text-xl opacity-50"><i class="fas fa-arrow-left"></i></button>
+            <span class="font-black text-sm uppercase tracking-[0.3em]">System Configuration</span>
+            <div class="w-10"></div>
         </header>
 
-        <div class="flex-1 overflow-auto bg-[var(--u-bg)]">
-            <div class="p-10 flex flex-col items-center bg-[var(--u-surf)] border-b border-[var(--u-border)]">
-                <div id="st-big-avatar" class="w-24 h-24 bg-blue-600 rounded-[35%] flex items-center justify-center text-4xl font-black mb-4 shadow-2xl">?</div>
-                <h2 id="st-display-name" class="text-2xl font-black tracking-tight">User</h2>
-                <p id="st-display-email" class="text-xs opacity-40 font-mono mt-1">...</p>
-                <button onclick="editUserName()" class="mt-4 px-6 py-2 bg-white/5 rounded-full text-[10px] font-black uppercase hover:bg-white/10 transition">Изменить имя</button>
-            </div>
-
-            <p class="px-8 py-6 text-[11px] font-black text-blue-500 uppercase tracking-[0.2em]">Внешний вид</p>
-            <div class="grid grid-cols-3 gap-4 px-8 mb-8">
-                <button onclick="applyAppTheme('midnight')" class="flex flex-col items-center gap-2">
-                    <div class="w-full aspect-square rounded-2xl bg-[#0e1621] border-2 border-white/10"></div>
-                    <span class="text-[9px] font-bold uppercase">Midnight</span>
-                </button>
-                <button onclick="applyAppTheme('arctic')" class="flex flex-col items-center gap-2">
-                    <div class="w-full aspect-square rounded-2xl bg-white border-2 border-black/10"></div>
-                    <span class="text-[9px] font-bold uppercase">Arctic</span>
-                </button>
-                <button onclick="applyAppTheme('matrix')" class="flex flex-col items-center gap-2">
-                    <div class="w-full aspect-square rounded-2xl bg-black border-2 border-[#00ff41]"></div>
-                    <span class="text-[9px] font-bold uppercase">Matrix</span>
+        <div class="flex-1 overflow-auto">
+            <div class="p-10 flex flex-col items-center bg-gradient-to-b from-[var(--u-surf)] to-transparent">
+                <div id="st-avatar" class="w-28 h-28 bg-blue-600 rounded-[35%] flex items-center justify-center text-5xl font-black mb-6 shadow-[0_20px_40px_rgba(0,136,204,0.3)] border-4 border-[var(--u-bg)]">?</div>
+                <h2 id="st-name" class="text-3xl font-black tracking-tighter">Unknown Agent</h2>
+                <div id="st-email" class="text-[10px] font-bold opacity-30 uppercase tracking-widest mt-2">---@---.---</div>
+                
+                <button onclick="changeDisplayName()" class="mt-8 px-8 py-3 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 text-[10px] font-black uppercase tracking-widest transition-all">
+                    Update Display Name
                 </button>
             </div>
 
-            <p class="px-8 py-2 text-[11px] font-black text-red-500 uppercase tracking-[0.2em]">Система</p>
-            <div class="px-4 space-y-1">
-                <div class="flex items-center justify-between p-4 bg-[var(--u-surf)] rounded-2xl" onclick="copyUserUID()">
-                    <div><div class="font-bold text-sm">Ваш идентификатор (UID)</div><div id="st-uid-val" class="text-[10px] opacity-30 font-mono">...</div></div>
-                    <i class="fas fa-copy opacity-30"></i>
+            <p class="px-8 py-6 text-[10px] font-black text-blue-500 uppercase tracking-[0.3em]">Visual Interface</p>
+            <div class="grid grid-cols-3 gap-4 px-8 mb-10">
+                <div onclick="setAppTheme('midnight')" class="group cursor-pointer">
+                    <div class="aspect-square bg-[#0e1621] rounded-2xl border-2 border-white/10 group-hover:border-blue-500 transition-all mb-2 flex items-center justify-center"><i class="fas fa-moon opacity-20"></i></div>
+                    <div class="text-[9px] font-black text-center uppercase">Midnight</div>
                 </div>
-                <div class="flex items-center justify-between p-4 bg-[var(--u-surf)] rounded-2xl text-red-500" onclick="handleSignOut()">
-                    <div class="font-bold text-sm">Выйти из аккаунта</div>
-                    <i class="fas fa-sign-out-alt"></i>
+                <div onclick="setAppTheme('arctic')" class="group cursor-pointer">
+                    <div class="aspect-square bg-white rounded-2xl border-2 border-black/5 group-hover:border-blue-500 transition-all mb-2 flex items-center justify-center"><i class="fas fa-sun text-black opacity-20"></i></div>
+                    <div class="text-[9px] font-black text-center uppercase text-gray-500">Arctic</div>
+                </div>
+                <div onclick="setAppTheme('matrix')" class="group cursor-pointer">
+                    <div class="aspect-square bg-black rounded-2xl border-2 border-[#00ff41]/30 group-hover:border-[#00ff41] transition-all mb-2 flex items-center justify-center"><i class="fas fa-code text-[#00ff41] opacity-20"></i></div>
+                    <div class="text-[9px] font-black text-center uppercase text-[#00ff41]">Matrix</div>
+                </div>
+            </div>
+
+            <p class="px-8 py-4 text-[10px] font-black text-red-500 uppercase tracking-[0.3em]">Critical Actions</p>
+            <div class="px-8 space-y-3 pb-10">
+                <div onclick="copyUserUID()" class="p-5 bg-[var(--u-surf)] rounded-2xl border border-[var(--u-border)] flex justify-between items-center active:scale-95 transition-all">
+                    <div>
+                        <div class="font-bold text-xs">Access Key (UID)</div>
+                        <div id="st-uid" class="text-[10px] opacity-30 font-mono mt-1">...</div>
+                    </div>
+                    <i class="fas fa-fingerprint opacity-20"></i>
+                </div>
+                <div onclick="signOutUser()" class="p-5 bg-red-500/10 rounded-2xl border border-red-500/20 flex justify-between items-center text-red-500 active:scale-95 transition-all">
+                    <div class="font-black text-xs uppercase italic">Terminate Session</div>
+                    <i class="fas fa-power-off"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="u-call-overlay">
-        <video id="remote-video" class="u-v-remote" autoplay playsinline></video>
-        <video id="local-video" class="u-v-local" autoplay muted playsinline></video>
+    <div id="u-call-container">
+        <video id="remote-v" class="v-remote" autoplay playsinline></video>
+        <video id="local-v" class="v-local" autoplay muted playsinline></video>
+        
         <div class="absolute inset-0 flex flex-col justify-between items-center py-20 bg-gradient-to-b from-black/60 via-transparent to-black/80">
-            <div class="text-center">
-                <div id="call-ui-avatar" class="w-24 h-24 bg-blue-600 rounded-full mx-auto flex items-center justify-center text-4xl font-black mb-6 border-4 border-white/20">?</div>
-                <h2 id="call-ui-name" class="text-3xl font-black text-white">ВЫЗОВ</h2>
-                <div class="flex items-center justify-center gap-2 mt-2">
-                    <span class="w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
-                    <span class="text-xs font-bold text-blue-400 uppercase tracking-widest">End-to-End Encrypted</span>
-                </div>
+            <div class="text-center animate-pulse">
+                <div id="call-av" class="w-24 h-24 bg-blue-600 rounded-full mx-auto flex items-center justify-center text-4xl font-black mb-6 border-4 border-white/20 shadow-2xl">?</div>
+                <h2 id="call-name" class="text-4xl font-black text-white italic tracking-tighter uppercase">Initializing...</h2>
+                <p class="text-[10px] font-black text-blue-400 mt-4 tracking-[0.4em] uppercase">AES-256 P2P Signal</p>
             </div>
-            <button onclick="terminateCurrentCall()" class="w-20 h-20 bg-red-600 text-white rounded-full flex items-center justify-center text-3xl shadow-[0_0_50px_rgba(220,38,38,0.5)] active:scale-75 transition-all">
-                <i class="fas fa-phone-slash"></i>
-            </button>
+
+            <div class="flex flex-col items-center gap-8">
+                <div class="flex gap-10">
+                    <button class="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-xl text-white"><i class="fas fa-microphone"></i></button>
+                    <button class="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-xl text-white"><i class="fas fa-camera"></i></button>
+                </div>
+                <button onclick="terminateCallSession()" class="w-24 h-24 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-4xl shadow-[0_0_50px_rgba(239,68,68,0.5)] transform active:scale-75 transition-all">
+                    <i class="fas fa-phone-slash"></i>
+                </button>
+            </div>
         </div>
     </div>
 
     <script type="module">
-        // ИМПОРТ МОДУЛЕЙ FIREBASE 10.7+
+        /* ================================================
+           ИНФРАСТРУКТУРА FIREBASE v10.7+
+           Core Real-time Logic & WebRTC Gateway
+           ================================================
+        */
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, update, get, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, update, get, remove, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // КОНФИГУРАЦИЯ СЕРВЕРОВ (MOROZOV INFRASTRUCTURE)
+        // Ключи доступа (Morozov Ultra Infrastructure)
         const firebaseConfig = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
@@ -247,293 +350,390 @@
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ СОСТОЯНИЯ
+        // Глобальные инстансы
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        let currentUser = null;
-        let activeChatPartner = null;
-        let rtcPeerConnection = null;
-        let isRegistrationMode = false;
+        // Внутреннее состояние приложения
+        let userSelf = null;
+        let partnerActive = null;
+        let peerConn = null;
+        let isRegistration = false;
+        let activeRoomId = null;
 
-        // --- БЛОК 1: СИСТЕМА УВЕДОМЛЕНИЙ (TOASTS) ---
-        function showToast(text, duration = 3000) {
-            const t = document.getElementById('u-global-toast');
-            t.innerText = text;
-            t.style.display = 'block';
-            setTimeout(() => { t.style.display = 'none'; }, duration);
-        }
-
-        // --- БЛОК 2: АВТОРИЗАЦИЯ И УПРАВЛЕНИЕ СЕССИЕЙ ---
-        window.toggleAuthMode = () => {
-            isRegistrationMode = !isRegistrationMode;
-            document.getElementById('auth-reg-box').classList.toggle('hidden', !isRegistrationMode);
-            document.getElementById('auth-mode-toggle').innerText = isRegistrationMode ? "Уже есть аккаунт? Войти" : "Нет аккаунта? Создать";
+        // --- МОДУЛЬ 1: УПРАВЛЕНИЕ НАВИГАЦИЕЙ ---
+        window.navigate = (screenId) => {
+            console.log(`[NAV] Переход к: ${screenId}`);
+            const screens = ['main', 'chat', 'settings', 'auth'];
+            screens.forEach(s => {
+                const el = document.getElementById(`u-scr-${s}`);
+                if(el) {
+                    if(s === screenId) el.classList.add('u-screen-on');
+                    else el.classList.remove('u-screen-on');
+                }
+            });
         };
 
-        window.handleAuthAction = async () => {
+        // --- МОДУЛЬ 2: СИСТЕМА АВТОРИЗАЦИИ (EXTENDED) ---
+        window.toggleAuthMode = () => {
+            isRegistration = !isRegistration;
+            const btnLabel = document.getElementById('auth-btn-label');
+            const switchBtn = document.getElementById('auth-switch-btn');
+            const regFields = document.getElementById('auth-reg-fields');
+
+            if(isRegistration) {
+                btnLabel.innerText = "CREATE ACCOUNT";
+                switchBtn.innerText = "Already have an account? Sign In";
+                regFields.classList.remove('hidden');
+            } else {
+                btnLabel.innerText = "SIGN IN";
+                switchBtn.innerText = "Don't have an account? Create one";
+                regFields.classList.add('hidden');
+            }
+        };
+
+        window.executeAuthAction = async () => {
             const email = document.getElementById('auth-email').value.trim();
             const pass = document.getElementById('auth-pass').value.trim();
             const nick = document.getElementById('auth-nick').value.trim();
-            const errBox = document.getElementById('auth-error-msg');
-            const btn = document.getElementById('auth-btn');
+            const log = document.getElementById('auth-status-msg');
+            const btn = document.getElementById('auth-main-btn');
 
-            if (!email || pass.length < 6) {
-                errBox.innerText = "Проверьте почту и пароль (мин. 6 симв.)";
+            if(!email || pass.length < 6) {
+                log.innerText = "Invalid Email or Short Password";
                 return;
             }
 
             btn.disabled = true;
             btn.innerHTML = `<div class="u-loader"></div>`;
+            log.innerText = "";
 
             try {
-                if (isRegistrationMode) {
+                if(isRegistration) {
+                    console.log("[AUTH] Регистрация нового агента...");
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    await updateProfile(res.user, { displayName: nick || "User" });
-                    await set(ref(db, `v18/users/${res.user.uid}`), { 
-                        email, name: nick || "User", uid: res.user.uid, about: "Using Morozov Ultra" 
+                    await updateProfile(res.user, { displayName: nick || "Agent" });
+                    // Создаем запись в базе
+                    await set(ref(db, `v50/users/${res.user.uid}`), {
+                        email: email,
+                        name: nick || "Agent",
+                        uid: res.user.uid,
+                        joined: Date.now(),
+                        status: "online"
                     });
                 } else {
+                    console.log("[AUTH] Вход в систему...");
                     await signInWithEmailAndPassword(auth, email, pass);
                 }
-            } catch (err) {
-                errBox.innerText = "Ошибка: " + err.message;
-            } finally {
+            } catch (error) {
+                console.error("[AUTH ERROR]", error.code);
+                log.innerText = error.message.replace("Firebase: ", "");
+                btn.innerHTML = `<span>${isRegistration ? 'CREATE ACCOUNT' : 'SIGN IN'}</span>`;
                 btn.disabled = false;
-                btn.innerHTML = "<span>ПРОДОЛЖИТЬ</span>";
             }
         };
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('scr-auth').style.display = 'none';
-                initApplicationLogic();
+        onAuthStateChanged(auth, (u) => {
+            if(u) {
+                userSelf = u;
+                console.log(`[AUTH] Добро пожаловать, ${u.displayName}`);
+                document.getElementById('u-scr-auth').style.display = 'none';
+                initUltraSocialCore();
+                navigate('main');
             } else {
-                document.getElementById('scr-auth').style.display = 'flex';
+                document.getElementById('u-scr-auth').style.display = 'flex';
+                navigate('auth');
             }
         });
 
-        // --- БЛОК 3: СОЦИАЛЬНАЯ ЛОГИКА (ДРУЗЬЯ) ---
-        function initApplicationLogic() {
-            console.log("Ultra Core: Запуск систем...");
+        // --- МОДУЛЬ 3: СОЦИАЛЬНОЕ ЯДРО (ДРУЗЬЯ И ЗАПРОСЫ) ---
+        function initUltraSocialCore() {
+            console.log("[CORE] Инициализация социальных сервисов...");
             
-            // 1. Слушаем изменения списка друзей
-            onValue(ref(db, `v18/social/${currentUser.uid}`), (snap) => {
-                const list = document.getElementById('contact-list-container');
-                const pendingList = document.getElementById('pending-requests-list');
-                const notifArea = document.getElementById('main-notifications');
-                const countBadge = document.getElementById('notif-count');
+            const friendsRef = ref(db, `v50/social/${userSelf.uid}`);
+            onValue(friendsRef, (snap) => {
+                const listF = document.getElementById('list-friends');
+                const listR = document.getElementById('list-requests');
+                const reqSec = document.getElementById('section-requests');
+                const reqBadge = document.getElementById('requests-badge');
+                const empty = document.getElementById('empty-state');
 
-                list.innerHTML = ""; pendingList.innerHTML = "";
-                let pCount = 0;
+                listF.innerHTML = "";
+                listR.innerHTML = "";
+                let rCount = 0;
+                let fCount = 0;
 
-                snap.forEach(s => {
-                    const friend = s.val();
-                    if (friend.status === 'request') {
-                        pCount++;
+                snap.forEach((child) => {
+                    const data = child.val();
+                    
+                    if(data.status === 'inbound') {
+                        rCount++;
                         const el = document.createElement('div');
-                        el.className = "flex items-center justify-between p-4 border-b border-white/5";
-                        el.innerHTML = `<div class="text-sm font-bold">${friend.name}</div>
-                                        <button onclick="acceptFriendship('${friend.id}')" class="bg-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Принять</button>`;
-                        pendingList.appendChild(el);
-                    } else if (friend.status === 'active') {
+                        el.className = "u-item bg-blue-500/5 animate-pulse";
+                        el.innerHTML = `
+                            <div class="u-avatar">${data.name[0]}</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-sm">${data.name}</div>
+                                <div class="text-[9px] opacity-40 uppercase font-black">Wants to connect</div>
+                            </div>
+                            <button onclick="confirmFriendship('${data.id}', '${data.name}')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-black">ACCEPT</button>
+                        `;
+                        listR.appendChild(el);
+                    } 
+                    else if(data.status === 'mesh') {
+                        fCount++;
                         const el = document.createElement('div');
-                        el.className = "flex items-center p-4 bg-[var(--u-surf)] rounded-2xl border border-[var(--u-border)] active:scale-[0.98] transition cursor-pointer";
-                        el.innerHTML = `<div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center font-black mr-4 text-xl">${friend.name[0]}</div>
-                                        <div class="flex-1">
-                                            <div class="font-black text-lg leading-none">${friend.name}</div>
-                                            <div class="text-[10px] opacity-40 uppercase font-bold mt-1 tracking-wider">На связи</div>
-                                        </div>
-                                        <i class="fas fa-chevron-right opacity-10"></i>`;
-                        el.onclick = () => startChatSession(friend);
-                        list.appendChild(el);
+                        el.className = "u-item";
+                        el.innerHTML = `
+                            <div class="u-avatar">${data.name[0]}</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-sm">${data.name}</div>
+                                <div class="text-[9px] text-[var(--u-green)] uppercase font-black">Active Link</div>
+                            </div>
+                            <i class="fas fa-chevron-right opacity-10"></i>
+                        `;
+                        el.onclick = () => openChatTerminal(data);
+                        listF.appendChild(el);
                     }
                 });
 
-                notifArea.classList.toggle('hidden', pCount === 0);
-                countBadge.innerText = pCount;
+                reqSec.classList.toggle('hidden', rCount === 0);
+                reqBadge.innerText = rCount;
+                empty.classList.toggle('hidden', fCount > 0 || rCount > 0);
             });
 
-            // 2. Слушаем входящие вызовы
-            listenForInboundCalls();
+            // Глобальный слушатель вызовов
+            listenForInboundSignaling();
         }
 
-        window.triggerFriendSearch = async () => {
-            const email = prompt("Введите Email пользователя:");
-            if (!email || email === currentUser.email) return;
+        window.initFriendSearch = async () => {
+            const targetEmail = prompt("Enter Target Agent Email:");
+            if(!targetEmail || targetEmail === userSelf.email) return;
 
-            showToast("Поиск...");
-            const snap = await get(ref(db, `v18/users`));
-            let target = null;
-            snap.forEach(s => { if (s.val().email === email) target = s.val(); });
+            console.log(`[SOCIAL] Поиск: ${targetEmail}`);
+            const usersSnap = await get(ref(db, `v50/users`));
+            let targetUser = null;
 
-            if (target) {
-                await update(ref(db, `v18/social/${target.uid}/${currentUser.uid}`), { id: currentUser.uid, name: currentUser.displayName, status: 'request' });
-                await update(ref(db, `v18/social/${currentUser.uid}/${target.uid}`), { id: target.uid, name: target.name, status: 'waiting' });
-                showToast("Запрос отправлен!");
+            usersSnap.forEach(u => {
+                if(u.val().email === targetEmail) targetUser = u.val();
+            });
+
+            if(targetUser) {
+                // 1. Отправляем запрос получателю
+                await update(ref(db, `v50/social/${targetUser.uid}/${userSelf.uid}`), {
+                    id: userSelf.uid,
+                    name: userSelf.displayName,
+                    status: 'inbound'
+                });
+                // 2. Ставим себе статус ожидания
+                await update(ref(db, `v50/social/${userSelf.uid}/${targetUser.uid}`), {
+                    id: targetUser.uid,
+                    name: targetUser.name,
+                    status: 'outbound'
+                });
+                alert("Request Broadcasted Successfully.");
             } else {
-                showToast("Пользователь не найден");
+                alert("Agent Not Found in Global Database.");
             }
         };
 
-        window.acceptFriendship = async (fid) => {
-            await update(ref(db, `v18/social/${currentUser.uid}/${fid}`), { status: 'active' });
-            await update(ref(db, `v18/social/${fid}/${currentUser.uid}`), { status: 'active' });
-            showToast("Контакт добавлен");
+        window.confirmFriendship = async (fid, fname) => {
+            console.log(`[SOCIAL] Подтверждение связи с ${fid}`);
+            const updates = {};
+            updates[`v50/social/${userSelf.uid}/${fid}/status`] = 'mesh';
+            updates[`v50/social/${fid}/${userSelf.uid}/status`] = 'mesh';
+            await update(ref(db), updates);
         };
 
-        // --- БЛОК 4: ИНЖЕНЕРИЯ ЧАТА ---
-        window.startChatSession = (partner) => {
-            activeChatPartner = partner;
-            document.getElementById('scr-chat').classList.add('u-screen-active');
-            document.getElementById('chat-partner-name').innerText = partner.name;
-            document.getElementById('chat-avatar').innerText = partner.name[0];
+        // --- МОДУЛЬ 4: ТЕРМИНАЛ СООБЩЕНИЙ ---
+        window.openChatTerminal = (partner) => {
+            partnerActive = partner;
+            activeRoomId = [userSelf.uid, partner.id].sort().join("_X_");
             
-            const roomID = [currentUser.uid, partner.id].sort().join("___");
-            onValue(ref(db, `v18/messages/${roomID}`), (snap) => {
-                const feed = document.getElementById('chat-messages-feed');
-                feed.innerHTML = "";
+            navigate('chat');
+            document.getElementById('chat-header-name').innerText = partner.name;
+            document.getElementById('chat-header-avatar').innerText = partner.name[0];
+            
+            const chatRef = ref(db, `v50/rooms/${activeRoomId}`);
+            onValue(chatRef, (snap) => {
+                const box = document.getElementById('chat-feed-box');
+                box.innerHTML = "";
                 snap.forEach(m => {
                     const msg = m.val();
-                    const isMe = msg.sid === currentUser.uid;
+                    const isMe = msg.senderId === userSelf.uid;
                     const bubble = document.createElement('div');
                     bubble.className = `u-bubble ${isMe ? 'u-bubble-me' : 'u-bubble-he'}`;
                     
-                    if (msg.tp === 'img') bubble.innerHTML = `<img src="${msg.body}" class="rounded-lg shadow-sm">`;
-                    else bubble.innerHTML = `<div>${msg.body}</div>`;
-
-                    feed.appendChild(bubble);
+                    if(msg.type === 'media') {
+                        bubble.innerHTML = `<img src="${msg.content}" class="rounded-xl mb-1 max-w-full shadow-sm">`;
+                    } else {
+                        bubble.innerText = msg.content;
+                    }
+                    
+                    box.appendChild(bubble);
                 });
-                feed.scrollTop = feed.scrollHeight;
+                box.scrollTop = box.scrollHeight;
             });
         };
 
-        window.dispatchMessage = () => {
-            const field = document.getElementById('chat-input-field');
-            const text = field.innerText.trim();
-            if (!text) return;
+        window.sendMessageData = () => {
+            const input = document.getElementById('chat-input');
+            const text = input.innerText.trim();
+            if(!text || !activeRoomId) return;
 
-            const roomID = [currentUser.uid, activeChatPartner.id].sort().join("___");
-            push(ref(db, `v18/messages/${roomID}`), {
-                sid: currentUser.uid, body: text, tp: 'text', ts: Date.now()
+            console.log("[CHAT] Отправка данных...");
+            push(ref(db, `v50/rooms/${activeRoomId}`), {
+                senderId: userSelf.uid,
+                content: text,
+                type: 'text',
+                timestamp: Date.now()
             });
-            field.innerText = ""; toggleSendIcon();
+            input.innerText = "";
+            toggleSendBtn();
         };
 
-        window.handleFileUpload = (input) => {
+        window.sendImageMedia = (input) => {
             const file = input.files[0];
-            if (!file) return;
+            if(!file) return;
+
             const reader = new FileReader();
             reader.onload = (e) => {
-                const roomID = [currentUser.uid, activeChatPartner.id].sort().join("___");
-                push(ref(db, `v18/messages/${roomID}`), {
-                    sid: currentUser.uid, body: e.target.result, tp: 'img', ts: Date.now()
+                console.log("[CHAT] Отправка медиа-пакета...");
+                push(ref(db, `v50/rooms/${activeRoomId}`), {
+                    senderId: userSelf.uid,
+                    content: e.target.result,
+                    type: 'media',
+                    timestamp: Date.now()
                 });
             };
             reader.readAsDataURL(file);
         };
 
-        // --- БЛОК 5: WebRTC ЗВОНКИ (P2P СЛОЙ) ---
-        const iceConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+        window.toggleSendBtn = () => {
+            const hasText = document.getElementById('chat-input').innerText.trim().length > 0;
+            document.getElementById('chat-send-btn').classList.toggle('hidden', !hasText);
+        };
 
-        window.initiateCall = async (type) => {
-            console.log("RTC: Исходящий вызов...");
-            rtcPeerConnection = new RTCPeerConnection(iceConfig);
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            stream.getTracks().forEach(t => rtcPeerConnection.addTrack(t, stream));
+        // --- МОДУЛЬ 5: СИСТЕМА ПЕРСОНАЛИЗАЦИИ ---
+        window.setAppTheme = (themeName) => {
+            console.log(`[THEME] Применение стиля: ${themeName}`);
+            document.body.className = `theme-${themeName}`;
+            localStorage.setItem('u_ultra_theme', themeName);
+        };
+        // Авто-загрузка темы
+        setAppTheme(localStorage.getItem('u_ultra_theme') || 'midnight');
+
+        window.navigateSettings = () => {
+            document.getElementById('st-name').innerText = userSelf.displayName;
+            document.getElementById('st-email').innerText = userSelf.email;
+            document.getElementById('st-uid').innerText = userSelf.uid;
+            document.getElementById('st-avatar').innerText = userSelf.displayName[0];
+            navigate('settings');
+        };
+
+        window.changeDisplayName = async () => {
+            const newName = prompt("Enter New Identity:", userSelf.displayName);
+            if(newName && newName.length > 2) {
+                await updateProfile(userSelf, { displayName: newName });
+                await update(ref(db, `v50/users/${userSelf.uid}`), { name: newName });
+                location.reload();
+            }
+        };
+
+        window.copyUserUID = () => {
+            navigator.clipboard.writeText(userSelf.uid);
+            alert("Security Key Copied to Clipboard.");
+        };
+
+        window.signOutUser = () => {
+            if(confirm("Terminate current secure session?")) {
+                signOut(auth).then(() => location.reload());
+            }
+        };
+
+        // --- МОДУЛЬ 6: ИНЖЕНЕРИЯ WEBRTC (ЗВОНКИ) ---
+        const rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+
+        window.startVideoCall = async () => {
+            console.log("[RTC] Инициация P2P видео-канала...");
+            peerConn = new RTCPeerConnection(rtcConfig);
             
-            document.getElementById('local-video').srcObject = stream;
-            document.getElementById('u-call-overlay').style.display = 'flex';
-            document.getElementById('call-ui-name').innerText = activeChatPartner.name;
-            document.getElementById('call-ui-avatar').innerText = activeChatPartner.name[0];
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            stream.getTracks().forEach(track => peerConn.addTrack(track, stream));
+            
+            document.getElementById('local-v').srcObject = stream;
+            document.getElementById('u-call-container').style.display = 'flex';
+            document.getElementById('call-name').innerText = partnerActive.name;
+            document.getElementById('call-av').innerText = partnerActive.name[0];
 
-            rtcPeerConnection.onicecandidate = (e) => {
-                if (e.candidate) push(ref(db, `v18/calls/${activeChatPartner.id}/ice`), e.candidate.toJSON());
+            peerConn.onicecandidate = (e) => {
+                if(e.candidate) {
+                    push(ref(db, `v50/calls/${partnerActive.id}/ice`), e.candidate.toJSON());
+                }
             };
-            rtcPeerConnection.ontrack = (e) => document.getElementById('remote-video').srcObject = e.streams[0];
 
-            const offer = await rtcPeerConnection.createOffer();
-            await rtcPeerConnection.setLocalDescription(offer);
+            peerConn.ontrack = (e) => {
+                document.getElementById('remote-v').srcObject = e.streams[0];
+            };
 
-            set(ref(db, `v18/calls/${activeChatPartner.id}/signal`), {
-                offer, from: currentUser.uid, name: currentUser.displayName
+            const offer = await peerConn.createOffer();
+            await peerConn.setLocalDescription(offer);
+
+            set(ref(db, `v50/calls/${partnerActive.id}/payload`), {
+                offer: offer,
+                from: userSelf.uid,
+                name: userSelf.displayName
             });
 
-            onValue(ref(db, `v18/calls/${activeChatPartner.id}/answer`), async snap => {
-                if (snap.val() && !rtcPeerConnection.currentRemoteDescription) {
-                    await rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(snap.val()));
+            onValue(ref(db, `v50/calls/${partnerActive.id}/answer`), async snap => {
+                const answer = snap.val();
+                if(answer && !peerConn.currentRemoteDescription) {
+                    await peerConn.setRemoteDescription(new RTCSessionDescription(answer));
                 }
             });
         };
 
-        function listenForInboundCalls() {
-            onValue(ref(db, `v18/calls/${currentUser.uid}/signal`), async snap => {
+        function listenForInboundSignaling() {
+            onValue(ref(db, `v50/calls/${userSelf.uid}/payload`), async snap => {
                 const data = snap.val();
-                if (data && data.offer && !rtcPeerConnection) {
-                    if (confirm(`Входящий видеозвонок от ${data.name}. Ответить?`)) {
-                        rtcPeerConnection = new RTCPeerConnection(iceConfig);
-                        const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        s.getTracks().forEach(t => rtcPeerConnection.addTrack(t, s));
+                if(data && data.offer && !peerConn) {
+                    if(confirm(`Incoming encrypted call from ${data.name}. Accept?`)) {
+                        peerConn = new RTCPeerConnection(rtcConfig);
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                        stream.getTracks().forEach(track => peerConn.addTrack(track, stream));
                         
-                        document.getElementById('local-video').srcObject = s;
-                        document.getElementById('u-call-overlay').style.display = 'flex';
-                        rtcPeerConnection.ontrack = (e) => document.getElementById('remote-video').srcObject = e.streams[0];
-                        rtcPeerConnection.onicecandidate = (e) => {
-                            if (e.candidate) push(ref(db, `v18/calls/${data.from}/ice`), e.candidate.toJSON());
+                        document.getElementById('local-v').srcObject = stream;
+                        document.getElementById('u-call-container').style.display = 'flex';
+                        
+                        peerConn.ontrack = (e) => document.getElementById('remote-v').srcObject = e.streams[0];
+                        peerConn.onicecandidate = (e) => {
+                            if(e.candidate) push(ref(db, `v50/calls/${data.from}/ice`), e.candidate.toJSON());
                         };
 
-                        await rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-                        const answer = await rtcPeerConnection.createAnswer();
-                        await rtcPeerConnection.setLocalDescription(answer);
-                        set(ref(db, `v18/calls/${data.from}/answer`), answer);
+                        await peerConn.setRemoteDescription(new RTCSessionDescription(data.offer));
+                        const answer = await peerConn.createAnswer();
+                        await peerConn.setLocalDescription(answer);
 
-                        onValue(ref(db, `v18/calls/${currentUser.uid}/ice`), sn => {
-                            sn.forEach(c => rtcPeerConnection.addIceCandidate(new RTCIceCandidate(c.val())));
+                        set(ref(db, `v50/calls/${data.from}/answer`), answer);
+
+                        onValue(ref(db, `v50/calls/${userSelf.uid}/ice`), iceSnap => {
+                            iceSnap.forEach(c => {
+                                peerConn.addIceCandidate(new RTCIceCandidate(c.val()));
+                            });
                         });
                     } else {
-                        remove(ref(db, `v18/calls/${currentUser.uid}`));
+                        remove(ref(db, `v50/calls/${userSelf.uid}`));
                     }
                 }
             });
         }
 
-        // --- БЛОК 6: НАСТРОЙКИ И ТЕМЫ ---
-        window.applyAppTheme = (t) => {
-            document.body.className = 'theme-' + t;
-            localStorage.setItem('u-selected-theme', t);
-        };
-        applyAppTheme(localStorage.getItem('u-selected-theme') || 'midnight');
-
-        window.openSettingsScreen = () => {
-            document.getElementById('st-display-name').innerText = currentUser.displayName;
-            document.getElementById('st-display-email').innerText = currentUser.email;
-            document.getElementById('st-uid-val').innerText = currentUser.uid;
-            document.getElementById('st-big-avatar').innerText = currentUser.displayName[0];
-            document.getElementById('scr-settings').classList.add('u-screen-active');
+        window.terminateCallSession = () => {
+            console.log("[RTC] Завершение сеанса...");
+            location.reload();
         };
 
-        window.editUserName = async () => {
-            const n = prompt("Новое имя:", currentUser.displayName);
-            if (n && n.length > 2) {
-                await updateProfile(currentUser, { displayName: n });
-                await update(ref(db, `v18/users/${currentUser.uid}`), { name: n });
-                openSettingsScreen();
-                showToast("Имя обновлено");
-            }
-        };
-
-        // ВСПОМОГАТЕЛЬНОЕ
-        window.terminateCurrentCall = () => location.reload();
-        window.closeChatSession = () => document.getElementById('scr-chat').classList.remove('u-screen-active');
-        window.closeSettingsScreen = () => document.getElementById('scr-settings').classList.remove('u-screen-active');
-        window.handleSignOut = () => signOut(auth).then(() => location.reload());
-        window.copyUserUID = () => { navigator.clipboard.writeText(currentUser.uid); showToast("UID скопирован"); };
-        window.toggleSendIcon = () => {
-            const has = document.getElementById('chat-input-field').innerText.trim().length > 0;
-            document.getElementById('chat-send-btn').classList.toggle('hidden', !has);
-        };
     </script>
 </body>
 </html>
