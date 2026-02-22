@@ -3,42 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ULTRA v27.0 | TITAN UNLIMITED</title>
+    <title>ULTRA TITAN v30.0 | ENTERPRISE EDITION</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
+        /* ГЛОБАЛЬНЫЕ КОНСТАНТЫ ДИЗАЙНА */
         :root {
-            --background-color: #010204;
-            --surface-color: #0d1117;
-            --border-color: #30363d;
-            --accent-color: #2f81f7;
-            --success-color: #3fb950;
-            --danger-color: #f85149;
-            --text-primary: #c9d1d9;
-            --text-secondary: #8b949e;
+            --titan-background-black: #010204;
+            --titan-surface-gray: #0d1117;
+            --titan-border-gray: #30363d;
+            --titan-accent-blue: #2f81f7;
+            --titan-accent-green: #3fb950;
+            --titan-accent-red: #f85149;
+            --titan-text-main: #c9d1d9;
+            --titan-text-dim: #8b949e;
+            --titan-shadow-heavy: 0 10px 50px rgba(0,0,0,0.8);
         }
 
+        /* БАЗОВЫЕ НАСТРОЙКИ СТРАНИЦЫ */
         * {
             box-sizing: border-box;
+            outline: none;
+            -webkit-font-smoothing: antialiased;
             -webkit-tap-highlight-color: transparent;
-            scrollbar-width: none;
         }
 
         body {
-            background-color: var(--background-color);
-            color: var(--text-primary);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--titan-background-black);
+            color: var(--titan-text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
+            user-select: none;
         }
 
-        /* Система экранов (Pages) */
-        .app-screen {
+        /* АРХИТЕКТУРА ЭКРАНОВ */
+        .titan-screen-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -46,252 +51,409 @@
             bottom: 0;
             display: none;
             flex-direction: column;
-            background: var(--background-color);
-            z-index: 10;
-        }
-
-        .app-screen.active {
-            display: flex;
+            background: var(--titan-background-black);
             z-index: 100;
         }
 
-        /* Поля ввода (Inputs) */
-        .titan-input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            border-radius: 18px;
-            color: white;
+        .titan-screen-container.active-screen {
+            display: flex;
+            animation: screenFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes screenFadeIn {
+            from { opacity: 0; transform: scale(1.05); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* СТИЛИЗАЦИЯ ИНПУТОВ */
+        .titan-input-field {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--titan-border-gray);
+            padding: 22px;
+            border-radius: 20px;
+            color: #ffffff;
             font-size: 16px;
+            font-weight: 500;
             width: 100%;
-            outline: none;
             transition: all 0.3s ease;
+            margin-bottom: 15px;
         }
 
-        .titan-input:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(47, 129, 247, 0.2);
+        .titan-input-field:focus {
+            border-color: var(--titan-accent-blue);
+            background: var(--titan-surface-gray);
+            box-shadow: 0 0 20px rgba(47, 129, 247, 0.2);
         }
 
-        /* Кнопки (Buttons) */
-        .titan-button {
-            background: var(--accent-color);
-            color: white;
-            padding: 20px;
-            border-radius: 18px;
-            font-weight: 800;
+        /* СТИЛИЗАЦИЯ КНОПОК */
+        .titan-action-button {
+            background: var(--titan-accent-blue);
+            color: #ffffff;
+            padding: 22px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             border: none;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             width: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .titan-button:active {
-            transform: scale(0.97);
-            opacity: 0.9;
+        .titan-action-button:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
         }
 
-        /* Чат компоненты */
-        .message-feed {
+        .titan-action-button:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        /* КОМПОНЕНТЫ ЧАТА */
+        .chat-scroll-area {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
+            background: radial-gradient(circle at top, #0d1117 0%, #010204 100%);
         }
+
+        .message-row {
+            display: flex;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .message-row.row-outgoing { justify-content: flex-end; }
+        .message-row.row-incoming { justify-content: flex-start; }
 
         .message-bubble {
-            max-width: 80%;
-            padding: 16px 20px;
-            border-radius: 24px;
+            max-width: 75%;
+            padding: 16px 22px;
+            border-radius: 25px;
             font-size: 15px;
-            line-height: 1.5;
+            line-height: 1.4;
             position: relative;
-            word-wrap: break-word;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        .bubble-me {
-            align-self: flex-end;
-            background: var(--accent-color);
-            color: white;
-            border-bottom-right-radius: 4px;
+        .bubble-outgoing {
+            background: var(--titan-accent-blue);
+            color: #ffffff;
+            border-bottom-right-radius: 5px;
         }
 
-        .bubble-peer {
-            align-self: flex-start;
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-bottom-left-radius: 4px;
+        .bubble-incoming {
+            background: var(--titan-surface-gray);
+            border: 1px solid var(--titan-border-gray);
+            color: var(--titan-text-main);
+            border-bottom-left-radius: 5px;
         }
 
-        .media-attachment {
-            border-radius: 16px;
-            margin-top: 8px;
-            max-width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: black;
-        }
-
-        /* Интерфейс видеозвонка */
-        #video-call-overlay {
+        /* ИНТЕРФЕЙС ЗВОНКА */
+        .call-fullscreen-module {
             position: fixed;
             inset: 0;
-            background: #000;
-            z-index: 1000;
+            background: #000000;
+            z-index: 5000;
             display: none;
         }
 
-        #remote-video-stream {
+        .call-fullscreen-module.call-active {
+            display: flex;
+        }
+
+        #remote-video-canvas {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        #local-video-preview {
+        #local-video-canvas {
             position: absolute;
-            top: 40px;
-            right: 20px;
+            top: 50px;
+            right: 25px;
             width: 120px;
             height: 180px;
             border-radius: 20px;
-            border: 2px solid white;
+            border: 2px solid rgba(255,255,255,0.4);
             object-fit: cover;
-            z-index: 1001;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 5001;
+            background: #111111;
         }
 
-        .call-controls-bar {
+        .call-actions-overlay {
             position: absolute;
-            bottom: 50px;
+            bottom: 60px;
             left: 0;
             right: 0;
             display: flex;
             justify-content: center;
-            gap: 25px;
-            z-index: 1002;
+            gap: 30px;
+            z-index: 5002;
         }
 
-        .control-btn {
-            width: 70px;
-            height: 70px;
+        .round-call-btn {
+            width: 75px;
+            height: 75px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
+            font-size: 28px;
             color: white;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255,255,255,0.1);
             backdrop-filter: blur(15px);
-            border: none;
+            border: 1px solid rgba(255,255,255,0.2);
             cursor: pointer;
+            transition: 0.3s;
         }
 
-        .btn-hangup {
-            background: var(--danger-color);
+        .btn-end-call {
+            background: var(--titan-accent-red) !important;
+            border: none;
+        }
+
+        /* НАСТРОЙКИ (SETTINGS UI) */
+        .settings-container {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--titan-background-black);
+        }
+
+        .settings-block {
+            padding: 25px;
+            border-bottom: 1px solid var(--titan-border-gray);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            items-center;
+            padding: 10px 0;
+        }
+
+        .settings-label {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .settings-description {
+            font-size: 12px;
+            color: var(--titan-text-dim);
+        }
+
+        /* ПАНЕЛЬ ВКЛАДОК */
+        .bottom-navigation-bar {
+            height: 85px;
+            background: var(--titan-surface-gray);
+            border-top: 1px solid var(--titan-border-gray);
+            display: flex;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--titan-text-dim);
+            transition: 0.3s;
+        }
+
+        .nav-tab-item.tab-active {
+            color: var(--titan-accent-blue);
+        }
+
+        .nav-tab-label {
+            font-size: 10px;
+            font-weight: 900;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
 
-    <div id="screen-auth" class="app-screen active justify-center items-center px-8">
-        <div class="w-full max-w-sm text-center">
-            <h1 class="text-6xl font-black italic mb-10 tracking-tighter">TITAN <span class="text-blue-500">27</span></h1>
-            
-            <div class="bg-[var(--surface-color)] p-8 rounded-[40px] border border-[var(--border-color)] shadow-2xl">
-                <div class="space-y-4">
-                    <input id="auth-email" type="email" placeholder="Email (egor@mail.ru)" class="titan-input" value="egorkamorozoff2014@gmail.com">
-                    <input id="auth-password" type="password" placeholder="Пароль" class="titan-input">
-                    <input id="auth-nickname" type="text" placeholder="Уникальный ID (для новых)" class="titan-input">
+    <section id="titan-screen-auth" class="titan-screen-container active-screen justify-center items-center px-10">
+        <div class="w-full max-w-md">
+            <header class="text-center mb-12">
+                <h1 class="text-7xl font-black italic tracking-tighter text-white">TITAN</h1>
+                <p class="text-[10px] font-bold uppercase tracking-[0.5em] text-blue-500 mt-2">Monolith Enterprise v30.0</p>
+            </header>
+
+            <div class="bg-[var(--titan-surface-gray)] p-10 rounded-[40px] border border-[var(--titan-border-gray)] shadow-2xl">
+                <div class="auth-fields-wrapper">
+                    <input type="email" id="input-auth-email" class="titan-input-field" placeholder="Node Address (Email)" value="egorkamorozoff2014@gmail.com">
+                    <input type="password" id="input-auth-password" class="titan-input-field" placeholder="Security Token (Password)">
+                    <input type="text" id="input-auth-nickname" class="titan-input-field" placeholder="Global Identity ID (New Users)">
                 </div>
-                
-                <button id="auth-button" onclick="TitanEngine.Auth.execute()" class="titan-button mt-8 shadow-xl shadow-blue-500/20">
-                    Войти в Mesh
+
+                <button id="button-auth-submit" onclick="TitanEngine.Authentication.processEntry()" class="titan-action-button mt-6">
+                    Initialize Core
                 </button>
-                
-                <p id="auth-status-label" class="text-[10px] font-bold uppercase mt-6 text-gray-500 tracking-[0.2em]">Система готова</p>
+
+                <div id="auth-status-feedback" class="text-center mt-6 text-[10px] font-black uppercase tracking-widest text-gray-600">
+                    Awaiting Handshake
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div id="screen-hub" class="app-screen">
-        <header class="p-8 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--surface-color)]">
+    <section id="titan-screen-hub" class="titan-screen-container">
+        <header class="p-8 border-b border-[var(--titan-border-gray)] flex justify-between items-center bg-[var(--titan-surface-gray)]/80 backdrop-blur-md">
             <div>
-                <b class="text-2xl font-black italic uppercase">Центральный Хаб</b>
-                <div id="user-identity-display" class="text-blue-500 text-[10px] font-mono mt-1 uppercase">ID: Подключение...</div>
+                <h2 class="text-2xl font-black italic uppercase tracking-tighter">Mesh Hub</h2>
+                <div id="label-user-identity" class="text-blue-500 text-[10px] font-mono mt-1 uppercase font-bold tracking-widest">Node: Syncing...</div>
             </div>
-            <button onclick="TitanEngine.Social.addNewContact()" class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <i class="fas fa-plus text-white"></i>
+            <button onclick="TitanEngine.SocialManager.initiateAddContact()" class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl active:scale-90 transition">
+                <i class="fas fa-plus text-white text-xl"></i>
             </button>
         </header>
-        
-        <div id="contacts-container" class="flex-1 overflow-y-auto p-8 space-y-4">
-            </div>
-    </div>
 
-    <div id="screen-chat" class="app-screen">
-        <header class="p-6 border-b border-[var(--border-color)] flex items-center gap-6 bg-[var(--surface-color)]">
-            <button onclick="TitanEngine.Navigation.switch('hub')" class="text-2xl opacity-40 hover:opacity-100 transition">
-                <i class="fas fa-arrow-left"></i>
+        <div id="hub-contacts-list" class="flex-1 overflow-y-auto p-6 space-y-4">
+            </div>
+
+        <nav class="bottom-navigation-bar">
+            <div class="nav-tab-item tab-active" onclick="TitanEngine.NavigationController.navigateTo('hub')">
+                <i class="fas fa-comment-alt text-xl"></i>
+                <span class="nav-tab-label">Messages</span>
+            </div>
+            <div class="nav-tab-item" onclick="TitanEngine.NavigationController.navigateTo('settings')">
+                <i class="fas fa-cog text-xl"></i>
+                <span class="nav-tab-label">Settings</span>
+            </div>
+        </nav>
+    </section>
+
+    <section id="titan-screen-chat" class="titan-screen-container">
+        <header class="p-6 border-b border-[var(--titan-border-gray)] flex items-center gap-6 bg-[var(--titan-surface-gray)]">
+            <button onclick="TitanEngine.NavigationController.navigateTo('hub')" class="text-2xl opacity-40 hover:opacity-100 transition">
+                <i class="fas fa-chevron-left"></i>
             </button>
             <div class="flex-1">
-                <b id="chat-partner-name" class="text-xl font-bold">Загрузка...</b>
-                <div id="chat-partner-status" class="text-[9px] font-black uppercase text-gray-500 tracking-tighter">Синхронизация</div>
+                <h3 id="label-chat-partner-name" class="text-xl font-bold tracking-tight">Agent</h3>
+                <div id="label-chat-partner-status" class="text-[9px] font-black uppercase text-green-500 tracking-widest">Encrypted</div>
             </div>
             <div class="flex gap-4">
-                <button onclick="TitanEngine.Media.initiateCall(false)" class="w-12 h-12 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center">
+                <button onclick="TitanEngine.MediaController.startVoiceCall(false)" class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-white/50">
                     <i class="fas fa-phone-alt"></i>
                 </button>
-                <button onclick="TitanEngine.Media.initiateCall(true)" class="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center">
+                <button onclick="TitanEngine.MediaController.startVoiceCall(true)" class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
                     <i class="fas fa-video"></i>
                 </button>
             </div>
         </header>
 
-        <div id="chat-messages-feed" class="message-feed">
+        <div id="chat-messages-container" class="chat-scroll-area">
             </div>
 
-        <div class="p-6 bg-[var(--surface-color)] border-t border-[var(--border-color)] flex gap-4 items-center pb-12">
-            <button onclick="document.getElementById('media-upload-input').click()" class="text-2xl opacity-30 hover:opacity-100 transition">
-                <i class="fas fa-paperclip"></i>
-            </button>
-            <input type="file" id="media-upload-input" class="hidden" accept="image/*,video/*" onchange="TitanEngine.Media.handleFileUpload(this)">
-            
-            <input id="chat-message-input" class="titan-input !p-5 !mb-0 flex-1" placeholder="Ваше сообщение...">
-            
-            <button onclick="TitanEngine.Chat.sendMessage()" class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl">
-                <i class="fas fa-paper-plane text-xl text-white"></i>
-            </button>
-        </div>
-    </div>
+        <footer class="p-6 bg-[var(--titan-surface-gray)] border-t border-[var(--titan-border-gray)] pb-10">
+            <div class="flex gap-4 items-center">
+                <button onclick="document.getElementById('input-file-attachment').click()" class="text-2xl opacity-30 hover:opacity-100 transition">
+                    <i class="fas fa-paperclip"></i>
+                </button>
+                <input type="file" id="input-file-attachment" class="hidden" onchange="TitanEngine.MediaController.processFileUpload(this)">
+                
+                <input type="text" id="input-chat-message" class="titan-input-field !mb-0 !p-5 flex-1" placeholder="Type encrypted signal...">
+                
+                <button onclick="TitanEngine.ChatManager.sendMessage()" class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                    <i class="fas fa-paper-plane text-xl"></i>
+                </button>
+            </div>
+        </footer>
+    </section>
 
-    <div id="video-call-overlay">
-        <video id="remote-video-stream" autoplay playsinline></video>
-        <video id="local-video-preview" autoplay muted playsinline></video>
+    <section id="titan-screen-settings" class="titan-screen-container">
+        <header class="p-10 border-b border-[var(--titan-border-gray)]">
+            <h2 class="text-3xl font-black italic uppercase tracking-tighter">Settings</h2>
+        </header>
+
+        <div class="settings-container">
+            <div class="settings-block items-center py-12">
+                <div id="settings-avatar-placeholder" class="w-24 h-24 bg-blue-600 rounded-[35px] flex items-center justify-center text-4xl font-black mb-4 shadow-2xl">?</div>
+                <h3 id="settings-display-nickname" class="text-2xl font-bold">User Identity</h3>
+                <p id="settings-display-email" class="text-gray-500 font-mono text-sm">email@titan.core</p>
+            </div>
+
+            <div class="settings-block">
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-label">Global Identity (Nickname)</div>
+                        <div class="settings-description">Смените ваше имя в глобальной сети Titan.</div>
+                    </div>
+                    <button onclick="TitanEngine.AccountSettings.updateNickname()" class="text-blue-500 font-bold uppercase text-xs tracking-widest">Modify</button>
+                </div>
+            </div>
+
+            <div class="settings-block">
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-label">Stealth Mode (Dark Theme)</div>
+                        <div class="settings-description">Максимальное затемнение интерфейса.</div>
+                    </div>
+                    <div class="relative inline-block w-12 h-6">
+                        <input type="checkbox" class="sr-only peer" onchange="TitanEngine.AccountSettings.toggleStealthMode(this)">
+                        <div class="w-full h-full bg-gray-700 rounded-full peer-checked:bg-blue-600 transition"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-block">
+                <button onclick="location.reload()" class="titan-action-button !bg-red-600/10 !text-red-500 !border !border-red-500/30">
+                    Terminate Session
+                </button>
+            </div>
+        </div>
+
+        <nav class="bottom-navigation-bar">
+            <div class="nav-tab-item" onclick="TitanEngine.NavigationController.navigateTo('hub')">
+                <i class="fas fa-comment-alt text-xl"></i>
+                <span class="nav-tab-label">Messages</span>
+            </div>
+            <div class="nav-tab-item tab-active" onclick="TitanEngine.NavigationController.navigateTo('settings')">
+                <i class="fas fa-cog text-xl"></i>
+                <span class="nav-tab-label">Settings</span>
+            </div>
+        </nav>
+    </section>
+
+    <div id="video-call-overlay" class="call-fullscreen-module">
+        <video id="remote-video-canvas" autoplay playsinline></video>
+        <video id="local-video-canvas" autoplay muted playsinline></video>
         
-        <div class="call-controls-bar">
-            <button onclick="TitanEngine.Media.toggleMicrophone()" id="call-mic-btn" class="control-btn">
+        <div class="call-actions-overlay">
+            <button onclick="TitanEngine.MediaController.toggleMicState()" id="btn-call-mic" class="round-call-btn">
                 <i class="fas fa-microphone"></i>
             </button>
-            <button onclick="TitanEngine.Media.flipCamera()" class="control-btn">
+            <button onclick="TitanEngine.MediaController.switchCameraSource()" class="round-call-btn">
                 <i class="fas fa-camera-rotate"></i>
             </button>
-            <button onclick="location.reload()" class="control-btn btn-hangup">
+            <button onclick="location.reload()" class="round-call-btn btn-end-call">
                 <i class="fas fa-phone-slash"></i>
             </button>
         </div>
     </div>
 
     <script type="module">
+        // Импорт официальных SDK Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, get, update, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // Конфигурация Firebase
-        const firebaseConfig = {
+        // КОНФИГУРАЦИЯ СЕРВЕРНОЙ ЧАСТИ
+        const FIREBASE_CONFIG_PARAMS = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
@@ -300,171 +462,182 @@
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        // Инициализация сервисов
-        const firebaseApp = initializeApp(firebaseConfig);
-        const database = getDatabase(firebaseApp);
-        const firebaseAuth = getAuth(firebaseApp);
-        const firebaseStorage = getStorage(firebaseApp);
+        // ИНИЦИАЛИЗАЦИЯ ЯДРА
+        const TITAN_APP = initializeApp(FIREBASE_CONFIG_PARAMS);
+        const TITAN_DB = getDatabase(TITAN_APP);
+        const TITAN_AUTH = getAuth(TITAN_APP);
+        const TITAN_STORAGE = getStorage(TITAN_APP);
 
-        // Объект управления TitanEngine
+        // ГЛОБАЛЬНЫЙ ОБЪЕКТ УПРАВЛЕНИЯ
         window.TitanEngine = {
-            State: {
-                CurrentUser: null,
-                ActivePartner: null,
-                CurrentRoom: null,
-                RTCPeer: null,
+            // Менеджер Состояний (Internal State)
+            CoreState: {
+                Identity: null,
+                ActiveChatPartner: null,
+                CurrentSyncRoom: null,
+                WebRTC_Peer: null,
                 LocalMediaStream: null,
-                CameraMode: 'user',
-                MicrophoneActive: true
+                CameraFacingMode: 'user',
+                MicrophoneEnabled: true
             },
 
-            Navigation: {
-                switch: (screenId) => {
-                    document.querySelectorAll('.app-screen').forEach(screen => screen.classList.remove('active'));
-                    document.getElementById(`screen-${screenId}`).classList.add('active');
+            // Контроллер Навигации
+            NavigationController: {
+                navigateTo: (screenName) => {
+                    const allScreens = document.querySelectorAll('.titan-screen-container');
+                    allScreens.forEach(screen => screen.classList.remove('active-screen'));
+                    
+                    const targetScreen = document.getElementById(`titan-screen-${screenName}`);
+                    if (targetScreen) {
+                        targetScreen.classList.add('active-screen');
+                    }
                 }
             },
 
-            Auth: {
-                execute: async () => {
-                    const emailValue = document.getElementById('auth-email').value;
-                    const passwordValue = document.getElementById('auth-password').value;
-                    const nicknameValue = document.getElementById('auth-nickname').value.trim();
-                    const statusLabel = document.getElementById('auth-status-label');
+            // Система Авторизации
+            Authentication: {
+                processEntry: async () => {
+                    const emailField = document.getElementById('input-auth-email').value;
+                    const passwordField = document.getElementById('input-auth-password').value;
+                    const nicknameField = document.getElementById('input-auth-nickname').value.trim();
+                    const statusLabel = document.getElementById('auth-status-feedback');
 
-                    if (!emailValue || !passwordValue) {
-                        statusLabel.innerText = "ОШИБКА: ЗАПОЛНИТЕ ПОЛЯ";
+                    if (!emailField || !passwordField) {
+                        statusLabel.innerText = "Error: Input required";
                         return;
                     }
 
-                    statusLabel.innerText = "ПОДКЛЮЧЕНИЕ К СЕРВЕРУ...";
-                    
+                    statusLabel.innerText = "Authorizing Node...";
+                    statusLabel.style.color = "#2f81f7";
+
                     try {
-                        // Сначала пробуем войти
-                        await signInWithEmailAndPassword(firebaseAuth, emailValue, passwordValue);
-                        statusLabel.innerText = "ВХОД ВЫПОЛНЕН";
+                        // Попытка входа
+                        await signInWithEmailAndPassword(TITAN_AUTH, emailField, passwordField);
                     } catch (error) {
-                        // Если аккаунта нет - регистрируем
+                        // Попытка регистрации
                         if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-                            if (!nicknameValue) {
-                                statusLabel.innerText = "НУЖЕН ID ДЛЯ НОВОГО АККАУНТА";
+                            if (!nicknameField) {
+                                statusLabel.innerText = "Error: Nickname needed for registration";
                                 return;
                             }
-                            
-                            statusLabel.innerText = "РЕГИСТРАЦИЯ НОВОГО УЗЛА...";
+
+                            statusLabel.innerText = "Creating Global Identity...";
                             try {
-                                const registrationResult = await createUserWithEmailAndPassword(firebaseAuth, emailValue, passwordValue);
-                                const userUid = registrationResult.user.uid;
-                                
-                                // Создаем записи в базе данных
-                                await set(ref(database, `v27/users/${userUid}`), {
-                                    id: nicknameValue,
+                                const regResponse = await createUserWithEmailAndPassword(TITAN_AUTH, emailField, passwordField);
+                                const userUid = regResponse.user.uid;
+
+                                const profileData = {
+                                    id: nicknameField,
                                     uid: userUid,
-                                    registeredAt: Date.now()
-                                });
+                                    email: emailField,
+                                    status: "active",
+                                    joined: Date.now()
+                                };
+
+                                await set(ref(TITAN_DB, `v30/users/${userUid}`), profileData);
+                                await set(ref(TITAN_DB, `v30/global_map/${nicknameField}`), userUid);
                                 
-                                await set(ref(database, `v27/id_map/${nicknameValue}`), userUid);
-                                statusLabel.innerText = "АККАУНТ СОЗДАН УСПЕШНО";
-                            } catch (regError) {
-                                statusLabel.innerText = "ОШИБКА РЕГИСТРАЦИИ: " + regError.message;
+                                statusLabel.innerText = "Identity Registered!";
+                            } catch (regErr) {
+                                statusLabel.innerText = "Registry Failed: " + regErr.message;
                             }
                         } else {
-                            statusLabel.innerText = "ОШИБКА АВТОРИЗАЦИИ: " + error.message;
+                            statusLabel.innerText = "Security Alert: " + error.message;
                         }
                     }
                 }
             },
 
-            Social: {
-                addNewContact: async () => {
-                    const targetNickname = prompt("Введите ID (ник) пользователя:");
-                    if (!targetNickname) return;
+            // Социальный Менеджер (Друзья/Контакты)
+            SocialManager: {
+                initiateAddContact: async () => {
+                    const targetNick = prompt("Enter Target Global ID:");
+                    if (!targetNick) return;
 
-                    const idSnapshot = await get(ref(database, `v27/id_map/${targetNickname}`));
-                    if (idSnapshot.exists()) {
-                        const targetUid = idSnapshot.val();
+                    const lookupSnapshot = await get(ref(TITAN_DB, `v30/global_map/${targetNick}`));
+                    if (lookupSnapshot.exists()) {
+                        const targetUid = lookupSnapshot.val();
+                        const myUid = TitanEngine.CoreState.Identity.uid;
+
+                        // Взаимное добавление
+                        const updates = {};
+                        updates[`v30/social/${myUid}/${targetUid}`] = { id: targetNick, uid: targetUid };
+                        updates[`v30/social/${targetUid}/${myUid}`] = { id: TitanEngine.CoreState.Identity.id, uid: myUid };
                         
-                        // Добавляем друг другу в списки контактов
-                        await update(ref(database, `v27/social/${TitanEngine.State.CurrentUser.uid}/${targetUid}`), {
-                            id: targetNickname,
-                            uid: targetUid
-                        });
-                        
-                        await update(ref(database, `v27/social/${targetUid}/${TitanEngine.State.CurrentUser.uid}`), {
-                            id: TitanEngine.State.CurrentUser.id,
-                            uid: TitanEngine.State.CurrentUser.uid
-                        });
-                        
-                        alert("Контакт успешно добавлен!");
+                        await update(ref(TITAN_DB), updates);
+                        alert("Node Linked Successfully!");
                     } else {
-                        alert("Пользователь с таким ID не найден.");
+                        alert("Signal Error: Target node not found.");
                     }
                 },
 
-                syncContacts: () => {
-                    const contactsRef = ref(database, `v27/social/${TitanEngine.State.CurrentUser.uid}`);
-                    onValue(contactsRef, (snapshot) => {
-                        const contactsContainer = document.getElementById('contacts-container');
-                        contactsContainer.innerHTML = "";
+                startContactListener: () => {
+                    const contactRef = ref(TITAN_DB, `v30/social/${TitanEngine.CoreState.Identity.uid}`);
+                    onValue(contactRef, (snapshot) => {
+                        const container = document.getElementById('hub-contacts-list');
+                        container.innerHTML = "";
                         
                         snapshot.forEach((child) => {
-                            const contactData = child.val();
-                            const contactElement = document.createElement('div');
-                            contactElement.className = "p-6 bg-[var(--surface-color)] rounded-[30px] border border-[var(--border-color)] flex justify-between items-center active:scale-95 transition-all cursor-pointer shadow-lg";
-                            contactElement.innerHTML = `
+                            const data = child.val();
+                            const card = document.createElement('div');
+                            card.className = "p-6 bg-[var(--titan-surface-gray)] rounded-[30px] border border-[var(--titan-border-gray)] flex justify-between items-center active:scale-95 transition shadow-lg cursor-pointer";
+                            card.innerHTML = `
                                 <div class="flex items-center gap-5">
                                     <div class="w-14 h-14 bg-blue-600/10 rounded-2xl flex items-center justify-center text-blue-500 font-black text-xl">
-                                        ${contactData.id[0].toUpperCase()}
+                                        ${data.id[0].toUpperCase()}
                                     </div>
                                     <div>
-                                        <b class="text-white text-lg">${contactData.id}</b>
-                                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Доступен</p>
+                                        <b class="text-white text-lg tracking-tight">${data.id}</b>
+                                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1 italic">Authorized Peer</p>
                                     </div>
                                 </div>
                                 <i class="fas fa-chevron-right opacity-20"></i>
                             `;
-                            contactElement.onclick = () => TitanEngine.Chat.openRoom(contactData);
-                            contactsContainer.appendChild(contactElement);
+                            card.onclick = () => TitanEngine.ChatManager.openChatSession(data);
+                            container.appendChild(card);
                         });
                     });
                 }
             },
 
-            Chat: {
-                openRoom: (partner) => {
-                    TitanEngine.State.ActivePartner = partner;
-                    TitanEngine.State.CurrentRoom = [TitanEngine.State.CurrentUser.uid, partner.uid].sort().join("_");
+            // Менеджер Сообщений
+            ChatManager: {
+                openChatSession: (partner) => {
+                    TitanEngine.CoreState.ActiveChatPartner = partner;
+                    TitanEngine.CoreState.CurrentSyncRoom = [TitanEngine.CoreState.Identity.uid, partner.uid].sort().join("_");
                     
-                    TitanEngine.Navigation.switch('chat');
-                    document.getElementById('chat-partner-name').innerText = partner.id;
+                    TitanEngine.NavigationController.navigateTo('chat');
+                    document.getElementById('label-chat-partner-name').innerText = partner.id;
                     
-                    TitanEngine.Chat.listenForMessages();
+                    TitanEngine.ChatManager.listenForIncomingPackets();
                 },
 
-                listenForMessages: () => {
-                    const messagesRef = ref(database, `v27/rooms/${TitanEngine.State.CurrentRoom}`);
-                    onValue(messagesRef, (snapshot) => {
-                        const feed = document.getElementById('chat-messages-feed');
+                listenForIncomingPackets: () => {
+                    const roomRef = ref(TITAN_DB, `v30/rooms/${TitanEngine.CoreState.CurrentSyncRoom}`);
+                    onValue(roomRef, (snapshot) => {
+                        const feed = document.getElementById('chat-messages-container');
                         feed.innerHTML = "";
                         
-                        snapshot.forEach((messageChild) => {
-                            const message = messageChild.val();
-                            const isMe = message.senderId === TitanEngine.State.CurrentUser.uid;
+                        snapshot.forEach((packetChild) => {
+                            const packet = packetChild.val();
+                            const isOutgoing = packet.senderId === TitanEngine.CoreState.Identity.uid;
                             
-                            let messageContent = "";
-                            if (message.type === 'text') {
-                                messageContent = message.text;
-                            } else if (message.type === 'media') {
-                                if (message.fileMime.includes('image')) {
-                                    messageContent = `<img src="${message.fileUrl}" class="media-attachment" onclick="window.open('${message.fileUrl}')">`;
+                            let htmlContent = "";
+                            if (packet.type === 'text') {
+                                htmlContent = packet.payload;
+                            } else if (packet.type === 'media') {
+                                if (packet.mime.includes('image')) {
+                                    htmlContent = `<img src="${packet.url}" class="media-attachment" onclick="window.open('${packet.url}')">`;
                                 } else {
-                                    messageContent = `<video src="${message.fileUrl}" controls class="media-attachment"></video>`;
+                                    htmlContent = `<video src="${packet.url}" controls class="media-attachment"></video>`;
                                 }
                             }
                             
                             feed.innerHTML += `
-                                <div class="message-bubble ${isMe ? 'bubble-me' : 'bubble-peer'}">
-                                    ${messageContent}
+                                <div class="message-row ${isOutgoing ? 'row-outgoing' : 'row-incoming'}">
+                                    <div class="message-bubble ${isOutgoing ? 'bubble-outgoing' : 'bubble-incoming'}">
+                                        ${htmlContent}
+                                    </div>
                                 </div>
                             `;
                         });
@@ -473,210 +646,223 @@
                 },
 
                 sendMessage: () => {
-                    const inputField = document.getElementById('chat-message-input');
-                    const text = inputField.value.trim();
+                    const inputEl = document.getElementById('input-chat-message');
+                    const textContent = inputEl.value.trim();
                     
-                    if (!text) return;
+                    if (!textContent) return;
                     
-                    const newMessageRef = push(ref(database, `v27/rooms/${TitanEngine.State.CurrentRoom}`));
-                    set(newMessageRef, {
-                        senderId: TitanEngine.State.CurrentUser.uid,
-                        text: text,
+                    const packetRef = push(ref(TITAN_DB, `v30/rooms/${TitanEngine.CoreState.CurrentSyncRoom}`));
+                    set(packetRef, {
+                        senderId: TitanEngine.CoreState.Identity.uid,
+                        payload: textContent,
                         type: 'text',
-                        timestamp: Date.now()
+                        time: Date.now()
                     });
                     
-                    inputField.value = "";
+                    inputEl.value = "";
                 }
             },
 
-            Media: {
-                handleFileUpload: async (inputElement) => {
-                    const file = inputElement.files[0];
+            // Медиа Контроллер (Файлы и Звонки)
+            MediaController: {
+                processFileUpload: async (fileInput) => {
+                    const file = fileInput.files[0];
                     if (!file) return;
 
-                    const fileId = Date.now() + "_" + file.name;
-                    const fileReference = storageRef(firebaseStorage, `v27/uploads/${fileId}`);
+                    const storageID = `v30_media_${Date.now()}_${file.name}`;
+                    const fileRef = storageRef(TITAN_STORAGE, `v30/vault/${storageID}`);
                     
                     try {
-                        console.log("Начало загрузки файла...");
-                        await uploadBytes(fileReference, file);
-                        const downloadUrl = await getDownloadURL(fileReference);
+                        console.log("Transmission started...");
+                        await uploadBytes(fileRef, file);
+                        const downloadUrl = await getDownloadURL(fileRef);
                         
-                        const newMessageRef = push(ref(database, `v27/rooms/${TitanEngine.State.CurrentRoom}`));
-                        set(newMessageRef, {
-                            senderId: TitanEngine.State.CurrentUser.uid,
-                            fileUrl: downloadUrl,
-                            fileMime: file.type,
+                        const packetRef = push(ref(TITAN_DB, `v30/rooms/${TitanEngine.CoreState.CurrentSyncRoom}`));
+                        set(packetRef, {
+                            senderId: TitanEngine.CoreState.Identity.uid,
+                            url: downloadUrl,
+                            mime: file.type,
                             type: 'media',
-                            timestamp: Date.now()
+                            time: Date.now()
                         });
-                        console.log("Файл успешно отправлен.");
-                    } catch (error) {
-                        alert("Ошибка при загрузке файла: " + error.message);
+                    } catch (err) {
+                        alert("Transmission Failed: " + err.message);
                     }
                 },
 
-                initiateCall: async (withVideo) => {
-                    document.getElementById('video-call-overlay').style.display = 'block';
+                startVoiceCall: async (useVideo) => {
+                    document.getElementById('video-call-overlay').classList.add('call-active');
                     
                     try {
-                        // Захват камеры и микрофона
-                        TitanEngine.State.LocalMediaStream = await navigator.mediaDevices.getUserMedia({
-                            video: withVideo ? { facingMode: TitanEngine.State.CameraMode } : false,
+                        // Доступ к оборудованию
+                        TitanEngine.CoreState.LocalMediaStream = await navigator.mediaDevices.getUserMedia({
+                            video: useVideo ? { facingMode: TitanEngine.CoreState.CameraFacingMode } : false,
                             audio: true
                         });
                         
-                        document.getElementById('local-video-preview').srcObject = TitanEngine.State.LocalMediaStream;
+                        document.getElementById('local-video-canvas').srcObject = TitanEngine.CoreState.LocalMediaStream;
                         
-                        // Настройка WebRTC
-                        TitanEngine.State.RTCPeer = new RTCPeerConnection({
+                        // Инициализация WebRTC Peer
+                        TitanEngine.CoreState.WebRTC_Peer = new RTCPeerConnection({
                             iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
                         });
 
-                        // Добавление треков в поток
-                        TitanEngine.State.LocalMediaStream.getTracks().forEach(track => {
-                            TitanEngine.State.RTCPeer.addTrack(track, TitanEngine.State.LocalMediaStream);
+                        // Инъекция треков
+                        TitanEngine.CoreState.LocalMediaStream.getTracks().forEach(track => {
+                            TitanEngine.CoreState.WebRTC_Peer.addTrack(track, TitanEngine.CoreState.LocalMediaStream);
                         });
 
-                        // Прием удаленного потока
-                        TitanEngine.State.RTCPeer.ontrack = (event) => {
-                            document.getElementById('remote-video-stream').srcObject = event.streams[0];
+                        // Обработка удаленного сигнала
+                        TitanEngine.CoreState.WebRTC_Peer.ontrack = (event) => {
+                            document.getElementById('remote-video-canvas').srcObject = event.streams[0];
                         };
 
-                        // ICE кандидаты
-                        TitanEngine.State.RTCPeer.onicecandidate = (event) => {
+                        // Передача ICE кандидатов
+                        TitanEngine.CoreState.WebRTC_Peer.onicecandidate = (event) => {
                             if (event.candidate) {
-                                const iceRef = push(ref(database, `v27/calls/${TitanEngine.State.ActivePartner.uid}/ice_candidates`));
+                                const iceRef = push(ref(TITAN_DB, `v30/calls/${TitanEngine.CoreState.ActiveChatPartner.uid}/ice_pool`));
                                 set(iceRef, event.candidate.toJSON());
                             }
                         };
 
-                        // Создание Offer
-                        const offer = await TitanEngine.State.RTCPeer.createOffer();
-                        await TitanEngine.State.RTCPeer.setLocalDescription(offer);
+                        // Создание оффера
+                        const sessionOffer = await TitanEngine.CoreState.WebRTC_Peer.createOffer();
+                        await TitanEngine.CoreState.WebRTC_Peer.setLocalDescription(sessionOffer);
                         
-                        // Сигнализация о вызове
-                        await set(ref(database, `v27/calls/${TitanEngine.State.ActivePartner.uid}/signal`), {
-                            offer: offer,
-                            callerId: TitanEngine.State.CurrentUser.uid,
-                            callerName: TitanEngine.State.CurrentUser.id,
-                            videoEnabled: withVideo,
-                            timestamp: Date.now()
+                        // Отправка сигнала в сеть
+                        await set(ref(TITAN_DB, `v30/calls/${TitanEngine.CoreState.ActiveChatPartner.uid}/signal`), {
+                            offer: sessionOffer,
+                            callerId: TitanEngine.CoreState.Identity.uid,
+                            callerName: TitanEngine.CoreState.Identity.id,
+                            video: useVideo,
+                            ts: Date.now()
                         });
 
-                        // Ожидание ответа (Answer)
-                        const answerRef = ref(database, `v27/calls/${TitanEngine.State.CurrentUser.uid}/answer`);
-                        onValue(answerRef, async (snapshot) => {
-                            const answer = snapshot.val();
-                            if (answer && !TitanEngine.State.RTCPeer.currentRemoteDescription) {
-                                await TitanEngine.State.RTCPeer.setRemoteDescription(new RTCSessionDescription(answer));
+                        // Прослушивание ответа
+                        const answerRef = ref(TITAN_DB, `v30/calls/${TitanEngine.CoreState.Identity.uid}/answer`);
+                        onValue(answerRef, async (snap) => {
+                            const ans = snap.val();
+                            if (ans && !TitanEngine.CoreState.WebRTC_Peer.currentRemoteDescription) {
+                                await TitanEngine.CoreState.WebRTC_Peer.setRemoteDescription(new RTCSessionDescription(ans));
                             }
                         });
 
-                    } catch (error) {
-                        console.error(error);
-                        alert("Доступ к камере/микрофону запрещен.");
+                    } catch (err) {
+                        alert("Hardware Access Denied.");
                         location.reload();
                     }
                 },
 
-                toggleMicrophone: () => {
-                    TitanEngine.State.MicrophoneActive = !TitanEngine.State.MicrophoneActive;
-                    TitanEngine.State.LocalMediaStream.getAudioTracks()[0].enabled = TitanEngine.State.MicrophoneActive;
+                toggleMicState: () => {
+                    const currentState = TitanEngine.CoreState.MicrophoneEnabled;
+                    TitanEngine.CoreState.LocalMediaStream.getAudioTracks()[0].enabled = !currentState;
+                    TitanEngine.CoreState.MicrophoneEnabled = !currentState;
                     
-                    const micBtn = document.getElementById('call-mic-btn');
-                    micBtn.style.color = TitanEngine.State.MicrophoneActive ? 'white' : 'red';
-                    micBtn.style.background = TitanEngine.State.MicrophoneActive ? 'rgba(255,255,255,0.15)' : 'rgba(255,0,0,0.2)';
+                    document.getElementById('btn-call-mic').style.color = !currentState ? 'white' : '#f85149';
                 },
 
-                flipCamera: async () => {
-                    TitanEngine.State.CameraMode = TitanEngine.State.CameraMode === 'user' ? 'environment' : 'user';
+                switchCameraSource: async () => {
+                    const newMode = TitanEngine.CoreState.CameraFacingMode === 'user' ? 'environment' : 'user';
+                    TitanEngine.CoreState.CameraFacingMode = newMode;
                     
-                    if (TitanEngine.State.LocalMediaStream) {
-                        // Останавливаем старые треки
-                        TitanEngine.State.LocalMediaStream.getTracks().forEach(track => track.stop());
+                    if (TitanEngine.CoreState.LocalMediaStream) {
+                        TitanEngine.CoreState.LocalMediaStream.getTracks().forEach(t => t.stop());
                         
-                        // Запускаем новую камеру
-                        TitanEngine.State.LocalMediaStream = await navigator.mediaDevices.getUserMedia({
-                            video: { facingMode: TitanEngine.State.CameraMode },
+                        const newStream = await navigator.mediaDevices.getUserMedia({
+                            video: { facingMode: newMode },
                             audio: true
                         });
                         
-                        document.getElementById('local-video-preview').srcObject = TitanEngine.State.LocalMediaStream;
+                        TitanEngine.CoreState.LocalMediaStream = newStream;
+                        document.getElementById('local-video-canvas').srcObject = newStream;
                         
-                        // Обновляем трек в RTCPeer
-                        const videoTrack = TitanEngine.State.LocalMediaStream.getVideoTracks()[0];
-                        const sender = TitanEngine.State.RTCPeer.getSenders().find(s => s.track.kind === 'video');
+                        const videoTrack = newStream.getVideoTracks()[0];
+                        const sender = TitanEngine.CoreState.WebRTC_Peer.getSenders().find(s => s.track.kind === 'video');
                         if (sender) sender.replaceTrack(videoTrack);
+                    }
+                }
+            },
+
+            // Настройки Аккаунта
+            AccountSettings: {
+                updateNickname: async () => {
+                    const newNick = prompt("Enter New Global ID:");
+                    if (!newNick) return;
+
+                    const uid = TitanEngine.CoreState.Identity.uid;
+                    await update(ref(TITAN_DB, `v30/users/${uid}`), { id: newNick });
+                    await set(ref(TITAN_DB, `v30/global_map/${newNick}`), uid);
+                    alert("Identity Updated!");
+                    location.reload();
+                },
+
+                toggleStealthMode: (checkbox) => {
+                    if (checkbox.checked) {
+                        document.body.style.filter = "contrast(1.2) brightness(0.8)";
+                    } else {
+                        document.body.style.filter = "none";
                     }
                 }
             }
         };
 
-        // СЛУШАТЕЛЬ ВХОДЯЩИХ ВЫЗОВОВ
-        function setupIncomingCallListener() {
-            const callSignalRef = ref(database, `v27/calls/${TitanEngine.State.CurrentUser.uid}/signal`);
-            onValue(callSignalRef, async (snapshot) => {
+        // СЛУШАТЕЛЬ ВХОДЯЩИХ СИГНАЛОВ (CALL LISTENER)
+        function initializeCallSync() {
+            const callRef = ref(TITAN_DB, `v30/calls/${TitanEngine.CoreState.Identity.uid}/signal`);
+            onValue(callRef, async (snapshot) => {
                 const callData = snapshot.val();
                 
-                if (callData && !TitanEngine.State.RTCPeer) {
-                    if (confirm(`ВХОДЯЩИЙ ВЫЗОВ ОТ: ${callData.callerName}`)) {
-                        TitanEngine.State.ActivePartner = { uid: callData.callerId, id: callData.callerName };
+                if (callData && !TitanEngine.CoreState.WebRTC_Peer) {
+                    if (confirm(`INCOMING SIGNAL FROM: ${callData.callerName}`)) {
+                        TitanEngine.CoreState.ActiveChatPartner = { uid: callData.callerId, id: callData.callerName };
                         
-                        await TitanEngine.Media.initiateCall(callData.videoEnabled);
+                        await TitanEngine.MediaController.startVoiceCall(callData.video);
                         
-                        // Установка Remote Description (Offer)
-                        await TitanEngine.State.RTCPeer.setRemoteDescription(new RTCSessionDescription(callData.offer));
+                        await TitanEngine.CoreState.WebRTC_Peer.setRemoteDescription(new RTCSessionDescription(callData.offer));
+                        const answer = await TitanEngine.CoreState.WebRTC_Peer.createAnswer();
+                        await TitanEngine.CoreState.WebRTC_Peer.setLocalDescription(answer);
                         
-                        // Создание и отправка Answer
-                        const answer = await TitanEngine.State.RTCPeer.createAnswer();
-                        await TitanEngine.State.RTCPeer.setLocalDescription(answer);
+                        await set(ref(TITAN_DB, `v30/calls/${callData.callerId}/answer`), answer);
                         
-                        await set(ref(database, `v27/calls/${callData.callerId}/answer`), answer);
-                        
-                        // Прием ICE кандидатов
-                        const iceCandidatesRef = ref(database, `v27/calls/${TitanEngine.State.CurrentUser.uid}/ice_candidates`);
-                        onValue(iceCandidatesRef, (iceSnapshot) => {
-                            iceSnapshot.forEach((candidateChild) => {
-                                TitanEngine.State.RTCPeer.addIceCandidate(new RTCIceCandidate(candidateChild.val()));
+                        const iceRef = ref(TITAN_DB, `v30/calls/${TitanEngine.CoreState.Identity.uid}/ice_pool`);
+                        onValue(iceRef, (iceSnap) => {
+                            iceSnap.forEach((c) => {
+                                TitanEngine.CoreState.WebRTC_Peer.addIceCandidate(new RTCIceCandidate(c.val()));
                             });
                         });
                     } else {
-                        // Отклонение вызова
-                        remove(ref(database, `v27/calls/${TitanEngine.State.CurrentUser.uid}`));
+                        remove(ref(TITAN_DB, `v30/calls/${TitanEngine.CoreState.Identity.uid}`));
                     }
                 }
             });
         }
 
-        // ОСНОВНОЙ ЦИКЛ ЖИЗНИ ПРИЛОЖЕНИЯ
-        onAuthStateChanged(firebaseAuth, (user) => {
+        // ТОЧКА ВХОДА И КОНТРОЛЬ ЖИЗНЕННОГО ЦИКЛА
+        onAuthStateChanged(TITAN_AUTH, (user) => {
             if (user) {
-                console.log("Пользователь авторизован:", user.uid);
-                
-                onValue(ref(database, `v27/users/${user.uid}`), (snapshot) => {
-                    TitanEngine.State.CurrentUser = snapshot.val();
-                    
-                    if (TitanEngine.State.CurrentUser) {
-                        TitanEngine.Navigation.switch('hub');
-                        document.getElementById('user-identity-display').innerText = "ID: " + TitanEngine.State.CurrentUser.id;
+                onValue(ref(TITAN_DB, `v30/users/${user.uid}`), (snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData) {
+                        TitanEngine.CoreState.Identity = userData;
+                        TitanEngine.NavigationController.navigateTo('hub');
                         
-                        TitanEngine.Social.syncContacts();
-                        setupIncomingCallListener();
+                        // Обновление UI настроек
+                        document.getElementById('label-user-identity').innerText = "Node: " + userData.id;
+                        document.getElementById('settings-display-nickname').innerText = userData.id;
+                        document.getElementById('settings-display-email').innerText = userData.email;
+                        document.getElementById('settings-avatar-placeholder').innerText = userData.id[0].toUpperCase();
                         
-                        // Статус Online
-                        const statusRef = ref(database, `v27/status/${user.uid}`);
-                        set(statusRef, "online");
-                        onDisconnect(statusRef).set("offline");
+                        // Запуск фоновых процессов
+                        TitanEngine.SocialManager.startContactListener();
+                        initializeCallSync();
                     }
                 });
             } else {
-                TitanEngine.Navigation.switch('auth');
+                TitanEngine.NavigationController.navigateTo('auth');
             }
         });
 
-        console.log("TITAN UNLIMITED CORE v27.0 ЗАПУЩЕН");
+        console.log("TITAN MONOLITH v30.0 DEPLOYED SUCCESSFULLY");
     </script>
 </body>
 </html>
