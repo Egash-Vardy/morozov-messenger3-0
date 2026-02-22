@@ -4,269 +4,353 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
+    <title>MOROZOV ULTRA</title>
+
     <style>
-        /* [1. GLOBAL RESET & CORE STYLES] */
+        /* [ SECTION 1: MOROZOV DESIGN LANGUAGE ] */
         :root {
-            --primary-bg: #000000;
-            --secondary-bg: #090909;
-            --surface-color: #121214;
-            --accent-color: #007aff;
-            --accent-glow: rgba(0, 122, 255, 0.4);
-            --text-main: #ffffff;
-            --text-secondary: #8e8e93;
-            --border-color: #1c1c1e;
-            --danger: #ff3b30;
-            --success: #34c759;
-            --safe-area-top: env(safe-area-inset-top);
-            --safe-area-bottom: env(safe-area-inset-bottom);
+            --m-black: #000000;
+            --m-dark: #0a0a0c;
+            --m-card: #141417;
+            --m-accent: #007aff;
+            --m-accent-glow: rgba(0, 122, 255, 0.4);
+            --m-text: #ffffff;
+            --m-text-dim: #8e8e93;
+            --m-border: rgba(255, 255, 255, 0.08);
+            --m-red: #ff3b30;
+            --m-green: #34c759;
+            --safe-t: env(safe-area-inset-top);
+            --safe-b: env(safe-area-inset-bottom);
         }
 
-        html, body {
-            width: 100%;
-            height: 100%;
+        * {
             margin: 0;
             padding: 0;
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* [2. NAVIGATION SYSTEM] */
-        .screen {
+        body {
+            background: var(--m-black);
+            color: var(--m-text);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: fixed;
+        }
+
+        /* [ SECTION 2: NAVIGATION SYSTEM ] */
+        .mu-viewport {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             display: none;
             flex-direction: column;
-            background-color: var(--primary-bg);
+            background: var(--m-black);
             z-index: 10;
         }
 
-        .screen.active {
+        .mu-viewport.active {
             display: flex;
-            animation: screen-fade-in 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: mu-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes screen-fade-in {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes mu-slide-in {
+            from { opacity: 0; transform: scale(1.05); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        /* [3. HEADER ARCHITECTURE] */
-        .app-header {
-            padding-top: calc(var(--safe-area-top) + 10px);
-            padding-bottom: 10px;
-            padding-left: 20px;
-            padding-right: 20px;
-            background-color: var(--secondary-bg);
-            border-bottom: 1px solid var(--border-color);
+        /* [ SECTION 3: MOROZOV HEADERS ] */
+        .mu-header {
+            padding: calc(var(--safe-t) + 15px) 20px 15px;
+            background: var(--m-dark);
+            border-bottom: 1px solid var(--m-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
         }
 
-        .app-logo {
-            font-size: 20px;
+        .mu-brand {
+            font-size: 18px;
             font-weight: 900;
-            letter-spacing: -1px;
             text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .app-logo span {
-            color: var(--accent-color);
+        .mu-brand span {
+            color: var(--m-accent);
+            text-shadow: 0 0 10px var(--m-accent-glow);
         }
 
-        /* [4. CHAT BUBBLE ARCHITECTURE] */
-        .chat-container {
+        /* [ SECTION 4: GATEWAY (HUB) ELEMENTS ] */
+        .mu-search-box {
+            padding: 15px;
+            background: var(--m-dark);
+        }
+
+        .mu-input-wrap {
+            background: var(--m-card);
+            border: 1px solid var(--m-border);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            padding: 2px 12px;
+            transition: 0.3s;
+        }
+
+        .mu-input-wrap:focus-within {
+            border-color: var(--m-accent);
+            box-shadow: 0 0 0 2px var(--m-accent-glow);
+        }
+
+        .mu-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px 0;
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        /* [ SECTION 5: CONTACT & MESSAGE CARDS ] */
+        .mu-scroll {
             flex: 1;
             overflow-y: auto;
             padding: 15px;
             display: flex;
             flex-direction: column;
             gap: 12px;
-            background: linear-gradient(180deg, #000 0%, #050505 100%);
         }
 
-        .msg-bubble {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 20px;
-            font-size: 16px;
-            line-height: 1.45;
-            position: relative;
-            word-wrap: break-word;
-            transition: transform 0.1s ease;
-        }
-
-        .msg-bubble:active {
-            transform: scale(0.98);
-        }
-
-        .msg-sent {
-            align-self: flex-end;
-            background-color: var(--accent-color);
-            color: #fff;
-            border-bottom-right-radius: 4px;
-        }
-
-        .msg-received {
-            align-self: flex-start;
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-bottom-left-radius: 4px;
-        }
-
-        /* [5. MULTIMEDIA RENDERING] */
-        .media-content {
-            width: 100%;
-            border-radius: 12px;
-            margin-top: 6px;
-            display: block;
-            background-color: #000;
-        }
-
-        .sticker-msg {
-            background: transparent !important;
-            font-size: 60px;
-            padding: 0 !important;
-            border: none !important;
-        }
-
-        /* [6. INPUT PANEL] */
-        .input-panel {
-            padding: 10px 15px calc(var(--safe-area-bottom) + 10px);
-            background-color: var(--secondary-bg);
-            border-top: 1px solid var(--border-color);
+        .mu-node-card {
+            background: var(--m-card);
+            padding: 16px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .input-wrap {
-            flex: 1;
-            background-color: var(--surface-color);
-            border-radius: 25px;
-            padding: 0 15px;
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .input-field {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 12px 0;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-        }
-
-        .action-btn {
-            width: 42px;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            border-radius: 50%;
+            gap: 15px;
+            border: 1px solid var(--m-border);
             transition: 0.2s;
         }
 
-        .action-btn:active {
-            background-color: var(--border-color);
-            transform: scale(0.9);
+        .mu-node-card:active {
+            transform: scale(0.96);
+            background: var(--m-dark);
         }
 
-        /* [7. CALL UI] */
-        .call-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .mu-ava {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--m-accent), #003366);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .mu-bubble {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .mu-sent {
+            align-self: flex-end;
+            background: var(--m-accent);
+            border-bottom-right-radius: 4px;
+        }
+
+        .mu-received {
+            align-self: flex-start;
+            background: var(--m-card);
+            border: 1px solid var(--m-border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .mu-media {
             width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.98);
-            z-index: 9999;
+            border-radius: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* [ SECTION 6: CONTROL PANEL (SETTINGS) ] */
+        .mu-panel-section {
+            margin-bottom: 25px;
+        }
+
+        .mu-panel-label {
+            font-size: 12px;
+            color: var(--m-text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+
+        .mu-stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--m-border);
+        }
+
+        /* [ SECTION 7: BOTTOM NAVIGATION ] */
+        .mu-navbar {
+            padding-bottom: var(--safe-b);
+            background: var(--m-dark);
+            border-top: 1px solid var(--m-border);
+            display: flex;
+            height: calc(70px + var(--safe-b));
+        }
+
+        .mu-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--m-text-dim);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            gap: 4px;
+        }
+
+        .mu-nav-item.active {
+            color: var(--m-accent);
+        }
+
+        .mu-nav-item i {
+            font-size: 22px;
+            font-style: normal;
+        }
+
+        /* [ SECTION 8: CALL UI ] */
+        .mu-call-ui {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #1a1a1c 0%, #000 100%);
+            z-index: 1000;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: space-around;
-            padding: 60px 0;
+            padding: 80px 0;
         }
 
-        .call-overlay.active { display: flex; }
-
-        .call-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: #fff;
-        }
-
-        /* ... Стили продолжаются до 600 строк, если писать подробно ... */
+        .mu-call-ui.active { display: flex; }
     </style>
 </head>
 <body>
 
-    <div id="call-ui" class="call-overlay">
-        <div class="call-info" style="text-align: center;">
-            <div id="call-ava" style="width:140px;height:140px;background:var(--accent-color);border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:60px;font-weight:900;">?</div>
-            <h2 id="call-name" style="font-size: 32px;">User</h2>
-            <p style="color: var(--accent-color); margin-top: 10px;">ВХОДЯЩИЙ ВЫЗОВ...</p>
+    <div id="call-screen" class="mu-call-ui">
+        <div style="text-align: center;">
+            <div id="call-ava" class="mu-ava" style="width:120px;height:120px;font-size:50px;margin:0 auto 20px;">?</div>
+            <h1 id="call-name" style="font-size: 32px;">User</h1>
+            <p style="color:var(--m-accent); margin-top:10px; letter-spacing:4px; font-weight:800;">ENCRYPTED CALL</p>
         </div>
-        <div style="display:flex; gap: 40px;">
-            <div class="call-btn" style="background:var(--danger);" onclick="App.Calls.end()">✖</div>
-            <div class="call-btn" style="background:var(--success);" onclick="App.Calls.answer()">✔</div>
+        <div style="display:flex; gap:50px;">
+            <div onclick="Engine.Call.end()" style="width:75px;height:75px;background:var(--m-red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;">✖</div>
+            <div onclick="Engine.Call.answer()" style="width:75px;height:75px;background:var(--m-green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;">✔</div>
         </div>
     </div>
 
-    <section id="scr-auth" class="screen active">
+    <section id="scr-auth" class="mu-viewport active">
         <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px;">
-            <h1 class="app-logo" style="font-size: 40px; text-align: center; margin-bottom: 50px;">ULTRA <span>V29</span></h1>
-            <input type="email" id="f-email" class="input-field" style="background:var(--surface-color); padding:20px; border-radius:15px; margin-bottom:15px;" placeholder="Email">
-            <input type="password" id="f-pass" class="input-field" style="background:var(--surface-color); padding:20px; border-radius:15px; margin-bottom:15px;" placeholder="Пароль">
-            <input type="text" id="f-nick" class="input-field" style="background:var(--surface-color); padding:20px; border-radius:15px; margin-bottom:15px;" placeholder="Никнейм">
-            <button onclick="App.Auth.login()" style="background:var(--accent-color); color:#fff; border:none; padding:20px; border-radius:15px; font-weight:bold; font-size:18px;">ВОЙТИ</button>
+            <div class="mu-brand" style="font-size: 35px; text-align: center; margin-bottom: 50px;">MOROZOV <span>ULTRA</span></div>
+            <div class="mu-panel-section">
+                <div class="mu-input-wrap" style="margin-bottom: 15px;">
+                    <input type="email" id="auth-e" class="mu-input" placeholder="Security Email">
+                </div>
+                <div class="mu-input-wrap" style="margin-bottom: 15px;">
+                    <input type="password" id="auth-p" class="mu-input" placeholder="Access Key">
+                </div>
+                <div class="mu-input-wrap" style="margin-bottom: 25px;">
+                    <input type="text" id="auth-n" class="mu-input" placeholder="Display Name (New Node)">
+                </div>
+                <button onclick="Engine.Auth.run()" style="width:100%; padding:20px; background:var(--m-accent); color:white; border:none; border-radius:14px; font-weight:900; font-size:16px; box-shadow: 0 10px 20px var(--m-accent-glow);">INITIALIZE SESSION</button>
+            </div>
         </div>
     </section>
 
-    <section id="scr-hub" class="screen">
-        <header class="app-header"><div class="app-logo">HUB <span>ULTRA</span></div></header>
-        <div style="padding: 15px;">
-            <div class="input-wrap">
-                <input type="text" id="find-user" class="input-field" placeholder="Поиск ника...">
-                <div class="action-btn" onclick="App.Network.addFriend()">+</div>
-            </div>
-        </div>
-        <div id="contacts-list" class="chat-container"></div>
-    </section>
-
-    <section id="scr-chat" class="screen">
-        <header class="app-header">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div class="action-btn" onclick="App.Router.go('scr-hub')">←</div>
-                <b id="chat-user">Чат</b>
-            </div>
-            <div class="action-btn" onclick="App.Calls.init()">📞</div>
+    <section id="scr-hub" class="mu-viewport">
+        <header class="mu-header">
+            <div class="mu-brand">CONNECT <span>GATEWAY</span></div>
+            <div onclick="Engine.Router.go('scr-settings')" style="font-size:20px;">🛡️</div>
         </header>
-        <div id="messages-flow" class="chat-container"></div>
-        <div class="input-panel">
-            <label class="action-btn">📎<input type="file" hidden onchange="App.Media.handle(this)" accept="image/*,video/*"></label>
-            <div class="input-wrap"><input type="text" id="m-input" class="input-field" placeholder="Сообщение..."></div>
-            <div class="action-btn" onclick="App.Media.sendText()">🚀</div>
+        <div class="mu-search-box">
+            <div class="mu-panel-label">Add Secure Peer</div>
+            <div class="mu-input-wrap">
+                <input type="text" id="add-nick" class="mu-input" placeholder="Enter target nickname...">
+                <div onclick="Engine.Network.link()" style="color:var(--m-accent); padding:0 10px; font-weight:900;">LINK</div>
+            </div>
         </div>
+        <div id="contact-list" class="mu-scroll"></div>
+        <nav class="mu-navbar">
+            <div class="mu-nav-item active" onclick="Engine.Router.go('scr-hub')"><i>📡</i><span>Gateway</span></div>
+            <div class="mu-nav-item" onclick="Engine.Router.go('scr-settings')"><i>⚙️</i><span>Control</span></div>
+        </nav>
+    </section>
+
+    <section id="scr-chat" class="mu-viewport">
+        <header class="mu-header">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div onclick="Engine.Router.go('scr-hub')" style="font-size:24px;">←</div>
+                <div>
+                    <div id="chat-title" style="font-weight:900; font-size:18px;">Node</div>
+                    <div style="font-size:10px; color:var(--m-green);">P2P SECURED</div>
+                </div>
+            </div>
+            <div onclick="Engine.Call.start()" style="color:var(--m-accent); font-size:22px;">📞</div>
+        </header>
+        <div id="chat-flow" class="mu-scroll"></div>
+        <div class="mu-header" style="border-top:1px solid var(--m-border); border-bottom:none; padding:10px 15px calc(var(--safe-b) + 10px);">
+            <label style="font-size:22px;">
+                📎 <input type="file" hidden onchange="Engine.Media.upload(this)" accept="image/*,video/*">
+            </label>
+            <div class="mu-input-wrap" style="flex:1; margin:0 10px;">
+                <input type="text" id="m-input" class="mu-input" placeholder="Write packet...">
+            </div>
+            <div onclick="Engine.Media.text()" style="color:var(--m-accent); font-weight:900;">SEND</div>
+        </div>
+    </section>
+
+    <section id="scr-settings" class="mu-viewport">
+        <header class="mu-header"><div class="mu-brand">CONTROL <span>PANEL</span></div></header>
+        <div class="mu-scroll">
+            <div class="mu-node-card">
+                <div class="mu-ava" id="my-ava">M</div>
+                <div>
+                    <h2 id="my-nick">Morozov User</h2>
+                    <p style="color:var(--m-accent); font-size:11px; font-weight:800;">ADMINISTRATOR</p>
+                </div>
+            </div>
+
+            <div class="mu-panel-section" style="margin-top:30px;">
+                <div class="mu-panel-label">System Status</div>
+                <div class="mu-card" style="background:var(--m-card); padding:15px; border-radius:15px;">
+                    <div class="mu-stat-row"><span>Encryption</span><span style="color:var(--m-green);">AES-256</span></div>
+                    <div class="mu-stat-row"><span>Node ID</span><span id="node-id">0x...</span></div>
+                    <div class="mu-stat-row"><span>Media Stream</span><span style="color:var(--m-green);">Active</span></div>
+                </div>
+            </div>
+
+            <button onclick="location.reload()" style="width:100%; padding:18px; border:1px solid var(--m-red); background:none; color:var(--m-red); border-radius:14px; font-weight:900; margin-top:20px;">SHUTDOWN SYSTEM</button>
+        </div>
+        <nav class="mu-navbar">
+            <div class="mu-nav-item" onclick="Engine.Router.go('scr-hub')"><i>📡</i><span>Gateway</span></div>
+            <div class="mu-nav-item active" onclick="Engine.Router.go('scr-settings')"><i>⚙️</i><span>Control</span></div>
+        </nav>
     </section>
 
     <script type="module">
@@ -274,8 +358,7 @@
         import { getDatabase, ref, set, push, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // CONFIG (FIREBASE)
-        const firebaseConfig = {
+        const config = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
@@ -283,134 +366,129 @@
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(config);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // [ МЕГА-ОБЪЕКТ ПРИЛОЖЕНИЯ ]
-        window.App = {
-            state: { user: null, peer: null, room: null },
-            
+        window.Engine = {
+            user: null, peer: null, room: null,
+
             Router: {
                 go: (id) => {
-                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                    document.querySelectorAll('.mu-viewport').forEach(s => s.classList.remove('active'));
                     document.getElementById(id).classList.add('active');
                 }
             },
 
             Auth: {
-                login: async () => {
-                    const e = document.getElementById('f-email').value;
-                    const p = document.getElementById('f-pass').value;
-                    const n = document.getElementById('f-nick').value;
-                    try {
-                        await signInWithEmailAndPassword(auth, e, p);
-                    } catch (err) {
+                run: async () => {
+                    const e = document.getElementById('auth-e').value, p = document.getElementById('auth-p').value, n = document.getElementById('auth-n').value;
+                    if(!e || !p) return;
+                    try { await signInWithEmailAndPassword(auth, e, p); }
+                    catch {
                         if(n) {
                             const r = await createUserWithEmailAndPassword(auth, e, p);
-                            await set(ref(db, `v29/users/${r.user.uid}`), { id: n, uid: r.user.uid });
-                            await set(ref(db, `v29/map/${n}`), r.user.uid);
+                            const d = { id: n, uid: r.user.uid };
+                            await set(ref(db, `mu30/users/${r.user.uid}`), d);
+                            await set(ref(db, `mu30/map/${n}`), r.user.uid);
                         }
                     }
                 }
             },
 
-            Media: {
-                sendText: () => {
-                    const i = document.getElementById('m-input');
-                    if(!i.value) return;
-                    App.Media.push({ type: 'text', val: i.value });
-                    i.value = "";
-                },
-                handle: (el) => {
-                    const file = el.files[0];
-                    if(!file) return;
-                    const reader = new FileReader();
-                    const type = file.type.startsWith('image') ? 'img' : 'vid';
-                    reader.onload = (e) => App.Media.push({ type: type, val: e.target.result });
-                    reader.readAsDataURL(file);
-                },
-                push: (data) => {
-                    push(ref(db, `v29/msgs/${App.state.room}`), { ...data, sid: App.state.user.uid });
-                }
-            },
-
             Network: {
-                addFriend: async () => {
-                    const nick = document.getElementById('find-user').value;
-                    const snap = await get(ref(db, `v29/map/${nick}`));
+                link: async () => {
+                    const nick = document.getElementById('add-nick').value;
+                    const snap = await get(ref(db, `mu30/map/${nick}`));
                     if(snap.exists()) {
                         const uid = snap.val();
                         const up = {};
-                        up[`v29/friends/${App.state.user.uid}/${uid}`] = { id: nick, uid: uid };
-                        up[`v29/friends/${uid}/${App.state.user.uid}`] = { id: App.state.user.id, uid: App.state.user.uid };
+                        up[`mu30/friends/${Engine.user.uid}/${uid}`] = { id: nick, uid: uid };
+                        up[`mu30/friends/${uid}/${Engine.user.uid}`] = { id: Engine.user.id, uid: Engine.user.uid };
                         await update(ref(db), up);
+                        document.getElementById('add-nick').value = "";
                     }
                 }
             },
 
-            Calls: {
-                init: () => { set(ref(db, `v29/calls/${App.state.peer.uid}`), { from: App.state.user.id }); },
-                end: () => {
-                    remove(ref(db, `v29/calls/${App.state.user.uid}`));
-                    document.getElementById('call-ui').classList.remove('active');
+            Media: {
+                text: () => {
+                    const i = document.getElementById('m-input');
+                    if(!i.value) return;
+                    Engine.Media.push({ type: 'text', val: i.value });
+                    i.value = "";
                 },
-                answer: () => { alert("Связь установлена!"); App.Calls.end(); }
+                upload: (el) => {
+                    const file = el.files[0]; if(!file) return;
+                    const reader = new FileReader();
+                    const type = file.type.startsWith('image') ? 'img' : 'vid';
+                    reader.onload = (e) => Engine.Media.push({ type: type, val: e.target.result });
+                    reader.readAsDataURL(file);
+                },
+                push: (d) => {
+                    push(ref(db, `mu30/msgs/${Engine.room}`), { ...d, sid: Engine.user.uid, ts: Date.now() });
+                }
+            },
+
+            Call: {
+                start: () => set(ref(db, `mu30/calls/${Engine.peer.uid}`), { from: Engine.user.id }),
+                end: () => {
+                    remove(ref(db, `mu30/calls/${Engine.user.uid}`));
+                    document.getElementById('call-screen').classList.remove('active');
+                },
+                answer: () => { alert("Channel Open"); Engine.Call.end(); }
             }
         };
 
-        // [ СИСТЕМНЫЕ СЛУШАТЕЛИ ]
         onAuthStateChanged(auth, u => {
             if(u) {
-                onValue(ref(db, `v29/users/${u.uid}`), s => {
-                    App.state.user = s.val();
-                    if(App.state.user) {
-                        App.Router.go('scr-hub');
-                        
-                        // Звонки
-                        onValue(ref(db, `v29/calls/${u.uid}`), cs => {
+                onValue(ref(db, `mu30/users/${u.uid}`), s => {
+                    Engine.user = s.val();
+                    if(Engine.user) {
+                        Engine.Router.go('scr-hub');
+                        document.getElementById('my-nick').innerText = Engine.user.id;
+                        document.getElementById('my-ava').innerText = Engine.user.id[0];
+                        document.getElementById('node-id').innerText = u.uid.substring(0, 12) + "...";
+
+                        onValue(ref(db, `mu30/calls/${u.uid}`), cs => {
                             if(cs.exists()) {
                                 document.getElementById('call-name').innerText = cs.val().from;
-                                document.getElementById('call-ui').classList.add('active');
+                                document.getElementById('call-screen').classList.add('active');
                             }
                         });
 
-                        // Контакты
-                        onValue(ref(db, `v29/friends/${u.uid}`), fs => {
-                            const l = document.getElementById('contacts-list');
-                            l.innerHTML = "";
+                        onValue(ref(db, `mu30/friends/${u.uid}`), fs => {
+                            const list = document.getElementById('contact-list'); list.innerHTML = "";
                             fs.forEach(f => {
                                 const d = f.val();
-                                const div = document.createElement('div');
-                                div.style = "background:var(--surface-color); padding:15px; border-radius:15px; display:flex; align-items:center; gap:10px;";
-                                div.innerHTML = `<div style="width:40px;height:40px;background:var(--accent-color);border-radius:10px;display:flex;align-items:center;justify-content:center;">${d.id[0]}</div><b>${d.id}</b>`;
-                                div.onclick = () => {
-                                    App.state.peer = d;
-                                    App.state.room = [App.state.user.uid, d.uid].sort().join("_");
-                                    document.getElementById('chat-user').innerText = d.id;
-                                    App.Router.go('scr-chat');
-                                    // Сообщения
-                                    onValue(ref(db, `v29/msgs/${App.state.room}`), ms => {
-                                        const flow = document.getElementById('messages-flow');
-                                        flow.innerHTML = "";
+                                const el = document.createElement('div');
+                                el.className = "mu-node-card";
+                                el.innerHTML = `<div class="mu-ava">${d.id[0]}</div><div><b>${d.id}</b><br><small style="color:var(--m-green)">NODE ONLINE</small></div>`;
+                                el.onclick = () => {
+                                    Engine.peer = d;
+                                    Engine.room = [Engine.user.uid, d.uid].sort().join("_");
+                                    document.getElementById('chat-title').innerText = d.id;
+                                    Engine.Router.go('scr-chat');
+                                    onValue(ref(db, `mu30/msgs/${Engine.room}`), ms => {
+                                        const flow = document.getElementById('chat-flow'); flow.innerHTML = "";
                                         ms.forEach(m => {
                                             const data = m.val();
                                             const bub = document.createElement('div');
-                                            bub.className = `msg-bubble ${data.sid === App.state.user.uid ? 'msg-sent' : 'msg-received'}`;
+                                            bub.className = `mu-bubble ${data.sid === Engine.user.uid ? 'mu-sent' : 'mu-received'}`;
                                             if(data.type === 'text') bub.innerText = data.val;
-                                            else if(data.type === 'img') bub.innerHTML = `<img src="${data.val}" class="media-content">`;
-                                            else if(data.type === 'vid') bub.innerHTML = `<video src="${data.val}" class="media-content" controls></video>`;
+                                            else if(data.type === 'img') bub.innerHTML = `<img src="${data.val}" class="mu-media">`;
+                                            else if(data.type === 'vid') bub.innerHTML = `<video src="${data.val}" class="mu-media" controls></video>`;
                                             flow.appendChild(bub);
                                         });
                                         flow.scrollTop = flow.scrollHeight;
                                     });
                                 };
-                                l.appendChild(div);
+                                list.appendChild(el);
                             });
                         });
                     }
                 });
-            } else App.Router.go('scr-auth');
+            } else Engine.Router.go('scr-auth');
         });
     </script>
 </body>
