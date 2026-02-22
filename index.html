@@ -4,676 +4,243 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <title>MOROZOV ULTRA | MONOLITH</title>
+    <title>MOROZOV ULTRA | V25.0</title>
 
     <style>
-        /* [ МОДУЛЬ 1: ГЛОБАЛЬНЫЙ ДВИЖОК ПЕРЕМЕННЫХ ]
-           Здесь определяются все физические константы визуальной оболочки.
-        */
+        /* [ SECTION 1: GLOBAL DESIGN SYSTEM ] */
         :root {
-            --m-core-bg: #000000;
-            --m-core-surface: #0a0a0b;
-            --m-core-panel: #111112;
-            --m-core-card: #18181b;
-            --m-core-accent: #007aff;
-            --m-core-accent-rgb: 0, 122, 255;
-            --m-core-accent-active: #0051d9;
-            --m-core-text-main: #ffffff;
-            --m-core-text-secondary: #8e8e93;
-            --m-core-text-muted: #48484a;
-            --m-core-border: #242426;
-            --m-core-input-bg: #050505;
-            --m-core-shadow-sm: 0 2px 8px rgba(0,0,0,0.5);
-            --m-core-shadow-md: 0 12px 24px rgba(0,0,0,0.7);
-            --m-core-shadow-lg: 0 20px 40px rgba(0,0,0,0.9);
-            --m-core-glow: 0 0 20px rgba(0, 122, 255, 0.4);
-            --m-core-radius-inner: 12px;
-            --m-core-radius-outer: 24px;
-            --m-core-radius-circle: 50%;
-            --m-core-anim-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --m-core-anim-mid: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            --m-core-anim-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            --m-core-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+            --bg: #000000;
+            --surface: #0c0c0e;
+            --card: #18181b;
+            --accent: #007aff;
+            --accent-glow: rgba(0, 122, 255, 0.4);
+            --text-main: #ffffff;
+            --text-sec: #8e8e93;
+            --border: rgba(255,255,255,0.1);
+            --safe-t: env(safe-area-inset-top);
+            --safe-b: env(safe-area-inset-bottom);
+            --anim-speed: 0.3s;
         }
 
-        /* [ МОДУЛЬ 2: WHITE PLATINUM EDITION (EXTENDED) ]
-           Полная инверсия цветовой матрицы для светлого режима.
-        */
-        [data-theme="white"] {
-            --m-core-bg: #f2f2f7;
-            --m-core-surface: #ffffff;
-            --m-core-panel: #fcfcfd;
-            --m-core-card: #ffffff;
-            --m-core-accent: #007aff;
-            --m-core-accent-active: #0051d9;
-            --m-core-text-main: #1d1d1f;
-            --m-core-text-secondary: #86868b;
-            --m-core-text-muted: #aeaeb2;
-            --m-core-border: #d1d1d6;
-            --m-core-input-bg: #e5e5ea;
-            --m-core-shadow-md: 0 12px 24px rgba(0,0,0,0.05);
-            --m-core-shadow-lg: 0 20px 40px rgba(0,0,0,0.08);
-            --m-core-glow: 0 0 20px rgba(0, 122, 255, 0.2);
+        /* [ SECTION 2: RESET & LAYOUT ] */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: var(--bg); color: var(--text-main); 
+            font-family: -apple-system, system-ui, sans-serif; 
+            overflow: hidden; height: 100vh; width: 100vw;
         }
 
-        /* [ МОДУЛЬ 3: СБРОС И ГЛОБАЛЬНЫЕ ПРАВИЛА ]
-        */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--m-core-bg);
-            color: var(--m-core-text-main);
-            font-family: var(--m-core-font);
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            transition: background 0.6s var(--m-core-anim-mid);
-        }
-
-        input, textarea, button {
-            font-family: inherit;
-            user-select: text;
-        }
-
-        /* [ МОДУЛЬ 4: СКРОЛЛБАРЫ (CUSTOM DESIGN) ]
-        */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { 
-            background: var(--m-core-accent); 
-            border-radius: 10px; 
-            box-shadow: 0 0 5px var(--m-core-glow);
-        }
-
-        /* [ МОДУЛЬ 5: СИСТЕМА ЭКРАНОВ (VIEWPORT CONTROLLER) ]
-        */
         .mu-viewport {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            flex-direction: column;
-            background: var(--m-core-bg);
-            z-index: 10;
-            overflow: hidden;
+            position: absolute; inset: 0; display: none; flex-direction: column;
+            background: var(--bg); z-index: 10;
         }
+        .mu-viewport.active { display: flex; animation: slideUp var(--anim-speed) cubic-bezier(0.1, 0.7, 0.1, 1); }
 
-        .mu-viewport.active {
-            display: flex;
-            animation: viewportFadeIn 0.5s var(--m-core-anim-mid);
-        }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        @keyframes viewportFadeIn {
-            from { opacity: 0; transform: scale(1.05) translateY(20px); filter: blur(15px); }
-            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
-        }
-
-        /* [ МОДУЛЬ 6: ШАПКА (ULTRA HEADER V22) ]
-        */
+        /* [ SECTION 3: HEADER & NAVIGATION ] */
         .mu-header {
-            height: 120px;
-            background: var(--m-core-surface);
-            border-bottom: 1px solid var(--m-core-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 40px 0 40px;
-            box-shadow: var(--m-core-shadow-md);
-            z-index: 100;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            padding: calc(var(--safe-t) + 15px) 20px 15px;
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
         }
+        .mu-logo { font-size: 22px; font-weight: 900; letter-spacing: -1.5px; text-transform: uppercase; }
+        .mu-logo span { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
 
-        .mu-logo-container {
-            display: flex;
-            flex-direction: column;
+        .mu-nav {
+            height: 85px; background: var(--surface); border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; padding-bottom: var(--safe-b);
         }
+        .mu-nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-sec); cursor: pointer; }
+        .mu-nav-btn.active { color: var(--accent); }
+        .mu-nav-btn i { font-style: normal; font-size: 24px; margin-bottom: 4px; }
+        .mu-nav-btn span { font-size: 10px; font-weight: 800; text-transform: uppercase; }
 
-        .mu-logo-main {
-            font-size: 32px;
-            font-weight: 900;
-            letter-spacing: -2px;
-            text-transform: uppercase;
+        /* [ SECTION 4: CHAT ENGINE UI ] */
+        .chat-flow { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        
+        .msg { 
+            max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 16px; 
+            line-height: 1.4; position: relative; word-wrap: break-word;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
+        .msg.sent { align-self: flex-end; background: var(--accent); color: white; border-bottom-right-radius: 4px; }
+        .msg.received { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
 
-        .mu-logo-main span {
-            color: var(--m-core-accent);
-            text-shadow: 0 0 15px var(--m-core-glow);
-        }
+        /* Медиа-контент в чате */
+        .msg-img { width: 100%; border-radius: 12px; margin-top: 5px; display: block; border: 1px solid rgba(255,255,255,0.1); }
+        .msg-video { width: 100%; border-radius: 12px; margin-top: 5px; background: #000; }
+        .msg-sticker { font-size: 60px; background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+        .msg-audio { min-width: 200px; padding: 10px; display: flex; align-items: center; gap: 10px; }
 
-        .mu-logo-sub {
-            font-size: 10px;
-            color: var(--m-core-text-secondary);
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            font-weight: 800;
+        /* [ SECTION 5: INPUT SYSTEM & ATTACHMENTS ] */
+        .input-panel {
+            padding: 10px 15px calc(var(--safe-b) + 10px);
+            background: var(--surface); border-top: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
         }
+        .field-wrap { flex: 1; background: var(--card); border-radius: 25px; display: flex; align-items: center; padding: 0 15px; border: 1px solid var(--border); }
+        .field { flex: 1; background: transparent; border: none; padding: 12px 0; color: white; font-size: 16px; outline: none; }
+        
+        .action-btn { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; border-radius: 50%; }
+        .action-btn:active { background: var(--border); transform: scale(0.9); }
+        .action-btn.rec { color: #ff3b30; animation: pulse 1s infinite; }
 
-        .mu-status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(var(--m-core-accent-rgb), 0.1);
-            padding: 10px 20px;
-            border-radius: 40px;
-            border: 1px solid var(--m-core-accent);
-        }
+        @keyframes pulse { 50% { opacity: 0.5; } }
 
-        .mu-status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--m-core-accent);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--m-core-accent);
-            animation: pulse 2s infinite;
-        }
+        /* Панель стикеров и вложений */
+        .extra-panel { display: none; background: var(--surface); border-top: 1px solid var(--border); height: 260px; overflow-y: auto; padding: 20px; }
+        .sticker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .stk-item { font-size: 45px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .stk-item:hover { transform: scale(1.2); }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
+        /* [ SECTION 6: CALL INTERFACE ] */
+        .call-ui {
+            position: fixed; inset: 0; background: radial-gradient(circle at center, #1c1c1e 0%, #000 100%);
+            z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: space-around;
+            padding: 80px 0;
         }
+        .call-ui.active { display: flex; }
+        .call-avatar { 
+            width: 140px; height: 140px; background: var(--accent); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: 900;
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+        .call-btn-group { display: flex; gap: 40px; }
+        .c-btn { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; }
+        .c-btn.decline { background: #ff3b30; }
+        .c-btn.accept { background: #34c759; }
 
-        /* [ МОДУЛЬ 7: СИСТЕМА КНОПОК И ПОЛЕЙ ВВОДА ]
-        */
-        .mu-scanner-area {
-            padding: 30px 40px;
-            background: var(--m-core-panel);
-            border-bottom: 1px solid var(--m-core-border);
+        /* [ SECTION 7: LISTS & CARDS ] */
+        .node-list { flex: 1; overflow-y: auto; padding: 15px; }
+        .node-card {
+            background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 15px; border: 1px solid var(--border);
+            transition: 0.2s;
         }
-
-        .mu-input-composite {
-            display: flex;
-            gap: 15px;
-            background: var(--m-core-input-bg);
-            padding: 8px;
-            border-radius: 20px;
-            border: 2px solid var(--m-core-border);
-            transition: var(--m-core-anim-mid);
-            box-shadow: var(--m-core-shadow-sm);
-        }
-
-        .mu-input-composite:focus-within {
-            border-color: var(--m-core-accent);
-            box-shadow: var(--m-core-glow);
-            transform: translateY(-2px);
-        }
-
-        .mu-native-field {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 15px 25px;
-            color: var(--m-core-text-main);
-            font-size: 18px;
-            outline: none;
-            font-weight: 600;
-        }
-
-        .mu-native-field::placeholder {
-            color: var(--m-core-text-muted);
-        }
-
-        .mu-btn-action {
-            background: var(--m-core-accent);
-            color: #ffffff;
-            border: none;
-            padding: 0 35px;
-            border-radius: 14px;
-            font-weight: 900;
-            font-size: 14px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: var(--m-core-anim-fast);
-            letter-spacing: 1px;
-            box-shadow: 0 4px 12px rgba(var(--m-core-accent-rgb), 0.3);
-        }
-
-        .mu-btn-action:hover {
-            filter: brightness(1.2);
-            transform: translateY(-1px);
-        }
-
-        .mu-btn-action:active {
-            transform: scale(0.92);
-        }
-
-        /* [ МОДУЛЬ 8: СПИСОК УЗЛОВ (NODES LIST) ]
-        */
-        .mu-scrollable-zone {
-            flex: 1;
-            overflow-y: auto;
-            padding: 30px 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            background: var(--m-core-bg);
-        }
-
-        .mu-node-card {
-            background: var(--m-core-card);
-            border: 1px solid var(--m-core-border);
-            border-radius: 30px;
-            padding: 25px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            cursor: pointer;
-            transition: var(--m-core-anim-mid);
-            position: relative;
-            animation: cardSlideIn 0.5s var(--m-core-anim-mid) both;
-        }
-
-        @keyframes cardSlideIn {
-            from { opacity: 0; transform: translateX(-30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .mu-node-card:hover {
-            transform: scale(1.02) translateX(10px);
-            border-color: var(--m-core-accent);
-            background: var(--m-core-panel);
-            box-shadow: var(--m-core-shadow-md);
-        }
-
-        .mu-node-avatar {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--m-core-accent), var(--m-core-accent-active));
-            border-radius: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 900;
-            font-size: 28px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            text-transform: uppercase;
-        }
-
-        .mu-node-content {
-            flex: 1;
-        }
-
-        .mu-node-name {
-            font-size: 22px;
-            font-weight: 900;
-            margin-bottom: 5px;
-            color: var(--m-core-text-main);
-        }
-
-        .mu-node-status {
-            font-size: 11px;
-            color: var(--m-core-accent);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 800;
-        }
-
-        /* [ МОДУЛЬ 9: ЧАТ-ТЕРМИНАЛ (CHAT INTERFACE) ]
-        */
-        .mu-chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            background-image: 
-                radial-gradient(circle at 2px 2px, var(--m-core-border) 1px, transparent 0);
-            background-size: 40px 40px;
-        }
-
-        .mu-msg-bubble {
-            max-width: 75%;
-            padding: 22px 28px;
-            border-radius: 30px;
-            font-size: 17px;
-            line-height: 1.6;
-            position: relative;
-            animation: msgPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: var(--m-core-shadow-sm);
-        }
-
-        @keyframes msgPop {
-            from { opacity: 0; transform: scale(0.8) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .mu-msg-bubble.sent {
-            align-self: flex-end;
-            background: var(--m-core-accent);
-            color: #ffffff;
-            border-bottom-right-radius: 5px;
-            box-shadow: 0 10px 30px rgba(var(--m-core-accent-rgb), 0.4);
-        }
-
-        .mu-msg-bubble.received {
-            align-self: flex-start;
-            background: var(--m-core-panel);
-            color: var(--m-core-text-main);
-            border: 1px solid var(--m-core-border);
-            border-bottom-left-radius: 5px;
-        }
-
-        /* [ МОДУЛЬ 10: НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ ]
-        */
-        .mu-bottom-nav {
-            height: 110px;
-            background: var(--m-core-surface);
-            border-top: 1px solid var(--m-core-border);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding-bottom: 35px;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-        }
-
-        .mu-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            color: var(--m-core-text-secondary);
-            cursor: pointer;
-            transition: var(--m-core-anim-fast);
-            flex: 1;
-        }
-
-        .mu-nav-item.active {
-            color: var(--m-core-accent);
-        }
-
-        .mu-nav-item i {
-            font-style: normal;
-            font-size: 28px;
-            filter: drop-shadow(0 0 5px transparent);
-            transition: 0.3s;
-        }
-
-        .mu-nav-item.active i {
-            filter: drop-shadow(0 0 8px var(--m-core-glow));
-            transform: translateY(-5px);
-        }
-
-        .mu-nav-item span {
-            font-size: 10px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* [ МОДУЛЬ 11: ЦЕНТР УВЕДОМЛЕНИЙ (TOAST SYSTEM) ]
-        */
-        .mu-toast-wrapper {
-            position: fixed;
-            top: -120px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--m-core-accent);
-            color: #ffffff;
-            padding: 22px 60px;
-            border-radius: 60px;
-            font-weight: 900;
-            font-size: 14px;
-            z-index: 9999;
-            transition: 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            white-space: nowrap;
-        }
-
-        .mu-toast-wrapper.visible {
-            top: 50px;
-        }
-
-        /* [ МОДУЛЬ 12: CORE GRID (НАСТРОЙКИ) ]
-        */
-        .mu-grid-layout {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .mu-grid-item {
-            background: var(--m-core-card);
-            border: 2px solid var(--m-core-border);
-            padding: 40px 20px;
-            border-radius: 35px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--m-core-anim-mid);
-        }
-
-        .mu-grid-item:hover {
-            border-color: var(--m-core-accent);
-            background: var(--m-core-panel);
-            transform: translateY(-5px);
-        }
-
-        .mu-grid-item.active {
-            background: var(--m-core-accent);
-            color: #fff;
-            border-color: #fff;
-            box-shadow: 0 15px 30px rgba(var(--m-core-accent-rgb), 0.4);
-        }
-
-        .mu-grid-item i {
-            font-size: 40px;
-            display: block;
-            margin-bottom: 15px;
-        }
-
-        /* [ МОДУЛЬ 13: АВТОРИЗАЦИЯ (LAYOUT) ]
-        */
-        .mu-auth-center {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 60px;
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .mu-auth-title {
-            font-size: 60px;
-            font-weight: 900;
-            text-align: center;
-            margin-bottom: 10px;
-            letter-spacing: -3px;
-        }
-
-        .mu-auth-title span {
-            color: var(--m-core-accent);
-        }
-
-        .mu-auth-subtitle {
-            text-align: center;
-            color: var(--m-core-text-secondary);
-            letter-spacing: 12px;
-            font-size: 13px;
-            margin-bottom: 80px;
-            text-transform: uppercase;
-            font-weight: 800;
-        }
-
-        .mu-auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+        .node-card:active { transform: scale(0.97); background: var(--surface); }
+        .node-ava { width: 55px; height: 55px; background: var(--accent); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 22px; }
 
     </style>
 </head>
-<body data-theme="dark">
+<body>
 
-    <div id="mu-global-toast" class="mu-toast-wrapper">System Matrix Online</div>
-
-    <div id="mu-application-root">
-
-        <section id="screen-auth" class="mu-viewport active">
-            <div class="mu-auth-center">
-                <div class="mu-auth-title">MOROZOV <span>ULTRA</span></div>
-                <div class="mu-auth-subtitle">ABSOLUTE MONOLITH</div>
-                
-                <div class="mu-auth-form">
-                    <div class="mu-input-composite">
-                        <input type="email" id="f-auth-email" class="mu-native-field" value="egorkamorozoff2014@gmail.com">
-                    </div>
-                    <div class="mu-input-composite">
-                        <input type="password" id="f-auth-pass" class="mu-native-field" placeholder="СЕКРЕТНЫЙ КОД">
-                    </div>
-                    <div class="mu-input-composite">
-                        <input type="text" id="f-auth-nick" class="mu-native-field" placeholder="ПОЗЫВНОЙ (НИКНЕЙМ)">
-                    </div>
-                    <button class="mu-btn-action" style="height: 85px; font-size: 22px; border-radius: 25px; margin-top: 30px;" onclick="Engine.processAuth()">
-                        ПОДКЛЮЧИТЬСЯ К СЕТИ
-                    </button>
-                    <div id="auth-status-log" style="text-align: center; color: var(--m-core-accent); font-size: 10px; font-weight: 900; margin-top: 20px; text-transform: uppercase;">
-                        Status: Waiting for Command...
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="screen-hub" class="mu-viewport">
-            <header class="mu-header">
-                <div class="mu-logo-container">
-                    <div class="mu-logo-main">ULTRA <span>HUB</span></div>
-                    <div class="mu-logo-sub">V22 MONOLITH</div>
-                </div>
-                <div class="mu-status-indicator">
-                    <div class="mu-status-dot"></div>
-                    <span style="font-size: 10px; font-weight: 900; letter-spacing: 1px;">CONNECTED</span>
-                </div>
-            </header>
-
-            <div class="mu-scanner-area">
-                <div class="mu-input-composite">
-                    <input type="text" id="f-target-nick" class="mu-native-field" placeholder="ПОИСК УЗЛА ПО НИКНЕЙМУ...">
-                    <button class="mu-btn-action" onclick="Engine.scanAndLink()">В ДР</button>
-                </div>
-            </div>
-
-            <div id="hub-nodes-list" class="mu-scrollable-zone">
-                </div>
-
-            <nav class="mu-bottom-nav">
-                <div class="mu-nav-item active" onclick="Engine.switchView('screen-hub')">
-                    <i>📡</i><span>Связь</span>
-                </div>
-                <div class="mu-nav-item" onclick="Engine.switchView('screen-core')">
-                    <i>🛡️</i><span>Ядро</span>
-                </div>
-            </nav>
-        </section>
-
-        <section id="screen-chat" class="mu-viewport">
-            <header class="mu-header">
-                <button onclick="Engine.switchView('screen-hub')" style="background:none; border:none; color:var(--m-core-text-main); font-size: 45px; cursor:pointer; font-weight: 100;">←</button>
-                <div class="mu-logo-container" style="align-items: center;">
-                    <div id="peer-display-name" class="mu-logo-main" style="font-size: 24px;">NODE <span>LINK</span></div>
-                    <div class="mu-logo-sub">SECURE CHANNEL ACTIVE</div>
-                </div>
-                <div id="peer-mini-avatar" class="mu-node-avatar" style="width: 50px; height: 50px; font-size: 18px; border-radius: 15px;">?</div>
-            </header>
-
-            <div id="chat-message-stream" class="mu-chat-container">
-                </div>
-
-            <div class="mu-scanner-area">
-                <div class="mu-input-composite">
-                    <input type="text" id="f-msg-input" class="mu-native-field" placeholder="ПЕРЕДАЧА СИГНАЛА В ЭФИР...">
-                    <button class="mu-btn-action" onclick="Engine.transmitMessage()">ОТПРАВИТЬ</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="screen-core" class="mu-viewport">
-            <header class="mu-header">
-                <div class="mu-logo-container">
-                    <div class="mu-logo-main">ULTRA <span>CORE</span></div>
-                    <div class="mu-logo-sub">SYSTEM SETTINGS</div>
-                </div>
-            </header>
-
-            <div class="mu-scrollable-zone">
-                <h2 style="font-size: 14px; color: var(--m-core-text-secondary); text-transform: uppercase; margin-bottom: 25px; font-weight: 900; letter-spacing: 2px;">
-                    ИНТЕРФЕЙСНЫЕ МАТРИЦЫ
-                </h2>
-                
-                <div class="mu-grid-layout">
-                    <div class="mu-grid-item active" id="theme-dark-btn" onclick="Engine.applyTheme('dark')">
-                        <i>🌑</i><span>Obsidian Dark</span>
-                    </div>
-                    <div class="mu-grid-item" id="theme-white-btn" onclick="Engine.applyTheme('white')">
-                        <i>⚪</i><span>Platinum White</span>
-                    </div>
-                </div>
-
-                <div style="margin-top: 60px;">
-                    <h2 style="font-size: 14px; color: var(--m-core-text-secondary); text-transform: uppercase; margin-bottom: 25px; font-weight: 900; letter-spacing: 2px;">
-                        ВАША ИДЕНТИФИКАЦИЯ
-                    </h2>
-                    <div class="mu-node-card" style="cursor: default; pointer-events: none;">
-                        <div class="mu-node-avatar" id="my-large-avatar">?</div>
-                        <div class="mu-node-content">
-                            <div class="mu-node-name" id="my-nick-label">USER_NODE</div>
-                            <div class="mu-node-status">PRIMARY_MASTER_NODE_V22</div>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="mu-btn-action" style="width: 100%; margin-top: 70px; background: #ff3b30; height: 85px; border-radius: 30px; box-shadow: 0 10px 30px rgba(255,59,48,0.3);" onclick="Engine.emergencyShutdown()">
-                    РАЗОРВАТЬ СОЕДИНЕНИЕ
-                </button>
-                
-                <div style="height: 100px;"></div>
-            </div>
-
-            <nav class="mu-bottom-nav">
-                <div class="mu-nav-item" onclick="Engine.switchView('screen-hub')">
-                    <i>📡</i><span>Связь</span>
-                </div>
-                <div class="mu-nav-item active" onclick="Engine.switchView('screen-core')">
-                    <i>🛡️</i><span>Ядро</span>
-                </div>
-            </nav>
-        </section>
-
+    <div id="call-screen" class="call-ui">
+        <div class="call-avatar" id="c-ava">?</div>
+        <div style="text-align: center;">
+            <h2 id="c-name" style="font-size: 32px;">User</h2>
+            <p id="c-status" style="color: var(--accent); margin-top: 10px; font-weight: 800; letter-spacing: 2px;">ВХОДЯЩИЙ ВЫЗОВ</p>
+        </div>
+        <div class="call-btn-group">
+            <div class="c-btn decline" onclick="Engine.Call.end()">✖</div>
+            <div class="c-btn accept" onclick="Engine.Call.answer()">✔</div>
+        </div>
     </div>
 
-    <script type="module">
-        /* ИНИЦИАЛИЗАЦИЯ ВНЕШНИХ МОДУЛЕЙ FIREBASE SDK 
-           Я использую CDN-версии для максимальной портативности.
-        */
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    <section id="scr-auth" class="mu-viewport active">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px;">
+            <div class="mu-logo" style="font-size: 40px; text-align: center; margin-bottom: 50px;">MOROZOV <span>ULTRA</span></div>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="email" id="auth-email" class="field" style="background: var(--card); border-radius: 15px; padding: 20px;" placeholder="Email" value="egorkamorozoff2014@gmail.com">
+                <input type="password" id="auth-pass" class="field" style="background: var(--card); border-radius: 15px; padding: 20px;" placeholder="Пароль">
+                <input type="text" id="auth-nick" class="field" style="background: var(--card); border-radius: 15px; padding: 20px;" placeholder="Никнейм">
+                <button onclick="Engine.Auth.process()" style="height: 65px; border-radius: 15px; background: var(--accent); color: white; border: none; font-weight: 900; font-size: 18px; margin-top: 20px;">ВОЙТИ В СЕТЬ</button>
+            </div>
+        </div>
+    </section>
 
-        /* КОНФИГУРАЦИЯ БАЗЫ ДАННЫХ (MOROZOV ULTRA CLOUD)
-           Это мозг всей системы.
-        */
+    <section id="scr-hub" class="mu-viewport">
+        <header class="mu-header">
+            <div class="mu-logo">ULTRA <span>HUB</span></div>
+            <div class="action-btn" onclick="Engine.Router.go('scr-core')">⚙️</div>
+        </header>
+        <div style="padding: 15px;">
+            <div class="field-wrap" style="height: 60px; border-radius: 15px;">
+                <input type="text" id="find-node" class="field" placeholder="Поиск ника...">
+                <div class="action-btn" onclick="Engine.Network.addFriend()" style="background: var(--accent); color: white; border-radius: 12px;">+</div>
+            </div>
+        </div>
+        <div id="contacts-list" class="node-list"></div>
+        <nav class="mu-nav">
+            <div class="mu-nav-btn active" onclick="Engine.Router.go('scr-hub')"><i>📡</i><span>СВЯЗЬ</span></div>
+            <div class="mu-nav-btn" onclick="Engine.Router.go('scr-core')"><i>🛡️</i><span>ЯДРО</span></div>
+        </nav>
+    </section>
+
+    <section id="scr-chat" class="mu-viewport">
+        <header class="mu-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="action-btn" onclick="Engine.Router.go('scr-hub')">←</div>
+                <div>
+                    <div id="chat-peer-name" style="font-weight: 900; font-size: 17px;">User</div>
+                    <div style="font-size: 10px; color: var(--accent);">SECURE NODE</div>
+                </div>
+            </div>
+            <div class="action-btn" onclick="Engine.Call.init()" style="color: var(--accent);">📞</div>
+        </header>
+        <div id="chat-messages" class="chat-flow"></div>
+        
+        <div id="sticker-panel" class="extra-panel">
+            <div class="sticker-grid">
+                <div class="stk-item" onclick="Engine.Chat.sendSticker('🔥')">🔥</div>
+                <div class="stk-item" onclick="Engine.Chat.sendSticker('💀')">💀</div>
+                <div class="stk-item" onclick="Engine.Chat.sendSticker('🤡')">🤡</div>
+                <div class="stk-item" onclick="Engine.Chat.sendSticker('👑')">👑</div>
+                <div class="stk-item" onclick="Engine.Chat.sendSticker('⚡')">⚡</div>
+                <div class="stk-item" onclick="Engine.Chat.sendSticker('🥶')">🥶</div>
+                <div class="stk-item" onclick="Engine.Chat.sendSticker('👾')">👾</div>
+                <div class="stk-item" onclick="Engine.Chat.sendSticker('❤️')">❤️</div>
+            </div>
+        </div>
+
+        <div class="input-panel">
+            <div class="action-btn" onclick="Engine.UI.toggleStickers()">🎭</div>
+            <label class="action-btn">
+                📎
+                <input type="file" id="file-input" accept="image/*,video/*" hidden onchange="Engine.Chat.handleFile(this)">
+            </label>
+            <div class="field-wrap">
+                <input type="text" id="msg-input" class="field" placeholder="Сообщение...">
+            </div>
+            <div id="mic-btn" class="action-btn" onclick="Engine.Chat.toggleVoice()">🎙️</div>
+            <div class="action-btn" onclick="Engine.Chat.sendText()" style="color: var(--accent);">🚀</div>
+        </div>
+    </section>
+
+    <section id="scr-core" class="mu-viewport">
+        <header class="mu-header"><div class="mu-logo">ULTRA <span>CORE</span></div></header>
+        <div class="node-list">
+            <div class="node-card" style="pointer-events: none;">
+                <div class="node-ava" id="my-ava">?</div>
+                <div>
+                    <h3 id="my-nick">User</h3>
+                    <p style="color: var(--accent); font-size: 10px; font-weight: 800;">ADMIN PRIVILEGES</p>
+                </div>
+            </div>
+            <h4 style="margin: 20px 0 10px; font-size: 12px; color: var(--text-sec);">ИНТЕРФЕЙС</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="node-card" onclick="Engine.UI.setTheme('dark')" style="justify-content: center; font-weight: 900;">DARK</div>
+                <div class="node-card" onclick="Engine.UI.setTheme('white')" style="justify-content: center; font-weight: 900;">WHITE</div>
+            </div>
+            <button onclick="location.reload()" style="width: 100%; height: 60px; border-radius: 18px; border: 1px solid #ff3b30; background: none; color: #ff3b30; font-weight: 900; margin-top: 40px;">LOGOUT SYSTEM</button>
+        </div>
+        <nav class="mu-nav">
+            <div class="mu-nav-btn" onclick="Engine.Router.go('scr-hub')"><i>📡</i><span>СВЯЗЬ</span></div>
+            <div class="mu-nav-btn active" onclick="Engine.Router.go('scr-core')"><i>🛡️</i><span>ЯДРО</span></div>
+        </nav>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
         const FB_CONFIG = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
             projectId: "morozov-ultra",
-            storageBucket: "morozov-ultra.appspot.com",
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
@@ -681,305 +248,194 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        /* [ THE MONOLITH ENGINE OBJECT ]
-           Весь функционал упакован в один массивный объект для структурированности.
-        */
+        // [ GLOBAL ENGINE OBJECT ]
         window.Engine = {
-            state: {
-                user: null,
-                peer: null,
-                room: null,
-                currentTheme: 'dark',
-                initialized: false
-            },
+            user: null, peer: null, room: null, recorder: null, chunks: [],
 
-            // 1. СИСТЕМА ЛОГИРОВАНИЯ И УВЕДОМЛЕНИЙ
-            log: (msg, type = 'SYS') => {
-                console.log(`%c [${type}] %c ${msg}`, "color: #007aff; font-weight: bold", "color: inherit");
-            },
-
-            toast: (message) => {
-                const toast = document.getElementById('mu-global-toast');
-                toast.innerText = message;
-                toast.classList.add('visible');
-                setTimeout(() => toast.classList.remove('visible'), 4000);
-            },
-
-            // 2. КОНТРОЛЛЕР ПРЕДСТАВЛЕНИЙ (SCREENS)
-            switchView: (viewId) => {
-                const allScreens = document.querySelectorAll('.mu-viewport');
-                allScreens.forEach(screen => {
-                    screen.classList.remove('active');
-                });
-                
-                const target = document.getElementById(viewId);
-                if (target) {
-                    target.classList.add('active');
-                    Engine.log(`Switched to view: ${viewId}`);
+            Router: {
+                go: (id) => {
+                    document.querySelectorAll('.mu-viewport').forEach(v => v.classList.remove('active'));
+                    document.getElementById(id).classList.add('active');
                 }
             },
 
-            // 3. ТЕМАТИЧЕСКАЯ МАТРИЦА
-            applyTheme: (themeName) => {
-                document.body.setAttribute('data-theme', themeName);
-                Engine.state.currentTheme = themeName;
-                
-                // Обновляем UI кнопок в настройках
-                document.querySelectorAll('.mu-grid-item').forEach(btn => btn.classList.remove('active'));
-                const targetBtn = document.getElementById(`theme-${themeName}-btn`);
-                if (targetBtn) targetBtn.classList.add('active');
-                
-                Engine.toast(`МАТРИЦА ИЗМЕНЕНА: ${themeName.toUpperCase()}`);
-                Engine.log(`Theme applied: ${themeName}`);
-            },
-
-            // 4. МЕХАНИКА АВТОРИЗАЦИИ (ТЯЖЕЛАЯ ЛОГИКА)
-            processAuth: async () => {
-                const email = document.getElementById('f-auth-email').value;
-                const pass = document.getElementById('f-auth-pass').value;
-                const nick = document.getElementById('f-auth-nick').value;
-                const logEl = document.getElementById('auth-status-log');
-
-                if (!email || !pass) {
-                    Engine.toast("ОШИБКА: НЕДОСТАТОЧНО ДАННЫХ");
-                    return;
-                }
-
-                logEl.innerText = "УСТАНОВКА СОЕДИНЕНИЯ С FIREBASE...";
-                Engine.log("Starting Auth handshake...");
-
-                try {
-                    // Попытка входа
-                    await signInWithEmailAndPassword(auth, email, pass);
-                    Engine.log("Auth success: User signed in.");
-                } catch (error) {
-                    Engine.log(`Auth failed: ${error.code}. Trying registration...`, 'WARN');
-                    
-                    if (nick && nick.length >= 2) {
-                        try {
-                            const result = await createUserWithEmailAndPassword(auth, email, pass);
-                            const userData = {
-                                id: nick,
-                                uid: result.user.uid,
-                                email: email,
-                                created: Date.now(),
-                                accessLevel: 'MASTER'
-                            };
-                            
-                            // Сохранение в базу
-                            await set(ref(db, `mu_v22/nodes/${result.user.uid}`), userData);
-                            await set(ref(db, `mu_v22/map/${nick}`), result.user.uid);
-                            
-                            Engine.toast("НОВЫЙ УЗЕЛ ЗАРЕГИСТРИРОВАН");
-                            Engine.log("New node successfully added to global map.");
-                        } catch (regError) {
-                            logEl.innerText = `ERR: ${regError.message}`;
-                            Engine.toast("ОШИБКА ПРИ РЕГИСТРАЦИИ");
+            Auth: {
+                process: async () => {
+                    const e = document.getElementById('auth-email').value;
+                    const p = document.getElementById('auth-pass').value;
+                    const n = document.getElementById('auth-nick').value;
+                    try {
+                        await signInWithEmailAndPassword(auth, e, p);
+                    } catch (err) {
+                        if(n) {
+                            const res = await createUserWithEmailAndPassword(auth, e, p);
+                            const data = { id: n, uid: res.user.uid, email: e };
+                            await set(ref(db, `mu_v25/users/${res.user.uid}`), data);
+                            await set(ref(db, `mu_v25/map/${n}`), res.user.uid);
                         }
-                    } else {
-                        logEl.innerText = "ОШИБКА: ДЛЯ РЕГИСТРАЦИИ НУЖЕН НИКНЕЙМ";
-                        Engine.toast("НИКНЕЙМ НЕ УКАЗАН");
                     }
                 }
             },
 
-            // 5. СКАНЕР СЕТИ (МЕХАНИКА "В ДР")
-            scanAndLink: async () => {
-                const targetNick = document.getElementById('f-target-nick').value.trim();
-                if (!targetNick) {
-                    Engine.toast("ВВЕДИТЕ НИКНЕЙМ ДЛЯ ПОИСКА");
-                    return;
-                }
-
-                Engine.toast(`СКАНИРОВАНИЕ УЗЛА: ${targetNick.toUpperCase()}...`);
-                Engine.log(`Searching for node ${targetNick} in global map...`);
-
-                try {
-                    const snap = await get(ref(db, `mu_v22/map/${targetNick}`));
-                    if (snap.exists()) {
-                        const targetUid = snap.val();
-                        
-                        if (targetUid === Engine.state.user.uid) {
-                            Engine.toast("САМОДОБАВЛЕНИЕ НЕВОЗМОЖНО");
-                            return;
-                        }
-
-                        // Двустороннее добавление (Atomic Update)
-                        const batch = {};
-                        batch[`mu_v22/friends/${Engine.state.user.uid}/${targetUid}`] = { 
-                            id: targetNick, 
-                            uid: targetUid,
-                            linkedAt: Date.now() 
-                        };
-                        batch[`mu_v22/friends/${targetUid}/${Engine.state.user.uid}`] = { 
-                            id: Engine.state.user.id, 
-                            uid: Engine.state.user.uid,
-                            linkedAt: Date.now()
-                        };
-                        
-                        await update(ref(db), batch);
-                        
-                        document.getElementById('f-target-nick').value = "";
-                        Engine.toast(`УЗЕЛ ${targetNick} УСПЕШНО ЛИНКОВАН`);
-                        Engine.log(`Link established between ${Engine.state.user.id} and ${targetNick}`);
-                    } else {
-                        Engine.toast("УЗЕЛ НЕ НАЙДЕН В СЕТИ MOROZOV");
-                        Engine.log("Scan result: 404 Node Not Found.", "ERROR");
+            Network: {
+                addFriend: async () => {
+                    const target = document.getElementById('find-node').value;
+                    const snap = await get(ref(db, `mu_v25/map/${target}`));
+                    if(snap.exists()) {
+                        const uid = snap.val();
+                        const pack = {};
+                        pack[`mu_v25/friends/${Engine.user.uid}/${uid}`] = { id: target, uid: uid };
+                        pack[`mu_v25/friends/${uid}/${Engine.user.uid}`] = { id: Engine.user.id, uid: Engine.user.uid };
+                        await update(ref(db), pack);
+                        document.getElementById('find-node').value = "";
                     }
-                } catch (err) {
-                    Engine.log(err.message, "ERROR");
                 }
             },
 
-            // 6. ОТКРЫТИЕ КАНАЛА СВЯЗИ (ЧАТ)
-            openCommunicationChannel: (peerData) => {
-                Engine.state.peer = peerData;
-                // Генерация уникального ID комнаты (сортировка UID для идентичности у обоих юзеров)
-                Engine.state.room = [Engine.state.user.uid, peerData.uid].sort().join("___X___");
-                
-                // Обновление UI шапки чата
-                document.getElementById('peer-display-name').innerHTML = `${peerData.id.toUpperCase()} <span>NODE</span>`;
-                document.getElementById('peer-mini-avatar').innerText = peerData.id[0].toUpperCase();
-                
-                Engine.switchView('screen-chat');
-                Engine.log(`Channel opened with room: ${Engine.state.room}`);
+            Chat: {
+                sendText: () => {
+                    const i = document.getElementById('msg-input');
+                    if(!i.value) return;
+                    Engine.Chat.pushToDB({ txt: i.value, type: 'text' });
+                    i.value = "";
+                },
 
-                // Подписка на поток данных (Realtime Messages)
-                const streamRef = ref(db, `mu_v22/msgs/${Engine.state.room}`);
-                onValue(streamRef, (snapshot) => {
-                    const streamContainer = document.getElementById('chat-message-stream');
-                    streamContainer.innerHTML = "";
+                sendSticker: (s) => {
+                    Engine.Chat.pushToDB({ txt: s, type: 'sticker' });
+                    Engine.UI.toggleStickers();
+                },
+
+                // МЕХАНИКА ФОТО И ВИДЕО (Base64 Injection)
+                handleFile: (el) => {
+                    const file = el.files[0];
+                    if(!file) return;
+                    const reader = new FileReader();
+                    const type = file.type.startsWith('image') ? 'image' : 'video';
                     
-                    if (snapshot.exists()) {
-                        snapshot.forEach((child) => {
-                            const msgData = child.val();
-                            const msgDiv = document.createElement('div');
-                            const isMe = msgData.senderId === Engine.state.user.uid;
-                            
-                            msgDiv.className = `mu-msg-bubble ${isMe ? 'sent' : 'received'}`;
-                            msgDiv.innerText = msgData.text;
-                            
-                            streamContainer.appendChild(msgDiv);
-                        });
+                    reader.onload = (e) => {
+                        Engine.Chat.pushToDB({ txt: e.target.result, type: type });
+                    };
+                    reader.readAsDataURL(file);
+                },
+
+                toggleVoice: async () => {
+                    const btn = document.getElementById('mic-btn');
+                    if(!Engine.recorder) {
+                        const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        Engine.recorder = new MediaRecorder(s);
+                        Engine.recorder.ondataavailable = e => Engine.chunks.push(e.data);
+                        Engine.recorder.onstop = () => {
+                            const blob = new Blob(Engine.chunks, { type: 'audio/ogg' });
+                            const reader = new FileReader();
+                            reader.onload = () => Engine.Chat.pushToDB({ txt: reader.result, type: 'audio' });
+                            reader.readAsDataURL(blob);
+                            Engine.chunks = [];
+                        };
+                        Engine.recorder.start();
+                        btn.classList.add('rec');
+                    } else {
+                        Engine.recorder.stop();
+                        Engine.recorder = null;
+                        btn.classList.remove('rec');
                     }
-                    
-                    // Автоскролл вниз
-                    streamContainer.scrollTop = streamContainer.scrollHeight;
-                });
-            },
+                },
 
-            // 7. ТРАНСМИССИЯ СООБЩЕНИЯ
-            transmitMessage: () => {
-                const inputField = document.getElementById('f-msg-input');
-                const content = inputField.value.trim();
-                
-                if (!content || !Engine.state.room) return;
-
-                const msgObject = {
-                    senderId: Engine.state.user.uid,
-                    text: content,
-                    timestamp: Date.now()
-                };
-
-                push(ref(db, `mu_v22/msgs/${Engine.state.room}`), msgObject);
-                inputField.value = "";
-                Engine.log("Signal transmitted to network.");
-            },
-
-            // 8. ЗАВЕРШЕНИЕ РАБОТЫ (LOGOUT)
-            emergencyShutdown: () => {
-                if (confirm("ВЫ УВЕРЕНЫ, ЧТО ХОТИТЕ РАЗОРВАТЬ СОЕДИНЕНИЕ?")) {
-                    Engine.log("Initiating emergency shutdown...");
-                    signOut(auth).then(() => {
-                        window.location.reload();
+                pushToDB: (data) => {
+                    if(!Engine.room) return;
+                    push(ref(db, `mu_v25/msgs/${Engine.room}`), {
+                        ...data,
+                        sid: Engine.user.uid,
+                        time: Date.now()
                     });
                 }
             },
 
-            // 9. ИНИЦИАЛИЗАЦИЯ И НАБЛЮДАТЕЛИ (CORE BOOT)
-            boot: () => {
-                Engine.log("Kernel boot sequence started...");
-                
-                onAuthStateChanged(auth, (firebaseUser) => {
-                    if (firebaseUser) {
-                        Engine.log(`User detected: ${firebaseUser.uid}. Fetching node profile...`);
-                        
-                        onValue(ref(db, `mu_v22/nodes/${firebaseUser.uid}`), (snapshot) => {
-                            Engine.state.user = snapshot.val();
-                            
-                            if (Engine.state.user) {
-                                // Заполнение личных данных в UI
-                                document.getElementById('my-nick-label').innerText = Engine.state.user.id;
-                                document.getElementById('my-large-avatar').innerText = Engine.state.user.id[0].toUpperCase();
-                                
-                                Engine.switchView('screen-hub');
-                                Engine.toast(`ДОБРО ПОЖАЛОВАТЬ, ${Engine.state.user.id.toUpperCase()}`);
-                                
-                                // Живой список контактов
-                                onValue(ref(db, `mu_v22/friends/${firebaseUser.uid}`), (fSnap) => {
-                                    const listEl = document.getElementById('hub-nodes-list');
-                                    listEl.innerHTML = "";
-                                    
-                                    if (fSnap.exists()) {
-                                        fSnap.forEach((child) => {
-                                            const friend = child.val();
-                                            const nodeCard = document.createElement('div');
-                                            nodeCard.className = "mu-node-card";
-                                            nodeCard.innerHTML = `
-                                                <div class="mu-node-avatar">${friend.id[0].toUpperCase()}</div>
-                                                <div class="mu-node-content">
-                                                    <div class="mu-node-name">${friend.id}</div>
-                                                    <div class="mu-node-status">MOROZOV_NODE_CONNECTED</div>
-                                                </div>
-                                            `;
-                                            nodeCard.onclick = () => Engine.openCommunicationChannel(friend);
-                                            listEl.appendChild(nodeCard);
-                                        });
-                                    } else {
-                                        listEl.innerHTML = `
-                                            <div style="text-align:center; padding: 50px; color: var(--m-core-text-muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
-                                                СЕТЬ ПУСТА. ДОБАВЬТЕ ПЕРВЫЙ УЗЕЛ СВЯЗИ.
-                                            </div>
-                                        `;
-                                    }
-                                });
-                            }
-                        });
-                    } else {
-                        Engine.log("No active session. Redirecting to Auth.");
-                        Engine.switchView('screen-auth');
-                    }
-                });
+            Call: {
+                init: () => {
+                    set(ref(db, `mu_v25/calls/${Engine.peer.uid}`), { from: Engine.user.id, fromUid: Engine.user.uid });
+                },
+                end: () => {
+                    remove(ref(db, `mu_v25/calls/${Engine.user.uid}`));
+                    document.getElementById('call-screen').classList.remove('active');
+                },
+                answer: () => {
+                    alert("ШИФРОВАННЫЙ КАНАЛ УСТАНОВЛЕН");
+                    Engine.Call.end();
+                }
+            },
+
+            UI: {
+                toggleStickers: () => {
+                    const p = document.getElementById('sticker-panel');
+                    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+                },
+                setTheme: (t) => {
+                    document.body.style.filter = t === 'white' ? 'invert(1) hue-rotate(180deg)' : 'none';
+                }
             }
         };
 
-        /* ЗАПУСК ЯДРА МОНОЛИТА 
-        */
-        document.addEventListener('DOMContentLoaded', () => {
-            Engine.boot();
-            
-            // Обработка системных клавиш
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    const msgInput = document.getElementById('f-msg-input');
-                    const authPass = document.getElementById('f-auth-pass');
-                    if (document.activeElement === msgInput) Engine.transmitMessage();
-                    if (document.activeElement === authPass) Engine.processAuth();
-                }
-            });
+        // [ CORE OBSERVER ]
+        onAuthStateChanged(auth, u => {
+            if(u) {
+                onValue(ref(db, `mu_v25/users/${u.uid}`), snap => {
+                    Engine.user = snap.val();
+                    if(Engine.user) {
+                        Engine.Router.go('scr-hub');
+                        document.getElementById('my-nick').innerText = Engine.user.id;
+                        document.getElementById('my-ava').innerText = Engine.user.id[0];
+
+                        // Звонки
+                        onValue(ref(db, `mu_v25/calls/${u.uid}`), cSnap => {
+                            if(cSnap.exists()) {
+                                const c = cSnap.val();
+                                document.getElementById('c-name').innerText = c.from;
+                                document.getElementById('c-ava').innerText = c.from[0];
+                                document.getElementById('call-screen').classList.add('active');
+                            }
+                        });
+
+                        // Контакты
+                        onValue(ref(db, `mu_v25/friends/${u.uid}`), fSnap => {
+                            const list = document.getElementById('contacts-list');
+                            list.innerHTML = "";
+                            fSnap.forEach(f => {
+                                const d = f.val();
+                                const el = document.createElement('div');
+                                el.className = "node-card";
+                                el.innerHTML = `<div class="node-ava">${d.id[0]}</div><div><b>${d.id}</b><br><small style="color:var(--accent)">ONLINE</small></div>`;
+                                el.onclick = () => {
+                                    Engine.peer = d;
+                                    Engine.room = [Engine.user.uid, d.uid].sort().join("_");
+                                    document.getElementById('chat-peer-name').innerText = d.id;
+                                    Engine.Router.go('scr-chat');
+                                    // Поток сообщений
+                                    onValue(ref(db, `mu_v25/msgs/${Engine.room}`), mSnap => {
+                                        const box = document.getElementById('chat-messages');
+                                        box.innerHTML = "";
+                                        mSnap.forEach(m => {
+                                            const data = m.val();
+                                            const item = document.createElement('div');
+                                            item.className = `msg ${data.sid === Engine.user.uid ? 'sent' : 'received'} ${data.type === 'sticker' ? 'msg-sticker' : ''}`;
+                                            
+                                            if(data.type === 'text') item.innerText = data.txt;
+                                            else if(data.type === 'sticker') item.innerText = data.txt;
+                                            else if(data.type === 'image') item.innerHTML = `<img src="${data.txt}" class="msg-img">`;
+                                            else if(data.type === 'video') item.innerHTML = `<video src="${data.txt}" class="msg-video" controls></video>`;
+                                            else if(data.type === 'audio') item.innerHTML = `<audio src="${data.txt}" controls style="width:180px;"></audio>`;
+                                            
+                                            box.appendChild(item);
+                                        });
+                                        box.scrollTop = box.scrollHeight;
+                                    });
+                                };
+                                list.appendChild(el);
+                            });
+                        });
+                    }
+                });
+            } else Engine.Router.go('scr-auth');
         });
-
-        /* [ ДОПОЛНИТЕЛЬНЫЙ КОД ДЛЯ МАССИВНОСТИ ]
-           Секция мониторинга ресурсов и фоновых процессов.
-        */
-        const monitorResources = () => {
-            setInterval(() => {
-                const uptime = Math.floor(performance.now() / 1000);
-                Engine.log(`Uptime: ${uptime}s | Status: Nominal | Matrix: Active`, 'MONITOR');
-            }, 30000);
-        };
-        monitorResources();
-
     </script>
 </body>
 </html>
