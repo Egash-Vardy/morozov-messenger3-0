@@ -3,256 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ULTRA v20.0 | THE MONOLITH</title>
+    <title>ULTRA v25.0 | GOLIATH CORE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДИЗАЙНА */
         :root {
-            --bg: #010409;
-            --surf: #0d1117;
-            --brd: #30363d;
-            --acc: #238636; /* Зеленый "титановый" акцент */
-            --acc-hover: #2ea043;
-            --blue: #2f81f7;
-            --red: #da3633;
-            --text-main: #c9d1d9;
-            --text-dim: #8b949e;
-            --glass: rgba(13, 17, 23, 0.8);
+            --bg-deep: #010204;
+            --bg-surf: #0d1117;
+            --bg-line: #30363d;
+            --accent: #2f81f7;
+            --accent-glow: rgba(47, 129, 247, 0.4);
+            --danger: #f85149;
+            --success: #3fb950;
+            --text-p: #c9d1d9;
+            --text-s: #8b949e;
         }
 
-        /* БАЗОВЫЕ СТИЛИ */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* ГЛОБАЛЬНЫЕ СТИЛИ */
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; scrollbar-width: none; }
+        ::-webkit-scrollbar { display: none; }
+        
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
+            background-color: var(--bg-deep);
+            color: var(--text-p);
             font-family: 'Inter', sans-serif;
-            margin: 0; padding: 0;
-            height: 100vh; width: 100vw;
-            overflow: hidden;
-            user-select: none;
+            margin: 0; overflow: hidden; height: 100vh; width: 100vw;
         }
 
-        /* СИСТЕМА ЭКРАНОВ */
-        .u-screen {
+        /* АНИМАЦИИ ПЕРЕХОДОВ */
+        .page {
             position: fixed; inset: 0;
             display: none; flex-direction: column;
-            background: var(--bg);
+            background: var(--bg-deep);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
-            animation: fadeIn 0.4s ease;
         }
-        .u-screen.active { display: flex; z-index: 100; }
+        .page.active { display: flex; animation: slideIn 0.3s ease-out; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from { transform: translateX(30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* ПОЛЯ ВВОДА В СТИЛЕ CYBERPUNK */
-        .u-input {
-            background: #010409;
-            border: 1px solid var(--brd);
-            padding: 18px 24px;
-            border-radius: 16px;
+        /* ЭЛЕМЕНТЫ ВВОДА (INDUSTRIAL DESIGN) */
+        .g-input {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid var(--bg-line);
+            padding: 22px;
+            border-radius: 20px;
             color: white;
-            width: 100%;
             font-size: 16px;
+            width: 100%;
             outline: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: 0.3s;
         }
-        .u-input:focus {
-            border-color: var(--blue);
-            box-shadow: 0 0 20px rgba(47, 129, 247, 0.15);
-            background: #0d1117;
+        .g-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            background: var(--bg-surf);
         }
 
-        /* КНОПКИ */
-        .u-btn {
-            padding: 18px 30px;
-            border-radius: 16px;
+        /* КНОПКИ GOLIATH */
+        .g-btn {
+            background: var(--accent);
+            color: white;
+            padding: 22px;
+            border-radius: 20px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+            letter-spacing: 2px;
             border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
         }
-        .btn-main { background: var(--blue); color: white; }
-        .btn-main:hover { background: #4091ff; transform: translateY(-2px); }
-        .btn-main:active { transform: translateY(0); }
+        .g-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .g-btn:active { transform: translateY(0) scale(0.98); }
 
-        /* ЧАТ БАБЛЫ */
-        .msg-container { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; max-width: 85%; }
-        .msg-me { align-self: flex-end; }
-        .msg-he { align-self: flex-start; }
+        /* ЧАТ БАБЛЫ (ПРОДВИНУТЫЕ) */
+        .message-row { display: flex; width: 100%; margin-bottom: 16px; flex-direction: column; }
+        .m-me { align-items: flex-end; }
+        .m-he { align-items: flex-start; }
 
         .bubble {
-            padding: 14px 18px;
-            border-radius: 22px;
+            max-width: 75%;
+            padding: 16px 20px;
+            border-radius: 24px;
             font-size: 15px;
-            line-height: 1.5;
             position: relative;
-            word-wrap: break-word;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        .bubble-me { 
-            background: var(--blue); color: white; 
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 15px rgba(47, 129, 247, 0.2);
-        }
-        .bubble-he { 
-            background: var(--surf); color: var(--text-main); 
-            border: 1px solid var(--brd);
-            border-bottom-left-radius: 4px;
-        }
+        .b-me { background: var(--accent); border-bottom-right-radius: 4px; }
+        .b-he { background: var(--bg-surf); border: 1px solid var(--bg-line); border-bottom-left-radius: 4px; }
 
-        /* МЕДИА-КОНТЕНТ */
-        .media-wrap {
-            margin-top: 8px;
-            border-radius: 14px;
+        /* МЕДИА ГАЛЕРЕЯ */
+        .media-box {
+            margin-top: 10px;
+            border-radius: 18px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
             background: #000;
+            border: 1px solid var(--bg-line);
         }
-        .media-wrap img, .media-wrap video { width: 100%; display: block; }
+        .media-box img, .media-box video { max-width: 100%; display: block; }
 
-        /* ВИДЕО ЗВОНОК */
+        /* ВИДЕО ЗВОНОК (GOLIATH ENGINE) */
         #call-stage {
             position: fixed; inset: 0;
             background: #000;
-            z-index: 1000;
+            z-index: 10000;
             display: none;
         }
-        #remote-video { width: 100%; height: 100%; object-fit: cover; }
-        #local-video {
+        #remote-v { width: 100%; height: 100%; object-fit: cover; }
+        #local-v {
             position: absolute; top: 40px; right: 20px;
-            width: 120px; height: 180px;
-            border-radius: 20px; border: 2px solid white;
-            object-fit: cover; z-index: 1010;
+            width: 130px; height: 200px;
+            border-radius: 24px; border: 2px solid rgba(255,255,255,0.4);
+            object-fit: cover; z-index: 10001;
             background: #111;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .call-controls {
-            position: absolute; bottom: 40px; left: 0; width: 100%;
-            display: flex; justify-content: center; gap: 20px;
-            z-index: 1020;
+        .call-hud {
+            position: absolute; bottom: 50px; left: 0; width: 100%;
+            display: flex; justify-content: center; gap: 25px;
+            z-index: 10002;
         }
-        .ctrl-btn {
-            width: 65px; height: 65px; border-radius: 50%;
+        .hud-btn {
+            width: 70px; height: 70px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 24px; color: white; cursor: pointer;
-            backdrop-filter: blur(10px); background: rgba(255,255,255,0.1);
+            font-size: 26px; color: white; background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
         }
-        .ctrl-hangup { background: var(--red); }
+        .btn-hang { background: var(--danger) !important; }
+
+        /* ДЕБАГ КОНСОЛЬ */
+        #debug-log {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: 120px; background: rgba(0,0,0,0.8);
+            color: #3fb950; font-family: 'JetBrains Mono';
+            font-size: 10px; padding: 10px; overflow-y: auto;
+            z-index: 999; border-top: 1px solid var(--bg-line);
+            pointer-events: none; opacity: 0.6;
+        }
     </style>
 </head>
 <body>
 
-    <div id="scr-auth" class="u-screen active justify-center items-center px-6">
-        <div class="w-full max-w-md">
-            <div class="text-center mb-12">
-                <div class="inline-block p-4 bg-blue-600 rounded-3xl mb-6 shadow-2xl shadow-blue-500/20">
-                    <i class="fas fa-bolt text-4xl text-white"></i>
-                </div>
-                <h1 class="text-5xl font-black italic tracking-tighter">ULTRA <span class="text-blue-500">TITAN</span></h1>
-                <p class="text-dim text-sm mt-2 font-mono uppercase tracking-widest">v20.0 Monolith Core</p>
+    <div id="debug-log">SYSTEM BOOTING...</div>
+
+    <section id="scr-auth" class="page active justify-center items-center px-8">
+        <div class="w-full max-w-md text-center">
+            <div class="mb-10">
+                <h1 class="text-6xl font-black italic tracking-tighter text-white">GOLIATH <span class="text-blue-500">X</span></h1>
+                <p class="text-xs text-gray-500 mt-2 font-bold uppercase tracking-[0.3em]">Titan Mesh v25.0 Enterprise</p>
             </div>
 
-            <div class="bg-[var(--surf)] p-8 rounded-[40px] border border-[var(--brd)] shadow-2xl">
+            <div class="bg-[var(--bg-surf)] p-10 rounded-[45px] border border-[var(--bg-line)] shadow-2xl">
                 <div class="space-y-4">
-                    <div>
-                        <label class="text-[10px] font-bold uppercase text-dim ml-4 mb-2 block">Email Node</label>
-                        <input id="inp-email" type="email" placeholder="name@domain.com" class="u-input">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold uppercase text-dim ml-4 mb-2 block">Access Key</label>
-                        <input id="inp-pass" type="password" placeholder="••••••••" class="u-input">
-                    </div>
-                    <div id="box-nick">
-                        <label class="text-[10px] font-bold uppercase text-dim ml-4 mb-2 block">Unique ID (New Users)</label>
-                        <input id="inp-nick" type="text" placeholder="user_777" class="u-input">
-                    </div>
+                    <input id="auth-email" type="email" placeholder="Email Node" class="g-input" value="egorkamorozoff2014@gmail.com">
+                    <input id="auth-pass" type="password" placeholder="Access Code" class="g-input">
+                    <input id="auth-nick" type="text" placeholder="Identity Label (ID)" class="g-input">
                 </div>
 
-                <button id="btn-auth" onclick="App.Auth.execute()" class="u-btn btn-main w-full mt-8">
-                    <span>Initialize Interface</span>
-                    <i class="fas fa-chevron-right"></i>
+                <button id="auth-execute" onclick="Goliath.Auth.process()" class="g-btn w-full mt-8 shadow-xl shadow-blue-500/20">
+                    Initialize Core
                 </button>
                 
-                <p id="auth-status" class="text-center mt-6 text-[10px] font-mono uppercase text-dim">System Standby</p>
+                <div id="auth-status" class="mt-6 text-[10px] font-black uppercase text-gray-600 tracking-widest">Awaiting Input</div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div id="scr-hub" class="u-screen">
-        <header class="p-6 border-b border-[var(--brd)] flex justify-between items-center bg-[var(--surf)]/80 backdrop-blur-md">
+    <section id="scr-hub" class="page">
+        <header class="p-8 flex justify-between items-center bg-[var(--bg-surf)]/50 border-b border-[var(--bg-line)]">
             <div>
-                <h2 class="text-xl font-black italic">MESH HUB</h2>
-                <div id="label-my-id" class="text-blue-500 text-[10px] font-mono mt-1">NODE: ...</div>
+                <h2 class="text-2xl font-black italic">MESH HUB</h2>
+                <div id="my-identity" class="text-[10px] text-blue-500 font-mono mt-1 uppercase">NODE: LOADING...</div>
+            </div>
+            <button onclick="Goliath.Hub.addAgent()" class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg"><i class="fas fa-plus"></i></button>
+        </header>
+
+        <div id="agent-list" class="flex-1 overflow-y-auto p-8 space-y-4">
+            </div>
+
+        <div class="p-4 flex justify-center border-t border-[var(--bg-line)] bg-[var(--bg-surf)]">
+            <button onclick="location.reload()" class="text-[10px] font-black text-gray-600 uppercase tracking-widest">Secure Logout</button>
+        </div>
+    </section>
+
+    <section id="scr-chat" class="page">
+        <header class="p-6 border-b border-[var(--bg-line)] flex items-center gap-6 bg-[var(--bg-surf)]">
+            <button onclick="Goliath.Nav.go('hub')" class="text-2xl opacity-40"><i class="fas fa-arrow-left"></i></button>
+            <div class="flex-1">
+                <h3 id="target-id" class="text-xl font-bold">Agent</h3>
+                <div id="target-status" class="text-[9px] font-black text-gray-600 uppercase tracking-tighter italic">Syncing...</div>
             </div>
             <div class="flex gap-3">
-                <button onclick="App.Hub.addAgent()" class="w-12 h-12 bg-white/5 border border-[var(--brd)] rounded-2xl flex items-center justify-center">
-                    <i class="fas fa-user-plus text-sm"></i>
-                </button>
-                <button onclick="location.reload()" class="w-12 h-12 bg-red-500/10 text-red-500 border border-red-500/20 rounded-2xl flex items-center justify-center">
-                    <i class="fas fa-power-off text-sm"></i>
-                </button>
+                <button onclick="Goliath.Call.initiate(false)" class="w-12 h-12 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center"><i class="fas fa-phone-alt"></i></button>
+                <button onclick="Goliath.Call.initiate(true)" class="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center"><i class="fas fa-video"></i></button>
             </div>
         </header>
 
-        <div id="contact-list" class="flex-1 overflow-y-auto p-6 space-y-3">
+        <div id="chat-feed" class="flex-1 overflow-y-auto p-8 flex flex-col">
             </div>
 
-        <nav class="p-4 border-t border-[var(--brd)] bg-[var(--surf)] flex justify-around">
-            <i class="fas fa-comment-alt text-blue-500 text-xl"></i>
-            <i class="fas fa-globe-americas text-dim text-xl"></i>
-            <i class="fas fa-cog text-dim text-xl"></i>
-        </nav>
-    </div>
-
-    <div id="scr-chat" class="u-screen">
-        <header class="p-5 border-b border-[var(--brd)] flex items-center gap-4 bg-[var(--surf)]">
-            <button onclick="App.Nav.go('hub')" class="w-10 h-10 flex items-center justify-center opacity-50"><i class="fas fa-arrow-left"></i></button>
-            <div class="flex-1">
-                <h3 id="chat-title" class="font-bold text-lg">Agent</h3>
-                <div id="chat-status" class="text-[9px] uppercase font-black text-gray-500 tracking-tighter">Syncing...</div>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="App.Call.start(false)" class="w-11 h-11 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center"><i class="fas fa-phone-alt"></i></button>
-                <button onclick="App.Call.start(true)" class="w-11 h-11 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center"><i class="fas fa-video"></i></button>
-            </div>
-        </header>
-
-        <div id="chat-scroller" class="flex-1 overflow-y-auto p-5 flex flex-col">
-            </div>
-
-        <div class="p-4 bg-[var(--surf)] border-t border-[var(--brd)] pb-10">
-            <div class="flex gap-3 items-center">
-                <button onclick="document.getElementById('file-ptr').click()" class="w-12 h-12 text-dim text-xl"><i class="fas fa-paperclip"></i></button>
-                <input type="file" id="file-ptr" class="hidden" accept="image/*,video/*" onchange="App.Chat.handleFile(this)">
+        <div class="p-8 bg-[var(--bg-surf)] border-t border-[var(--bg-line)] pb-12">
+            <div class="flex gap-4 items-center">
+                <button onclick="document.getElementById('media-ptr').click()" class="text-2xl opacity-30 hover:opacity-100 transition"><i class="fas fa-paperclip"></i></button>
+                <input type="file" id="media-ptr" class="hidden" accept="image/*,video/*" onchange="Goliath.Chat.sendMedia(this)">
                 
-                <div class="flex-1 relative">
-                    <input id="msg-input" class="u-input !p-4" placeholder="Enter secure message...">
-                </div>
+                <input id="chat-input" class="g-input !p-5 !mb-0 flex-1" placeholder="Type encrypted signal...">
                 
-                <button onclick="App.Chat.sendText()" class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <i class="fas fa-paper-plane text-white"></i>
+                <button id="msg-send-btn" onclick="Goliath.Chat.sendText()" class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl">
+                    <i class="fas fa-paper-plane text-xl"></i>
                 </button>
             </div>
         </div>
-    </div>
+    </section>
 
     <div id="call-stage">
-        <video id="remote-video" autoplay playsinline></video>
-        <video id="local-video" autoplay muted playsinline></video>
+        <video id="remote-v" autoplay playsinline></video>
+        <video id="local-v" autoplay muted playsinline></video>
         
-        <div class="call-controls">
-            <button onclick="App.Call.toggleMic()" id="btn-mic" class="ctrl-btn"><i class="fas fa-microphone"></i></button>
-            <button onclick="App.Call.switchCam()" class="ctrl-btn"><i class="fas fa-camera-rotate"></i></button>
-            <button onclick="location.reload()" class="ctrl-btn ctrl-hangup"><i class="fas fa-phone-slash"></i></button>
+        <div class="call-hud">
+            <button onclick="Goliath.Call.toggleMic()" id="mic-toggle" class="hud-btn"><i class="fas fa-microphone"></i></button>
+            <button onclick="Goliath.Call.flipCamera()" class="hud-btn"><i class="fas fa-camera-rotate"></i></button>
+            <button onclick="location.reload()" class="hud-btn btn-hang"><i class="fas fa-phone-slash"></i></button>
         </div>
     </div>
 
@@ -262,8 +242,8 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // КОНФИГУРАЦИЯ БАЗЫ (ТВОИ ДАННЫЕ)
-        const fbConfig = {
+        // КОНФИГ
+        const G_CONFIG = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
@@ -272,153 +252,138 @@
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        const FB_APP = initializeApp(fbConfig);
+        const FB_APP = initializeApp(G_CONFIG);
         const DB = getDatabase(FB_APP);
         const AUTH = getAuth(FB_APP);
-        const STORE = getStorage(FB_APP);
+        const ST = getStorage(FB_APP);
 
-        // ОБЪЕКТ ПРИЛОЖЕНИЯ - ВЕСЬ МОЗГ ТУТ
-        window.App = {
+        // ОБЪЕКТ GOLIATH - ЯДРО СИСТЕМЫ
+        window.Goliath = {
             State: {
                 Me: null,
-                Partner: null,
-                Room: null,
+                ActivePeer: null,
+                RoomId: null,
                 RTC: null,
-                Stream: null,
-                Facing: "user",
-                MicOn: true
+                LocalStream: null,
+                FacingMode: 'user',
+                MicStatus: true
+            },
+
+            Log: (msg) => {
+                const el = document.getElementById('debug-log');
+                el.innerHTML += `> [${new Date().toLocaleTimeString()}] ${msg}<br>`;
+                el.scrollTop = el.scrollHeight;
+                console.log("[GOLIATH]", msg);
             },
 
             Nav: {
-                go: (screenId) => {
-                    console.log("[NAV] Switching to:", screenId);
-                    document.querySelectorAll('.u-screen').forEach(s => s.classList.remove('active'));
-                    document.getElementById(`scr-${screenId}`).classList.add('active');
+                go: (id) => {
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    document.getElementById(`scr-${id}`).classList.add('active');
+                    Goliath.Log("NAV TO: " + id);
                 }
             },
 
             Auth: {
-                execute: async () => {
-                    const e = document.getElementById('inp-email').value;
-                    const p = document.getElementById('inp-pass').value;
-                    const n = document.getElementById('inp-nick').value.trim();
-                    const log = document.getElementById('auth-status');
+                process: async () => {
+                    const e = document.getElementById('auth-email').value;
+                    const p = document.getElementById('auth-pass').value;
+                    const n = document.getElementById('auth-nick').value.trim();
+                    const st = document.getElementById('auth-status');
 
-                    if (!e || !p) return (log.innerText = "CREDENTIALS REQUIRED");
-                    log.innerText = "CONNECTING TO MESH...";
+                    if(!e || !p) { st.innerText = "ACCESS DENIED: EMPTY FIELDS"; return; }
+                    st.innerText = "INITIATING HANDSHAKE...";
 
                     try {
-                        // Пытаемся войти
                         await signInWithEmailAndPassword(AUTH, e, p);
                     } catch (err) {
-                        // Если нет акка - создаем
-                        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-                            if (!n) return (log.innerText = "ID REQUIRED FOR NEW NODE");
+                        if(err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                            if(!n) { st.innerText = "ID REQUIRED FOR REGISTRATION"; return; }
                             try {
                                 const res = await createUserWithEmailAndPassword(AUTH, e, p);
-                                await set(ref(DB, `v20/users/${res.user.uid}`), { id: n, uid: res.user.uid, ts: Date.now() });
-                                await set(ref(DB, `v20/map/${n}`), res.user.uid);
-                            } catch (e2) { log.innerText = "REG ERROR: " + e2.message; }
-                        } else { log.innerText = "AUTH ERROR: " + err.message; }
+                                await set(ref(DB, `v25/users/${res.user.uid}`), { id: n, uid: res.user.uid, ts: Date.now() });
+                                await set(ref(DB, `v25/map/${n}`), res.user.uid);
+                                st.innerText = "CORE CREATED";
+                            } catch (e2) { st.innerText = "REG ERROR: " + e2.message; }
+                        } else { st.innerText = "AUTH ERROR: " + err.message; }
                     }
                 }
             },
 
             Hub: {
                 init: () => {
-                    document.getElementById('label-my-id').innerText = "NODE: " + App.State.Me.id;
-                    App.Hub.listenSocial();
+                    document.getElementById('my-identity').innerText = "NODE: " + Goliath.State.Me.id;
+                    Goliath.Hub.syncSocial();
+                    Goliath.Log("HUB SYNCHRONIZED");
                 },
 
                 addAgent: async () => {
-                    const targetId = prompt("ENTER AGENT UNIQUE ID:");
-                    if (!targetId) return;
-                    
-                    const snap = await get(ref(DB, `v20/map/${targetId}`));
-                    if (snap.exists()) {
-                        const targetUid = snap.val();
-                        await update(ref(DB, `v20/social/${App.State.Me.uid}/${targetUid}`), { id: targetId, uid: targetUid });
-                        await update(ref(DB, `v20/social/${targetUid}/${App.State.Me.uid}`), { id: App.State.Me.id, uid: App.State.Me.uid });
-                    } else { alert("AGENT NOT FOUND IN GLOBAL MESH"); }
+                    const tid = prompt("ENTER TARGET NODE ID:");
+                    if(!tid) return;
+                    const snap = await get(ref(DB, `v25/map/${tid}`));
+                    if(snap.exists()){
+                        const tuid = snap.val();
+                        await update(ref(DB, `v25/social/${Goliath.State.Me.uid}/${tuid}`), { id: tid, uid: tuid });
+                        await update(ref(DB, `v25/social/${tuid}/${Goliath.State.Me.uid}`), { id: Goliath.State.Me.id, uid: Goliath.State.Me.uid });
+                        Goliath.Log("AGENT LINKED: " + tid);
+                    } else { alert("TARGET NOT FOUND IN MESH"); }
                 },
 
-                listenSocial: () => {
-                    onValue(ref(DB, `v20/social/${App.State.Me.uid}`), snap => {
-                        const list = document.getElementById('contact-list');
+                syncSocial: () => {
+                    onValue(ref(DB, `v25/social/${Goliath.State.Me.uid}`), snap => {
+                        const list = document.getElementById('agent-list');
                         list.innerHTML = "";
-                        snap.forEach(child => {
-                            const data = child.val();
-                            const div = document.createElement('div');
-                            div.className = "p-5 bg-[var(--surf)] border border-[var(--brd)] rounded-3xl flex justify-between items-center active:scale-95 transition-all";
-                            div.innerHTML = `
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-500 font-black">${data.id[0].toUpperCase()}</div>
-                                    <div>
-                                        <b class="text-white block">${data.id}</b>
-                                        <span class="text-[9px] text-dim font-bold uppercase">Linked Node</span>
-                                    </div>
+                        snap.forEach(c => {
+                            const d = c.val();
+                            const item = document.createElement('div');
+                            item.className = "p-6 bg-[var(--bg-surf)] rounded-[25px] border border-[var(--bg-line)] flex justify-between items-center active:scale-95 transition-all shadow-lg cursor-pointer";
+                            item.innerHTML = `
+                                <div class="flex items-center gap-5">
+                                    <div class="w-14 h-14 bg-blue-600/10 rounded-2xl flex items-center justify-center text-blue-500 font-black text-xl">${d.id[0].toUpperCase()}</div>
+                                    <div><b class="text-white text-lg">${d.id}</b><p class="text-[9px] text-gray-500 font-bold uppercase mt-1">Ready for sync</p></div>
                                 </div>
                                 <i class="fas fa-chevron-right opacity-20"></i>
                             `;
-                            div.onclick = () => App.Chat.open(data);
-                            list.appendChild(div);
+                            item.onclick = () => Goliath.Chat.open(d);
+                            list.appendChild(item);
                         });
                     });
                 }
             },
 
             Chat: {
-                open: (partner) => {
-                    App.State.Partner = partner;
-                    App.State.Room = [App.State.Me.uid, partner.uid].sort().join("_");
-                    App.Nav.go('chat');
-                    document.getElementById('chat-title').innerText = partner.id;
-                    App.Chat.syncMessages();
-                    App.Chat.monitorStatus();
+                open: (peer) => {
+                    Goliath.State.ActivePeer = peer;
+                    Goliath.State.RoomId = [Goliath.State.Me.uid, peer.uid].sort().join("_");
+                    Goliath.Nav.go('chat');
+                    document.getElementById('target-id').innerText = peer.id;
+                    Goliath.Chat.listen();
                 },
 
-                monitorStatus: () => {
-                    onValue(ref(DB, `v20/status/${App.State.Partner.uid}`), s => {
-                        const label = document.getElementById('chat-status');
-                        const isOnline = s.val() === "online";
-                        label.innerText = isOnline ? "Active Connection" : "Last seen recently";
-                        label.className = `text-[9px] uppercase font-black tracking-tighter ${isOnline ? 'text-green-500' : 'text-gray-500'}`;
-                    });
-                },
-
-                syncMessages: () => {
-                    onValue(ref(DB, `v20/rooms/${App.State.Room}`), snap => {
-                        const feed = document.getElementById('chat-scroller');
+                listen: () => {
+                    onValue(ref(DB, `v25/rooms/${Goliath.State.RoomId}`), snap => {
+                        const feed = document.getElementById('chat-feed');
                         feed.innerHTML = "";
                         snap.forEach(m => {
                             const d = m.val();
-                            const isMe = d.sid === App.State.Me.uid;
-                            
-                            let contentHtml = "";
-                            if (d.type === 'text') {
-                                contentHtml = `<div class="bubble ${isMe ? 'bubble-me' : 'bubble-he'}">${d.txt}</div>`;
-                            } else if (d.type === 'media') {
-                                const mediaTag = d.fileType.includes('image') ? 
-                                    `<img src="${d.url}" onclick="window.open('${d.url}')">` : 
-                                    `<video src="${d.url}" controls></video>`;
-                                contentHtml = `<div class="media-wrap ${isMe ? 'msg-me' : 'msg-he'}">${mediaTag}</div>`;
+                            const isMe = d.sid === Goliath.State.Me.uid;
+                            let html = "";
+                            if(d.type === 'text') html = `<div class="bubble ${isMe ? 'b-me' : 'b-he'}">${d.txt}</div>`;
+                            else if(d.type === 'media') {
+                                const tag = d.fileType.includes('image') ? `<img src="${d.url}">` : `<video src="${d.url}" controls></video>`;
+                                html = `<div class="media-box ${isMe ? 'b-me' : 'b-he'}">${tag}</div>`;
                             }
-
-                            feed.innerHTML += `
-                                <div class="msg-container ${isMe ? 'msg-me' : 'msg-he'}">
-                                    ${contentHtml}
-                                </div>
-                            `;
+                            feed.innerHTML += `<div class="message-row ${isMe ? 'm-me' : 'm-he'}">${html}</div>`;
                         });
                         feed.scrollTop = feed.scrollHeight;
                     });
                 },
 
                 sendText: () => {
-                    const inp = document.getElementById('msg-input');
-                    if (!inp.value.trim()) return;
-                    push(ref(DB, `v20/rooms/${App.State.Room}`), {
-                        sid: App.State.Me.uid,
+                    const inp = document.getElementById('chat-input');
+                    if(!inp.value.trim()) return;
+                    push(ref(DB, `v25/rooms/${Goliath.State.RoomId}`), {
+                        sid: Goliath.State.Me.uid,
                         txt: inp.value,
                         type: 'text',
                         ts: Date.now()
@@ -426,150 +391,134 @@
                     inp.value = "";
                 },
 
-                handleFile: async (el) => {
+                sendMedia: async (el) => {
                     const file = el.files[0];
-                    if (!file) return;
-                    console.log("[STORAGE] Uploading:", file.name);
-                    const path = `v20/media/${Date.now()}_${file.name}`;
-                    const storageRef = sRef(STORE, path);
-                    
+                    if(!file) return;
+                    Goliath.Log("UPLOADING MEDIA...");
+                    const storageRef = sRef(ST, `v25/${Date.now()}_${file.name}`);
                     try {
                         await uploadBytes(storageRef, file);
                         const url = await getDownloadURL(storageRef);
-                        push(ref(DB, `v20/rooms/${App.State.Room}`), {
-                            sid: App.State.Me.uid,
-                            url: url,
+                        push(ref(DB, `v25/rooms/${Goliath.State.RoomId}`), {
+                            sid: Goliath.State.Me.uid,
+                            url,
                             type: 'media',
                             fileType: file.type,
                             ts: Date.now()
                         });
-                    } catch (e) { alert("UPLOAD FAILED"); }
+                        Goliath.Log("MEDIA TRANSMITTED");
+                    } catch (e) { alert("UPLOAD ERROR"); }
                 }
             },
 
             Call: {
-                start: async (useVideo) => {
-                    console.log("[CALL] Initiating. Video:", useVideo);
+                initiate: async (video) => {
+                    Goliath.Log("OPENING SIGNAL CHANNEL...");
                     document.getElementById('call-stage').style.display = 'block';
-                    
                     try {
-                        App.State.Stream = await navigator.mediaDevices.getUserMedia({
-                            video: useVideo ? { facingMode: App.State.Facing } : false,
+                        Goliath.State.LocalStream = await navigator.mediaDevices.getUserMedia({
+                            video: video ? { facingMode: Goliath.State.FacingMode } : false,
                             audio: true
                         });
+                        document.getElementById('local-v').srcObject = Goliath.State.LocalStream;
                         
-                        document.getElementById('local-video').srcObject = App.State.Stream;
-                        
-                        App.State.RTC = new RTCPeerConnection({
+                        Goliath.State.RTC = new RTCPeerConnection({
                             iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
                         });
 
-                        App.State.Stream.getTracks().forEach(track => {
-                            App.State.RTC.addTrack(track, App.State.Stream);
-                        });
-
-                        App.State.RTC.ontrack = (event) => {
-                            document.getElementById('remote-video').srcObject = event.streams[0];
-                        };
-
-                        App.State.RTC.onicecandidate = (e) => {
-                            if (e.candidate) {
-                                push(ref(DB, `v20/calls/${App.State.Partner.uid}/ice`), e.candidate.toJSON());
-                            }
-                        };
-
-                        const offer = await App.State.RTC.createOffer();
-                        await App.State.RTC.setLocalDescription(offer);
+                        Goliath.State.LocalStream.getTracks().forEach(t => Goliath.State.RTC.addTrack(t, Goliath.State.LocalStream));
                         
-                        await set(ref(DB, `v20/calls/${App.State.Partner.uid}/sig`), {
-                            offer: offer,
-                            from: App.State.Me.uid,
-                            fromId: App.State.Me.id,
-                            video: useVideo
+                        Goliath.State.RTC.ontrack = (e) => {
+                            document.getElementById('remote-v').srcObject = e.streams[0];
+                        };
+
+                        Goliath.State.RTC.onicecandidate = (e) => {
+                            if(e.candidate) push(ref(DB, `v25/calls/${Goliath.State.ActivePeer.uid}/ice`), e.candidate.toJSON());
+                        };
+
+                        const offer = await Goliath.State.RTC.createOffer();
+                        await Goliath.State.RTC.setLocalDescription(offer);
+                        
+                        await set(ref(DB, `v25/calls/${Goliath.State.ActivePeer.uid}/sig`), {
+                            offer,
+                            from: Goliath.State.Me.uid,
+                            fromId: Goliath.State.Me.id,
+                            video
                         });
 
-                        onValue(ref(DB, `v20/calls/${App.State.Partner.uid}/ans`), async snap => {
+                        onValue(ref(DB, `v25/calls/${Goliath.State.ActivePeer.uid}/ans`), async snap => {
                             const ans = snap.val();
-                            if (ans && !App.State.RTC.currentRemoteDescription) {
-                                await App.State.RTC.setRemoteDescription(new RTCSessionDescription(ans));
+                            if(ans && !Goliath.State.RTC.currentRemoteDescription) {
+                                await Goliath.State.RTC.setRemoteDescription(new RTCSessionDescription(ans));
                             }
                         });
 
-                    } catch (err) {
-                        console.error(err);
-                        alert("MEDIA ACCESS DENIED");
-                        location.reload();
-                    }
+                    } catch (err) { alert("MEDIA BLOCKED"); location.reload(); }
                 },
 
                 listen: () => {
-                    onValue(ref(DB, `v20/calls/${App.State.Me.uid}/sig`), async snap => {
-                        const data = snap.val();
-                        if (data && !App.State.RTC) {
-                            if (confirm(`INCOMING CALL FROM ${data.fromId}`)) {
-                                App.State.Partner = { uid: data.from, id: data.fromId };
-                                await App.Call.start(data.video);
-                                await App.State.RTC.setRemoteDescription(new RTCSessionDescription(data.offer));
-                                const answer = await App.State.RTC.createAnswer();
-                                await App.State.RTC.setLocalDescription(answer);
-                                set(ref(DB, `v20/calls/${data.from}/ans`), answer);
+                    onValue(ref(DB, `v25/calls/${Goliath.State.Me.uid}/sig`), async snap => {
+                        const d = snap.val();
+                        if(d && !Goliath.State.RTC) {
+                            if(confirm(`INCOMING FROM ${d.fromId}?`)) {
+                                Goliath.State.ActivePeer = { uid: d.from, id: d.fromId };
+                                await Goliath.Call.initiate(d.video);
+                                await Goliath.State.RTC.setRemoteDescription(new RTCSessionDescription(d.offer));
+                                const ans = await Goliath.State.RTC.createAnswer();
+                                await Goliath.State.RTC.setLocalDescription(ans);
+                                set(ref(DB, `v25/calls/${d.from}/ans`), ans);
                                 
-                                onValue(ref(DB, `v20/calls/${App.State.Me.uid}/ice`), iceSnap => {
-                                    iceSnap.forEach(c => {
-                                        App.State.RTC.addIceCandidate(new RTCIceCandidate(c.val()));
-                                    });
+                                onValue(ref(DB, `v25/calls/${Goliath.State.Me.uid}/ice`), iSnap => {
+                                    iSnap.forEach(c => Goliath.State.RTC.addIceCandidate(new RTCIceCandidate(c.val())));
                                 });
                             } else {
-                                remove(ref(DB, `v20/calls/${App.State.Me.uid}`));
+                                remove(ref(DB, `v25/calls/${Goliath.State.Me.uid}`));
                             }
                         }
                     });
                 },
 
                 toggleMic: () => {
-                    App.State.MicOn = !App.State.MicOn;
-                    App.State.Stream.getAudioTracks()[0].enabled = App.State.MicOn;
-                    document.getElementById('btn-mic').style.color = App.State.MicOn ? 'white' : 'red';
+                    Goliath.State.MicStatus = !Goliath.State.MicStatus;
+                    Goliath.State.LocalStream.getAudioTracks()[0].enabled = Goliath.State.MicStatus;
+                    document.getElementById('mic-toggle').style.color = Goliath.State.MicStatus ? 'white' : 'red';
                 },
 
-                switchCam: async () => {
-                    App.State.Facing = App.State.Facing === "user" ? "environment" : "user";
-                    if (App.State.Stream) {
-                        App.State.Stream.getTracks().forEach(t => t.stop());
-                        App.State.Stream = await navigator.mediaDevices.getUserMedia({
-                            video: { facingMode: App.State.Facing },
+                flipCamera: async () => {
+                    Goliath.State.FacingMode = Goliath.State.FacingMode === 'user' ? 'environment' : 'user';
+                    if(Goliath.State.LocalStream) {
+                        Goliath.State.LocalStream.getTracks().forEach(t => t.stop());
+                        Goliath.State.LocalStream = await navigator.mediaDevices.getUserMedia({
+                            video: { facingMode: Goliath.State.FacingMode },
                             audio: true
                         });
-                        document.getElementById('local-video').srcObject = App.State.Stream;
-                        const videoTrack = App.State.Stream.getVideoTracks()[0];
-                        const sender = App.State.RTC.getSenders().find(s => s.track.kind === "video");
-                        if (sender) sender.replaceTrack(videoTrack);
+                        document.getElementById('local-v').srcObject = Goliath.State.LocalStream;
+                        const vTrack = Goliath.State.LocalStream.getVideoTracks()[0];
+                        const sender = Goliath.State.RTC.getSenders().find(s => s.track.kind === 'video');
+                        if(sender) sender.replaceTrack(vTrack);
                     }
                 }
             }
         };
 
-        // ГЛОБАЛЬНЫЙ СЛУШАТЕЛЬ СОСТОЯНИЯ AUTH
+        // LIFECYCLE CONTROLLER
         onAuthStateChanged(AUTH, user => {
-            if (user) {
-                onValue(ref(DB, `v20/users/${user.uid}`), snap => {
-                    App.State.Me = snap.val();
-                    if (App.State.Me) {
-                        App.Nav.go('hub');
-                        App.Hub.init();
-                        App.Call.listen();
-                        // Статус онлайн
-                        const statusRef = ref(DB, `v20/status/${user.uid}`);
-                        set(statusRef, "online");
-                        onDisconnect(statusRef).set("offline");
+            if(user) {
+                onValue(ref(DB, `v25/users/${user.uid}`), snap => {
+                    Goliath.State.Me = snap.val();
+                    if(Goliath.State.Me) {
+                        Goliath.Nav.go('hub');
+                        Goliath.Hub.init();
+                        Goliath.Call.listen();
+                        const stRef = ref(DB, `v25/status/${user.uid}`);
+                        set(stRef, "online");
+                        onDisconnect(stRef).set("offline");
                     }
                 });
-            } else {
-                App.Nav.go('auth');
-            }
+            } else { Goliath.Nav.go('auth'); }
         });
 
-        console.log("[SYSTEM] TITAN MONOLITH CORE INITIALIZED");
+        Goliath.Log("CORE v25.0 FULLY OPERATIONAL");
     </script>
 </body>
 </html>
