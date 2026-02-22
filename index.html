@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Morozov Ultra v15.5 | FULL RECOVERY</title>
+    <title>ULTRA v16.1 | FULL INFRASTRUCTURE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -19,170 +18,127 @@
             --u-green: #3fb950;
         }
 
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        
         body, html { 
-            height: 100%; width: 100%; margin: 0; padding: 0; 
-            background: var(--u-bg); color: #c9d1d9; 
-            font-family: 'Inter', sans-serif; overflow: hidden;
+            background: var(--u-bg); 
+            color: #c9d1d9; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 0; height: 100vh; overflow: hidden;
         }
 
-        /* --- SCREENS --- */
-        .u-screen {
-            position: fixed; inset: 0; display: none; flex-direction: column;
-            background: var(--u-bg); z-index: 10;
-        }
+        /* Экраны */
+        .u-screen { position: fixed; inset: 0; display: none; flex-direction: column; background: var(--u-bg); z-index: 10; }
         .u-screen.active { display: flex; z-index: 100; }
 
-        /* --- UI ELEMENTS --- */
-        .titan-input {
-            width: 100%;
-            padding: 22px;
+        /* Поля ввода и кнопки */
+        .u-input {
             background: #010409;
             border: 1px solid var(--u-border);
-            border-radius: 24px;
-            color: white;
-            font-size: 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .titan-input:focus { border-color: var(--u-accent); box-shadow: 0 0 20px rgba(47, 129, 247, 0.2); }
-
-        .titan-btn {
-            background: var(--u-accent);
-            color: white;
-            border-radius: 24px;
-            font-weight: 900;
             padding: 22px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border-radius: 24px;
+            color: white;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+        .u-input:focus { border-color: var(--u-accent); }
+
+        .u-btn {
+            padding: 20px;
+            border-radius: 24px;
+            font-weight: 800;
+            color: white;
             border: none;
             cursor: pointer;
-            transition: 0.3s;
+            text-transform: uppercase;
+            transition: transform 0.2s, background 0.3s;
         }
-        .titan-btn:active { transform: scale(0.96); }
+        .u-btn:active { transform: scale(0.95); }
+        .btn-primary { background: var(--u-accent); }
+        .btn-secondary { background: transparent; border: 2px solid var(--u-border); color: #8b949e; }
 
-        /* --- CHAT ELEMENTS --- */
-        .bubble {
-            max-width: 80%;
-            padding: 14px 20px;
-            border-radius: 22px;
-            font-size: 15px;
-            line-height: 1.5;
-            position: relative;
-        }
-        .bubble-me { align-self: flex-end; background: var(--u-accent); color: white; border-bottom-right-radius: 4px; }
-        .bubble-he { align-self: flex-start; background: var(--u-surf); border: 1px solid var(--u-border); border-bottom-left-radius: 4px; }
+        /* Чат и видео */
+        .bubble { max-width: 80%; padding: 15px 20px; border-radius: 25px; font-size: 15px; margin-bottom: 8px; }
+        .bubble-me { align-self: flex-end; background: var(--u-accent); border-bottom-right-radius: 5px; }
+        .bubble-he { align-self: flex-start; background: var(--u-surf); border: 1px solid var(--u-border); border-bottom-left-radius: 5px; }
 
-        /* --- STICKERS --- */
-        .sticker-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            padding: 20px;
-            background: var(--u-surf);
-            border-top: 1px solid var(--u-border);
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
-        }
-        .sticker-grid.open { max-height: 300px; }
-        .sticker-item { font-size: 32px; cursor: pointer; text-align: center; transition: 0.2s; }
-        .sticker-item:hover { transform: scale(1.2); }
-
-        /* --- CALL UI --- */
-        .call-container { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; }
-        #v-remote { width: 100%; height: 100%; object-fit: cover; }
-        #v-local { 
+        #video-grid { position: fixed; inset: 0; background: black; z-index: 1000; display: none; }
+        #remote-stream { width: 100%; height: 100%; object-fit: cover; }
+        #local-stream { 
             position: absolute; top: 40px; right: 20px; 
             width: 120px; height: 180px; border-radius: 20px; 
-            border: 2px solid rgba(255,255,255,0.2); object-fit: cover; background: #111;
+            border: 2px solid rgba(255,255,255,0.2); object-fit: cover;
         }
-        .call-controls {
-            position: absolute; bottom: 50px; left: 0; width: 100%;
-            display: flex; justify-content: center; gap: 30px;
-        }
-        .ctrl-btn {
-            width: 70px; height: 70px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; color: white; background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
-        }
-        .hangup { background: var(--u-red); border: none; }
     </style>
 </head>
 <body>
 
     <div id="scr-gate" class="u-screen active justify-center items-center px-10">
-        <div class="w-full max-w-md">
-            <h1 class="text-6xl font-black italic text-center mb-10 tracking-tighter">ULTRA <span class="text-blue-500">TITAN</span></h1>
-            <div class="bg-[var(--u-surf)] p-8 rounded-[40px] border border-[var(--u-border)] space-y-4">
-                <input id="in-email" type="email" placeholder="Email Address" class="titan-input">
-                <input id="in-pass" type="password" placeholder="Secure Password" class="titan-input">
-                <input id="in-id" type="text" placeholder="Уникальный ID (например: egor_x)" class="titan-input">
-                <button onclick="runAuth()" class="titan-btn w-full mt-4">Initialize Identity</button>
+        <div class="w-full max-w-sm text-center">
+            <h1 class="text-6xl font-black italic mb-10 tracking-tighter text-white">ULTRA <span class="text-blue-500">TITAN</span></h1>
+            
+            <div class="bg-[var(--u-surf)] p-8 rounded-[40px] border border-[var(--u-border)] shadow-2xl">
+                <input id="auth-email" type="email" placeholder="Email Address" class="u-input">
+                <input id="auth-pass" type="password" placeholder="Password" class="u-input">
+                <input id="auth-nick" type="text" placeholder="Придумай ID (для регистрации)" class="u-input">
+                
+                <div class="flex flex-col gap-3 mt-4">
+                    <button onclick="handleAuth('login')" class="u-btn btn-primary w-full">ВОЙТИ (Login)</button>
+                    <button onclick="handleAuth('register')" class="u-btn btn-secondary w-full text-xs">СОЗДАТЬ АККАУНТ (Register)</button>
+                </div>
+                
+                <p id="auth-log" class="text-red-500 mt-6 text-[10px] font-black uppercase tracking-widest"></p>
             </div>
-            <p id="auth-error" class="text-red-500 text-center mt-6 text-sm font-bold uppercase"></p>
         </div>
     </div>
 
     <div id="scr-main" class="u-screen">
-        <header class="h-24 px-8 flex items-center justify-between border-b border-[var(--u-border)] bg-[var(--u-surf)]">
+        <header class="p-8 border-b border-[var(--u-border)] flex justify-between items-center bg-[var(--u-surf)]">
             <div>
-                <h2 class="font-black text-2xl italic">TITAN CORE</h2>
-                <span id="display-my-id" class="text-[10px] font-mono text-blue-500 uppercase tracking-widest">ID: ...</span>
+                <b class="text-2xl italic text-white">TITAN HUB</b>
+                <div id="my-id-label" class="text-blue-500 text-[10px] font-bold uppercase mt-1">ID: ...</div>
             </div>
-            <button onclick="searchFriend()" class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg shadow-blue-600/20">
-                <i class="fas fa-plus"></i>
+            <button onclick="addFriendProcess()" class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-plus text-xl"></i>
             </button>
         </header>
-        <div id="friend-list" class="flex-1 overflow-y-auto p-8 space-y-4"></div>
+        <div id="friends-container" class="flex-1 overflow-y-auto p-8 space-y-4"></div>
     </div>
 
     <div id="scr-chat" class="u-screen">
-        <header class="h-24 px-8 flex items-center gap-5 border-b border-[var(--u-border)] bg-[var(--u-surf)]">
-            <button onclick="nav('main')" class="text-2xl opacity-30"><i class="fas fa-arrow-left"></i></button>
+        <header class="p-6 border-b border-[var(--u-border)] flex items-center gap-5 bg-[var(--u-surf)]">
+            <button onclick="nav('main')" class="text-2xl opacity-40"><i class="fas fa-arrow-left"></i></button>
             <div class="flex-1">
-                <h3 id="chat-title" class="font-black text-xl">Agent</h3>
-                <div id="chat-status" class="flex items-center gap-2">
-                    <div id="status-dot" class="w-2 h-2 rounded-full bg-gray-600"></div>
-                    <span id="status-text" class="text-[10px] uppercase font-bold opacity-40">Offline</span>
-                </div>
+                <b id="chat-user-name" class="text-xl">Agent</b>
+                <div id="online-status" class="text-[9px] uppercase font-bold text-gray-500">Connecting...</div>
             </div>
             <div class="flex gap-4">
-                <button onclick="initiateCall(false)" class="w-12 h-12 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center"><i class="fas fa-phone"></i></button>
-                <button onclick="initiateCall(true)" class="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center"><i class="fas fa-video"></i></button>
+                <button onclick="startCallSession(false)" class="w-12 h-12 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center"><i class="fas fa-phone"></i></button>
+                <button onclick="startCallSession(true)" class="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center"><i class="fas fa-video"></i></button>
             </div>
         </header>
 
-        <div id="message-feed" class="flex-1 overflow-y-auto p-6 flex flex-col gap-3"></div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-6 flex flex-col"></div>
 
-        <div id="stickers" class="sticker-grid">
-            <div class="sticker-item" onclick="pushSticker('🔥')">🔥</div>
-            <div class="sticker-item" onclick="pushSticker('💀')">💀</div>
-            <div class="sticker-item" onclick="pushSticker('👻')">👻</div>
-            <div class="sticker-item" onclick="pushSticker('👽')">👽</div>
-            <div class="sticker-item" onclick="pushSticker('🤡')">🤡</div>
-            <div class="sticker-item" onclick="pushSticker('💎')">💎</div>
-            <div class="sticker-item" onclick="pushSticker('⚡')">⚡</div>
-            <div class="sticker-item" onclick="pushSticker('👑')">👑</div>
+        <div id="sticker-panel" class="hidden grid grid-cols-4 gap-4 p-6 bg-[var(--u-surf)] border-t border-[var(--u-border)]">
+            <span onclick="sendEmoji('🔥')" class="text-3xl cursor-pointer text-center">🔥</span>
+            <span onclick="sendEmoji('💀')" class="text-3xl cursor-pointer text-center">💀</span>
+            <span onclick="sendEmoji('👻')" class="text-3xl cursor-pointer text-center">👻</span>
+            <span onclick="sendEmoji('🤡')" class="text-3xl cursor-pointer text-center">🤡</span>
         </div>
 
-        <div class="p-6 bg-[var(--u-surf)] border-t border-[var(--u-border)] flex items-center gap-4 pb-10">
-            <button onclick="toggleStickers()" class="text-2xl opacity-40 hover:opacity-100 transition"><i class="far fa-face-grin-tears"></i></button>
-            <input id="msg-input" class="titan-input flex-1" placeholder="Type your message...">
-            <button onclick="handleSend()" class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-xl shadow-xl active:scale-90 transition">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+        <div class="p-6 bg-[var(--u-surf)] flex gap-4 items-center">
+            <button onclick="document.getElementById('sticker-panel').classList.toggle('hidden')" class="text-2xl opacity-40"><i class="far fa-face-smile"></i></button>
+            <input id="chat-input" class="u-input !mb-0 flex-1" placeholder="Type a message...">
+            <button onclick="sendMessage()" class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
-    <div id="call-ui" class="call-container">
-        <video id="v-remote" autoplay playsinline></video>
-        <video id="v-local" autoplay muted playsinline></video>
-        <div class="call-controls">
-            <button onclick="toggleMic()" id="mic-btn" class="ctrl-btn"><i class="fas fa-microphone"></i></button>
-            <button onclick="location.reload()" class="ctrl-btn hangup"><i class="fas fa-phone-slash"></i></button>
-            <button onclick="toggleCam()" id="cam-btn" class="ctrl-btn"><i class="fas fa-camera"></i></button>
+    <div id="video-grid">
+        <video id="remote-stream" autoplay playsinline></video>
+        <video id="local-stream" autoplay muted playsinline></video>
+        <div class="absolute bottom-12 left-0 w-full flex justify-center gap-8">
+            <button onclick="location.reload()" class="w-20 h-20 bg-red-600 rounded-full text-white text-3xl shadow-2xl"><i class="fas fa-phone-slash"></i></button>
         </div>
     </div>
 
@@ -191,8 +147,7 @@
         import { getDatabase, ref, set, push, onValue, get, update, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // CONFIG (Используем твой текущий проект)
-        const fbConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
@@ -200,135 +155,114 @@
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        const app = initializeApp(fbConfig);
+        const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        let currentUser = null;
-        let activePartner = null;
-        let activeRoomId = null;
-        let rtcConnection = null;
-        let localMediaStream = null;
+        let userProfile = null;
+        let chatPartner = null;
+        let chatRoomId = null;
+        let peerConn = null;
+        let myStream = null;
 
-        // --- NAVIGATION SYSTEM ---
-        window.nav = (screenId) => {
+        // Навигация
+        window.nav = (id) => {
             document.querySelectorAll('.u-screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(`scr-${screenId}`).classList.add('active');
+            document.getElementById(`scr-${id}`).classList.add('active');
         };
 
-        // --- AUTHENTICATION LOGIC ---
-        window.runAuth = async () => {
-            const email = document.getElementById('in-email').value;
-            const pass = document.getElementById('in-pass').value;
-            const nick = document.getElementById('in-id').value.trim();
-            const err = document.getElementById('auth-error');
+        // --- ЛОГИКА ВХОДА И РЕГИСТРАЦИИ ---
+        window.handleAuth = async (mode) => {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            const nick = document.getElementById('auth-nick').value.trim();
+            const log = document.getElementById('auth-log');
 
-            if(!email || !pass || !nick) { err.innerText = "Error: Missing Fields"; return; }
+            if(!email || !pass) { log.innerText = "Error: Email & Pass required"; return; }
 
-            try {
-                // Пытаемся войти
-                const res = await signInWithEmailAndPassword(auth, email, pass);
-                console.log("Logged In");
-            } catch (e) {
-                // Если нет аккаунта - создаем
+            if (mode === 'login') {
+                try {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } catch (e) { log.innerText = "LOGIN FAILED: CHECK CREDENTIALS"; }
+            } else {
+                if(!nick) { log.innerText = "Error: Nickname required for registration"; return; }
                 try {
                     const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    // Регистрируем никнейм в системе поиска
-                    await set(ref(db, `v15/ids/${nick}`), res.user.uid);
-                    await set(ref(db, `v15/users/${res.user.uid}`), {
-                        id: nick,
-                        email: email,
-                        uid: res.user.uid,
-                        created: Date.now()
-                    });
-                } catch (e2) { err.innerText = "System Error: " + e2.code; }
+                    // Сохраняем ник
+                    await set(ref(db, `v16/ids/${nick}`), res.user.uid);
+                    await set(ref(db, `v16/users/${res.user.uid}`), { id: nick, uid: res.user.uid, email: email });
+                } catch (e) { log.innerText = "REGISTRATION FAILED: " + e.message; }
             }
         };
 
-        onAuthStateChanged(auth, (user) => {
-            if(user) {
-                currentUser = user;
-                // Получаем данные профиля (никнейм)
-                onValue(ref(db, `v15/users/${user.uid}`), (snap) => {
-                    const data = snap.val();
-                    if(data) {
-                        currentUser.customId = data.id;
-                        document.getElementById('display-my-id').innerText = `ID: ${data.id}`;
+        onAuthStateChanged(auth, u => {
+            if(u) {
+                onValue(ref(db, `v16/users/${u.uid}`), s => {
+                    userProfile = s.val();
+                    if(userProfile) {
+                        document.getElementById('my-id-label').innerText = "YOUR ID: " + userProfile.id;
                         nav('main');
-                        syncFriends();
-                        listenIncomingCalls();
-                        
-                        //Presence
-                        const statusRef = ref(db, `v15/status/${user.uid}`);
-                        set(statusRef, "online");
-                        onDisconnect(statusRef).set("offline");
+                        syncFriendList();
+                        listenForCalls();
+                        // Статус
+                        const st = ref(db, `v16/status/${u.uid}`);
+                        set(st, "online");
+                        onDisconnect(st).set("offline");
                     }
                 });
-            } else { nav('gate'); }
+            }
         });
 
-        // --- SOCIAL SYSTEM (ID SEARCH) ---
-        window.searchFriend = async () => {
-            const targetId = prompt("Enter Friend's ID (e.g., alex_ultra):");
-            if(!targetId || targetId === currentUser.customId) return;
-
-            const idRef = ref(db, `v15/ids/${targetId}`);
-            const snap = await get(idRef);
-
+        // --- ДОБАВЛЕНИЕ В ДР ПО ID ---
+        window.addFriendProcess = async () => {
+            const targetId = prompt("Enter Friend's ID:");
+            if(!targetId) return;
+            
+            const snap = await get(ref(db, `v16/ids/${targetId}`));
             if(snap.exists()) {
                 const targetUid = snap.val();
-                // Создаем взаимную связь
-                await update(ref(db, `v15/social/${currentUser.uid}/${targetUid}`), { uid: targetUid, id: targetId });
-                await update(ref(db, `v15/social/${targetUid}/${currentUser.uid}`), { uid: currentUser.uid, id: currentUser.customId });
-                alert("Success: Agent Linked!");
+                await update(ref(db, `v16/social/${userProfile.uid}/${targetUid}`), { id: targetId, uid: targetUid });
+                await update(ref(db, `v16/social/${targetUid}/${userProfile.uid}`), { id: userProfile.id, uid: userProfile.uid });
+                alert("FRIEND ADDED!");
             } else {
-                alert("Error: ID not found in Global Mesh");
+                alert("ID NOT FOUND");
             }
         };
 
-        function syncFriends() {
-            onValue(ref(db, `v15/social/${currentUser.uid}`), (snap) => {
-                const list = document.getElementById('friend-list');
-                list.innerHTML = "";
-                snap.forEach((child) => {
-                    const f = child.val();
-                    const card = document.createElement('div');
-                    card.className = "p-6 bg-[var(--u-surf)] rounded-[30px] border border-[var(--u-border)] flex justify-between items-center cursor-pointer active:scale-95 transition-all";
-                    card.innerHTML = `
-                        <div>
-                            <div class="font-black text-white text-lg">${f.id}</div>
-                            <div class="text-[9px] text-blue-500 font-bold uppercase tracking-widest mt-1">Ready to Connect</div>
-                        </div>
-                        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center opacity-20"><i class="fas fa-chevron-right"></i></div>
-                    `;
-                    card.onclick = () => openChannel(f);
-                    list.appendChild(card);
+        function syncFriendList() {
+            onValue(ref(db, `v16/social/${userProfile.uid}`), snap => {
+                const container = document.getElementById('friends-container');
+                container.innerHTML = "";
+                snap.forEach(child => {
+                    const d = child.val();
+                    const el = document.createElement('div');
+                    el.className = "p-6 bg-[var(--u-surf)] rounded-3xl border border-[var(--u-border)] flex justify-between items-center cursor-pointer active:scale-95 transition-all";
+                    el.innerHTML = `<div><b class="text-xl">${d.id}</b><p class="text-[10px] opacity-40">TITAN NODE ACTIVE</p></div><i class="fas fa-chevron-right opacity-20"></i>`;
+                    el.onclick = () => openChat(d);
+                    container.appendChild(el);
                 });
             });
         }
 
-        // --- CHAT SYSTEM ---
-        window.openChannel = (p) => {
-            activePartner = p;
-            activeRoomId = [currentUser.uid, p.uid].sort().join("_");
+        // --- ЧАТ ---
+        function openChat(p) {
+            chatPartner = p;
+            chatRoomId = [userProfile.uid, p.uid].sort().join("_");
             nav('chat');
-            document.getElementById('chat-title').innerText = p.id;
-
-            // Статус онлайна
-            onValue(ref(db, `v15/status/${p.uid}`), (snap) => {
-                const isOnline = snap.val() === "online";
-                document.getElementById('status-dot').style.background = isOnline ? "#3fb950" : "#484f58";
-                document.getElementById('status-text').innerText = isOnline ? "Online" : "Offline";
-                document.getElementById('status-text').style.color = isOnline ? "#3fb950" : "";
+            document.getElementById('chat-user-name').innerText = p.id;
+            
+            onValue(ref(db, `v16/status/${p.uid}`), s => {
+                const isOnline = s.val() === "online";
+                document.getElementById('online-status').innerText = isOnline ? "Online" : "Offline";
+                document.getElementById('online-status').style.color = isOnline ? "#3fb950" : "";
             });
 
-            // Загрузка сообщений
-            onValue(ref(db, `v15/rooms/${activeRoomId}`), (snap) => {
-                const feed = document.getElementById('message-feed');
+            onValue(ref(db, `v16/rooms/${chatRoomId}`), snap => {
+                const feed = document.getElementById('chat-messages');
                 feed.innerHTML = "";
-                snap.forEach((m) => {
+                snap.forEach(m => {
                     const d = m.val();
-                    const isMe = d.sid === currentUser.uid;
+                    const isMe = d.sid === userProfile.uid;
                     const div = document.createElement('div');
                     div.className = `bubble ${isMe ? 'bubble-me' : 'bubble-he'}`;
                     div.innerText = d.txt;
@@ -336,107 +270,68 @@
                 });
                 feed.scrollTop = feed.scrollHeight;
             });
-        };
+        }
 
-        window.handleSend = () => {
-            const inp = document.getElementById('msg-input');
-            const txt = inp.value.trim();
-            if(!txt) return;
-            push(ref(db, `v15/rooms/${activeRoomId}`), { sid: currentUser.uid, txt: txt, ts: Date.now() });
+        window.sendMessage = () => {
+            const inp = document.getElementById('chat-input');
+            const val = inp.value.trim();
+            if(!val) return;
+            push(ref(db, `v16/rooms/${chatRoomId}`), { sid: userProfile.uid, txt: val });
             inp.value = "";
         };
 
-        window.toggleStickers = () => document.getElementById('stickers').classList.toggle('open');
-
-        window.pushSticker = (emoji) => {
-            push(ref(db, `v15/rooms/${activeRoomId}`), { sid: currentUser.uid, txt: emoji, type: 'sticker' });
-            toggleStickers();
+        window.sendEmoji = (emoji) => {
+            push(ref(db, `v16/rooms/${chatRoomId}`), { sid: userProfile.uid, txt: emoji });
+            document.getElementById('sticker-panel').classList.add('hidden');
         };
 
-        // --- WEBRTC TITAN CALL ENGINE ---
-        window.initiateCall = async (videoEnabled = true) => {
-            document.getElementById('call-ui').style.display = 'block';
-            
+        // --- ВИДЕОСВЯЗЬ (TITAN WEBRTC) ---
+        window.startCallSession = async (withVideo) => {
+            document.getElementById('video-grid').style.display = 'block';
             try {
-                localMediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: videoEnabled,
-                    audio: true
-                });
-                document.getElementById('v-local').srcObject = localMediaStream;
+                myStream = await navigator.mediaDevices.getUserMedia({ video: withVideo, audio: true });
+                document.getElementById('local-stream').srcObject = myStream;
 
-                rtcConnection = new RTCPeerConnection({
-                    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-                });
+                peerConn = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+                myStream.getTracks().forEach(track => peerConn.addTrack(track, myStream));
 
-                localMediaStream.getTracks().forEach(track => rtcConnection.addTrack(track, localMediaStream));
+                peerConn.ontrack = e => document.getElementById('remote-stream').srcObject = e.streams[0];
+                peerConn.onicecandidate = e => e.candidate && push(ref(db, `v16/calls/${chatPartner.uid}/ice`), e.candidate.toJSON());
 
-                rtcConnection.ontrack = (event) => {
-                    document.getElementById('v-remote').srcObject = event.streams[0];
-                };
-
-                rtcConnection.onicecandidate = (event) => {
-                    if(event.candidate) {
-                        push(ref(db, `v15/calls/${activePartner.uid}/ice`), event.candidate.toJSON());
-                    }
-                };
-
-                const offer = await rtcConnection.createOffer();
-                await rtcConnection.setLocalDescription(offer);
-
-                await set(ref(db, `v15/calls/${activePartner.uid}/signal`), {
+                const offer = await peerConn.createOffer();
+                await peerConn.setLocalDescription(offer);
+                
+                await set(ref(db, `v16/calls/${chatPartner.uid}/signal`), {
                     offer: offer,
-                    from: currentUser.uid,
-                    fromId: currentUser.customId,
-                    isVideo: videoEnabled
+                    from: userProfile.uid,
+                    fromId: userProfile.id,
+                    video: withVideo
                 });
 
-                onValue(ref(db, `v15/calls/${activePartner.uid}/answer`), async (snap) => {
-                    if(snap.val() && !rtcConnection.currentRemoteDescription) {
-                        await rtcConnection.setRemoteDescription(new RTCSessionDescription(snap.val()));
-                    }
+                onValue(ref(db, `v16/calls/${chatPartner.uid}/answer`), async snap => {
+                    if(snap.val()) await peerConn.setRemoteDescription(new RTCSessionDescription(snap.val()));
                 });
-
-            } catch (err) {
-                alert("Media Error: Please check camera permissions.");
-                location.reload();
-            }
+            } catch (err) { alert("ERROR: Camera blocked!"); location.reload(); }
         };
 
-        function listenIncomingCalls() {
-            onValue(ref(db, `v15/calls/${currentUser.uid}/signal`), async (snap) => {
+        function listenForCalls() {
+            onValue(ref(db, `v16/calls/${userProfile.uid}/signal`), async snap => {
                 const data = snap.val();
-                if(data && data.offer && !rtcConnection) {
-                    if(confirm("Incoming Call from " + data.fromId)) {
-                        activePartner = { uid: data.from, id: data.fromId };
-                        await initiateCall(data.isVideo);
-                        await rtcConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-                        const answer = await rtcConnection.createAnswer();
-                        await rtcConnection.setLocalDescription(answer);
-                        await set(ref(db, `v15/calls/${data.from}/answer`), answer);
-                        
-                        onValue(ref(db, `v15/calls/${currentUser.uid}/ice`), (iceSnap) => {
-                            iceSnap.forEach(c => rtcConnection.addIceCandidate(new RTCIceCandidate(c.val())));
-                        });
+                if(data && !peerConn) {
+                    if(confirm("Call from " + data.fromId + "?")) {
+                        chatPartner = { uid: data.from, id: data.fromId };
+                        await startCallSession(data.video);
+                        await peerConn.setRemoteDescription(new RTCSessionDescription(data.offer));
+                        const answer = await peerConn.createAnswer();
+                        await peerConn.setLocalDescription(answer);
+                        set(ref(db, `v16/calls/${data.from}/answer`), answer);
+                        onValue(ref(db, `v16/calls/${userProfile.uid}/ice`), s => s.forEach(c => peerConn.addIceCandidate(new RTCIceCandidate(c.val()))));
                     } else {
-                        await remove(ref(db, `v15/calls/${currentUser.uid}`));
+                        remove(ref(db, `v16/calls/${userProfile.uid}`));
                     }
                 }
             });
         }
-
-        window.toggleMic = () => {
-            const track = localMediaStream.getAudioTracks()[0];
-            track.enabled = !track.enabled;
-            document.getElementById('mic-btn').style.background = track.enabled ? "" : "#f85149";
-        };
-
-        window.toggleCam = () => {
-            const track = localMediaStream.getVideoTracks()[0];
-            if(track) {
-                track.enabled = !track.enabled;
-                document.getElementById('cam-btn').style.background = track.enabled ? "" : "#f85149";
-            }
-        };
     </script>
 </body>
 </html>
