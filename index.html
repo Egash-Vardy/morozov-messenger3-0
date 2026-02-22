@@ -3,236 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ULTRA v25.0 | GOLIATH CORE</title>
+    <title>ULTRA v27.0 | TITAN UNLIMITED</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-
+    
     <style>
         :root {
-            --bg-deep: #010204;
-            --bg-surf: #0d1117;
-            --bg-line: #30363d;
-            --accent: #2f81f7;
-            --accent-glow: rgba(47, 129, 247, 0.4);
-            --danger: #f85149;
-            --success: #3fb950;
-            --text-p: #c9d1d9;
-            --text-s: #8b949e;
+            --background-color: #010204;
+            --surface-color: #0d1117;
+            --border-color: #30363d;
+            --accent-color: #2f81f7;
+            --success-color: #3fb950;
+            --danger-color: #f85149;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
         }
 
-        /* ГЛОБАЛЬНЫЕ СТИЛИ */
-        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; scrollbar-width: none; }
-        ::-webkit-scrollbar { display: none; }
-        
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            scrollbar-width: none;
+        }
+
         body {
-            background-color: var(--bg-deep);
-            color: var(--text-p);
-            font-family: 'Inter', sans-serif;
-            margin: 0; overflow: hidden; height: 100vh; width: 100vw;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
         }
 
-        /* АНИМАЦИИ ПЕРЕХОДОВ */
-        .page {
-            position: fixed; inset: 0;
-            display: none; flex-direction: column;
-            background: var(--bg-deep);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Система экранов (Pages) */
+        .app-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            flex-direction: column;
+            background: var(--background-color);
             z-index: 10;
         }
-        .page.active { display: flex; animation: slideIn 0.3s ease-out; }
 
-        @keyframes slideIn {
-            from { transform: translateX(30px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .app-screen.active {
+            display: flex;
+            z-index: 100;
         }
 
-        /* ЭЛЕМЕНТЫ ВВОДА (INDUSTRIAL DESIGN) */
-        .g-input {
-            background: rgba(0,0,0,0.3);
-            border: 2px solid var(--bg-line);
-            padding: 22px;
-            border-radius: 20px;
+        /* Поля ввода (Inputs) */
+        .titan-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 18px;
             color: white;
             font-size: 16px;
             width: 100%;
             outline: none;
-            transition: 0.3s;
-        }
-        .g-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
-            background: var(--bg-surf);
+            transition: all 0.3s ease;
         }
 
-        /* КНОПКИ GOLIATH */
-        .g-btn {
-            background: var(--accent);
+        .titan-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(47, 129, 247, 0.2);
+        }
+
+        /* Кнопки (Buttons) */
+        .titan-button {
+            background: var(--accent-color);
             color: white;
-            padding: 22px;
-            border-radius: 20px;
+            padding: 20px;
+            border-radius: 18px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             border: none;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
+            transition: all 0.2s ease;
+            width: 100%;
         }
-        .g-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
-        .g-btn:active { transform: translateY(0) scale(0.98); }
 
-        /* ЧАТ БАБЛЫ (ПРОДВИНУТЫЕ) */
-        .message-row { display: flex; width: 100%; margin-bottom: 16px; flex-direction: column; }
-        .m-me { align-items: flex-end; }
-        .m-he { align-items: flex-start; }
+        .titan-button:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
 
-        .bubble {
-            max-width: 75%;
+        /* Чат компоненты */
+        .message-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message-bubble {
+            max-width: 80%;
             padding: 16px 20px;
             border-radius: 24px;
             font-size: 15px;
+            line-height: 1.5;
             position: relative;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            word-wrap: break-word;
         }
-        .b-me { background: var(--accent); border-bottom-right-radius: 4px; }
-        .b-he { background: var(--bg-surf); border: 1px solid var(--bg-line); border-bottom-left-radius: 4px; }
 
-        /* МЕДИА ГАЛЕРЕЯ */
-        .media-box {
-            margin-top: 10px;
-            border-radius: 18px;
-            overflow: hidden;
-            background: #000;
-            border: 1px solid var(--bg-line);
+        .bubble-me {
+            align-self: flex-end;
+            background: var(--accent-color);
+            color: white;
+            border-bottom-right-radius: 4px;
         }
-        .media-box img, .media-box video { max-width: 100%; display: block; }
 
-        /* ВИДЕО ЗВОНОК (GOLIATH ENGINE) */
-        #call-stage {
-            position: fixed; inset: 0;
+        .bubble-peer {
+            align-self: flex-start;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        .media-attachment {
+            border-radius: 16px;
+            margin-top: 8px;
+            max-width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: black;
+        }
+
+        /* Интерфейс видеозвонка */
+        #video-call-overlay {
+            position: fixed;
+            inset: 0;
             background: #000;
-            z-index: 10000;
+            z-index: 1000;
             display: none;
         }
-        #remote-v { width: 100%; height: 100%; object-fit: cover; }
-        #local-v {
-            position: absolute; top: 40px; right: 20px;
-            width: 130px; height: 200px;
-            border-radius: 24px; border: 2px solid rgba(255,255,255,0.4);
-            object-fit: cover; z-index: 10001;
-            background: #111;
+
+        #remote-video-stream {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #local-video-preview {
+            position: absolute;
+            top: 40px;
+            right: 20px;
+            width: 120px;
+            height: 180px;
+            border-radius: 20px;
+            border: 2px solid white;
+            object-fit: cover;
+            z-index: 1001;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .call-hud {
-            position: absolute; bottom: 50px; left: 0; width: 100%;
-            display: flex; justify-content: center; gap: 25px;
-            z-index: 10002;
-        }
-        .hud-btn {
-            width: 70px; height: 70px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 26px; color: white; background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(15px);
-        }
-        .btn-hang { background: var(--danger) !important; }
 
-        /* ДЕБАГ КОНСОЛЬ */
-        #debug-log {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            height: 120px; background: rgba(0,0,0,0.8);
-            color: #3fb950; font-family: 'JetBrains Mono';
-            font-size: 10px; padding: 10px; overflow-y: auto;
-            z-index: 999; border-top: 1px solid var(--bg-line);
-            pointer-events: none; opacity: 0.6;
+        .call-controls-bar {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            z-index: 1002;
+        }
+
+        .control-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-hangup {
+            background: var(--danger-color);
         }
     </style>
 </head>
 <body>
 
-    <div id="debug-log">SYSTEM BOOTING...</div>
-
-    <section id="scr-auth" class="page active justify-center items-center px-8">
-        <div class="w-full max-w-md text-center">
-            <div class="mb-10">
-                <h1 class="text-6xl font-black italic tracking-tighter text-white">GOLIATH <span class="text-blue-500">X</span></h1>
-                <p class="text-xs text-gray-500 mt-2 font-bold uppercase tracking-[0.3em]">Titan Mesh v25.0 Enterprise</p>
-            </div>
-
-            <div class="bg-[var(--bg-surf)] p-10 rounded-[45px] border border-[var(--bg-line)] shadow-2xl">
+    <div id="screen-auth" class="app-screen active justify-center items-center px-8">
+        <div class="w-full max-w-sm text-center">
+            <h1 class="text-6xl font-black italic mb-10 tracking-tighter">TITAN <span class="text-blue-500">27</span></h1>
+            
+            <div class="bg-[var(--surface-color)] p-8 rounded-[40px] border border-[var(--border-color)] shadow-2xl">
                 <div class="space-y-4">
-                    <input id="auth-email" type="email" placeholder="Email Node" class="g-input" value="egorkamorozoff2014@gmail.com">
-                    <input id="auth-pass" type="password" placeholder="Access Code" class="g-input">
-                    <input id="auth-nick" type="text" placeholder="Identity Label (ID)" class="g-input">
+                    <input id="auth-email" type="email" placeholder="Email (egor@mail.ru)" class="titan-input" value="egorkamorozoff2014@gmail.com">
+                    <input id="auth-password" type="password" placeholder="Пароль" class="titan-input">
+                    <input id="auth-nickname" type="text" placeholder="Уникальный ID (для новых)" class="titan-input">
                 </div>
-
-                <button id="auth-execute" onclick="Goliath.Auth.process()" class="g-btn w-full mt-8 shadow-xl shadow-blue-500/20">
-                    Initialize Core
+                
+                <button id="auth-button" onclick="TitanEngine.Auth.execute()" class="titan-button mt-8 shadow-xl shadow-blue-500/20">
+                    Войти в Mesh
                 </button>
                 
-                <div id="auth-status" class="mt-6 text-[10px] font-black uppercase text-gray-600 tracking-widest">Awaiting Input</div>
+                <p id="auth-status-label" class="text-[10px] font-bold uppercase mt-6 text-gray-500 tracking-[0.2em]">Система готова</p>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section id="scr-hub" class="page">
-        <header class="p-8 flex justify-between items-center bg-[var(--bg-surf)]/50 border-b border-[var(--bg-line)]">
+    <div id="screen-hub" class="app-screen">
+        <header class="p-8 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--surface-color)]">
             <div>
-                <h2 class="text-2xl font-black italic">MESH HUB</h2>
-                <div id="my-identity" class="text-[10px] text-blue-500 font-mono mt-1 uppercase">NODE: LOADING...</div>
+                <b class="text-2xl font-black italic uppercase">Центральный Хаб</b>
+                <div id="user-identity-display" class="text-blue-500 text-[10px] font-mono mt-1 uppercase">ID: Подключение...</div>
             </div>
-            <button onclick="Goliath.Hub.addAgent()" class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg"><i class="fas fa-plus"></i></button>
+            <button onclick="TitanEngine.Social.addNewContact()" class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-plus text-white"></i>
+            </button>
         </header>
-
-        <div id="agent-list" class="flex-1 overflow-y-auto p-8 space-y-4">
+        
+        <div id="contacts-container" class="flex-1 overflow-y-auto p-8 space-y-4">
             </div>
+    </div>
 
-        <div class="p-4 flex justify-center border-t border-[var(--bg-line)] bg-[var(--bg-surf)]">
-            <button onclick="location.reload()" class="text-[10px] font-black text-gray-600 uppercase tracking-widest">Secure Logout</button>
-        </div>
-    </section>
-
-    <section id="scr-chat" class="page">
-        <header class="p-6 border-b border-[var(--bg-line)] flex items-center gap-6 bg-[var(--bg-surf)]">
-            <button onclick="Goliath.Nav.go('hub')" class="text-2xl opacity-40"><i class="fas fa-arrow-left"></i></button>
+    <div id="screen-chat" class="app-screen">
+        <header class="p-6 border-b border-[var(--border-color)] flex items-center gap-6 bg-[var(--surface-color)]">
+            <button onclick="TitanEngine.Navigation.switch('hub')" class="text-2xl opacity-40 hover:opacity-100 transition">
+                <i class="fas fa-arrow-left"></i>
+            </button>
             <div class="flex-1">
-                <h3 id="target-id" class="text-xl font-bold">Agent</h3>
-                <div id="target-status" class="text-[9px] font-black text-gray-600 uppercase tracking-tighter italic">Syncing...</div>
+                <b id="chat-partner-name" class="text-xl font-bold">Загрузка...</b>
+                <div id="chat-partner-status" class="text-[9px] font-black uppercase text-gray-500 tracking-tighter">Синхронизация</div>
             </div>
-            <div class="flex gap-3">
-                <button onclick="Goliath.Call.initiate(false)" class="w-12 h-12 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center"><i class="fas fa-phone-alt"></i></button>
-                <button onclick="Goliath.Call.initiate(true)" class="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center"><i class="fas fa-video"></i></button>
-            </div>
-        </header>
-
-        <div id="chat-feed" class="flex-1 overflow-y-auto p-8 flex flex-col">
-            </div>
-
-        <div class="p-8 bg-[var(--bg-surf)] border-t border-[var(--bg-line)] pb-12">
-            <div class="flex gap-4 items-center">
-                <button onclick="document.getElementById('media-ptr').click()" class="text-2xl opacity-30 hover:opacity-100 transition"><i class="fas fa-paperclip"></i></button>
-                <input type="file" id="media-ptr" class="hidden" accept="image/*,video/*" onchange="Goliath.Chat.sendMedia(this)">
-                
-                <input id="chat-input" class="g-input !p-5 !mb-0 flex-1" placeholder="Type encrypted signal...">
-                
-                <button id="msg-send-btn" onclick="Goliath.Chat.sendText()" class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl">
-                    <i class="fas fa-paper-plane text-xl"></i>
+            <div class="flex gap-4">
+                <button onclick="TitanEngine.Media.initiateCall(false)" class="w-12 h-12 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-phone-alt"></i>
+                </button>
+                <button onclick="TitanEngine.Media.initiateCall(true)" class="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-video"></i>
                 </button>
             </div>
-        </div>
-    </section>
+        </header>
 
-    <div id="call-stage">
-        <video id="remote-v" autoplay playsinline></video>
-        <video id="local-v" autoplay muted playsinline></video>
+        <div id="chat-messages-feed" class="message-feed">
+            </div>
+
+        <div class="p-6 bg-[var(--surface-color)] border-t border-[var(--border-color)] flex gap-4 items-center pb-12">
+            <button onclick="document.getElementById('media-upload-input').click()" class="text-2xl opacity-30 hover:opacity-100 transition">
+                <i class="fas fa-paperclip"></i>
+            </button>
+            <input type="file" id="media-upload-input" class="hidden" accept="image/*,video/*" onchange="TitanEngine.Media.handleFileUpload(this)">
+            
+            <input id="chat-message-input" class="titan-input !p-5 !mb-0 flex-1" placeholder="Ваше сообщение...">
+            
+            <button onclick="TitanEngine.Chat.sendMessage()" class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl">
+                <i class="fas fa-paper-plane text-xl text-white"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="video-call-overlay">
+        <video id="remote-video-stream" autoplay playsinline></video>
+        <video id="local-video-preview" autoplay muted playsinline></video>
         
-        <div class="call-hud">
-            <button onclick="Goliath.Call.toggleMic()" id="mic-toggle" class="hud-btn"><i class="fas fa-microphone"></i></button>
-            <button onclick="Goliath.Call.flipCamera()" class="hud-btn"><i class="fas fa-camera-rotate"></i></button>
-            <button onclick="location.reload()" class="hud-btn btn-hang"><i class="fas fa-phone-slash"></i></button>
+        <div class="call-controls-bar">
+            <button onclick="TitanEngine.Media.toggleMicrophone()" id="call-mic-btn" class="control-btn">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button onclick="TitanEngine.Media.flipCamera()" class="control-btn">
+                <i class="fas fa-camera-rotate"></i>
+            </button>
+            <button onclick="location.reload()" class="control-btn btn-hangup">
+                <i class="fas fa-phone-slash"></i>
+            </button>
         </div>
     </div>
 
@@ -240,10 +288,10 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, get, update, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // КОНФИГ
-        const G_CONFIG = {
+        // Конфигурация Firebase
+        const firebaseConfig = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
@@ -252,273 +300,383 @@
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        const FB_APP = initializeApp(G_CONFIG);
-        const DB = getDatabase(FB_APP);
-        const AUTH = getAuth(FB_APP);
-        const ST = getStorage(FB_APP);
+        // Инициализация сервисов
+        const firebaseApp = initializeApp(firebaseConfig);
+        const database = getDatabase(firebaseApp);
+        const firebaseAuth = getAuth(firebaseApp);
+        const firebaseStorage = getStorage(firebaseApp);
 
-        // ОБЪЕКТ GOLIATH - ЯДРО СИСТЕМЫ
-        window.Goliath = {
+        // Объект управления TitanEngine
+        window.TitanEngine = {
             State: {
-                Me: null,
-                ActivePeer: null,
-                RoomId: null,
-                RTC: null,
-                LocalStream: null,
-                FacingMode: 'user',
-                MicStatus: true
+                CurrentUser: null,
+                ActivePartner: null,
+                CurrentRoom: null,
+                RTCPeer: null,
+                LocalMediaStream: null,
+                CameraMode: 'user',
+                MicrophoneActive: true
             },
 
-            Log: (msg) => {
-                const el = document.getElementById('debug-log');
-                el.innerHTML += `> [${new Date().toLocaleTimeString()}] ${msg}<br>`;
-                el.scrollTop = el.scrollHeight;
-                console.log("[GOLIATH]", msg);
-            },
-
-            Nav: {
-                go: (id) => {
-                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                    document.getElementById(`scr-${id}`).classList.add('active');
-                    Goliath.Log("NAV TO: " + id);
+            Navigation: {
+                switch: (screenId) => {
+                    document.querySelectorAll('.app-screen').forEach(screen => screen.classList.remove('active'));
+                    document.getElementById(`screen-${screenId}`).classList.add('active');
                 }
             },
 
             Auth: {
-                process: async () => {
-                    const e = document.getElementById('auth-email').value;
-                    const p = document.getElementById('auth-pass').value;
-                    const n = document.getElementById('auth-nick').value.trim();
-                    const st = document.getElementById('auth-status');
+                execute: async () => {
+                    const emailValue = document.getElementById('auth-email').value;
+                    const passwordValue = document.getElementById('auth-password').value;
+                    const nicknameValue = document.getElementById('auth-nickname').value.trim();
+                    const statusLabel = document.getElementById('auth-status-label');
 
-                    if(!e || !p) { st.innerText = "ACCESS DENIED: EMPTY FIELDS"; return; }
-                    st.innerText = "INITIATING HANDSHAKE...";
+                    if (!emailValue || !passwordValue) {
+                        statusLabel.innerText = "ОШИБКА: ЗАПОЛНИТЕ ПОЛЯ";
+                        return;
+                    }
 
+                    statusLabel.innerText = "ПОДКЛЮЧЕНИЕ К СЕРВЕРУ...";
+                    
                     try {
-                        await signInWithEmailAndPassword(AUTH, e, p);
-                    } catch (err) {
-                        if(err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-                            if(!n) { st.innerText = "ID REQUIRED FOR REGISTRATION"; return; }
+                        // Сначала пробуем войти
+                        await signInWithEmailAndPassword(firebaseAuth, emailValue, passwordValue);
+                        statusLabel.innerText = "ВХОД ВЫПОЛНЕН";
+                    } catch (error) {
+                        // Если аккаунта нет - регистрируем
+                        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                            if (!nicknameValue) {
+                                statusLabel.innerText = "НУЖЕН ID ДЛЯ НОВОГО АККАУНТА";
+                                return;
+                            }
+                            
+                            statusLabel.innerText = "РЕГИСТРАЦИЯ НОВОГО УЗЛА...";
                             try {
-                                const res = await createUserWithEmailAndPassword(AUTH, e, p);
-                                await set(ref(DB, `v25/users/${res.user.uid}`), { id: n, uid: res.user.uid, ts: Date.now() });
-                                await set(ref(DB, `v25/map/${n}`), res.user.uid);
-                                st.innerText = "CORE CREATED";
-                            } catch (e2) { st.innerText = "REG ERROR: " + e2.message; }
-                        } else { st.innerText = "AUTH ERROR: " + err.message; }
+                                const registrationResult = await createUserWithEmailAndPassword(firebaseAuth, emailValue, passwordValue);
+                                const userUid = registrationResult.user.uid;
+                                
+                                // Создаем записи в базе данных
+                                await set(ref(database, `v27/users/${userUid}`), {
+                                    id: nicknameValue,
+                                    uid: userUid,
+                                    registeredAt: Date.now()
+                                });
+                                
+                                await set(ref(database, `v27/id_map/${nicknameValue}`), userUid);
+                                statusLabel.innerText = "АККАУНТ СОЗДАН УСПЕШНО";
+                            } catch (regError) {
+                                statusLabel.innerText = "ОШИБКА РЕГИСТРАЦИИ: " + regError.message;
+                            }
+                        } else {
+                            statusLabel.innerText = "ОШИБКА АВТОРИЗАЦИИ: " + error.message;
+                        }
                     }
                 }
             },
 
-            Hub: {
-                init: () => {
-                    document.getElementById('my-identity').innerText = "NODE: " + Goliath.State.Me.id;
-                    Goliath.Hub.syncSocial();
-                    Goliath.Log("HUB SYNCHRONIZED");
+            Social: {
+                addNewContact: async () => {
+                    const targetNickname = prompt("Введите ID (ник) пользователя:");
+                    if (!targetNickname) return;
+
+                    const idSnapshot = await get(ref(database, `v27/id_map/${targetNickname}`));
+                    if (idSnapshot.exists()) {
+                        const targetUid = idSnapshot.val();
+                        
+                        // Добавляем друг другу в списки контактов
+                        await update(ref(database, `v27/social/${TitanEngine.State.CurrentUser.uid}/${targetUid}`), {
+                            id: targetNickname,
+                            uid: targetUid
+                        });
+                        
+                        await update(ref(database, `v27/social/${targetUid}/${TitanEngine.State.CurrentUser.uid}`), {
+                            id: TitanEngine.State.CurrentUser.id,
+                            uid: TitanEngine.State.CurrentUser.uid
+                        });
+                        
+                        alert("Контакт успешно добавлен!");
+                    } else {
+                        alert("Пользователь с таким ID не найден.");
+                    }
                 },
 
-                addAgent: async () => {
-                    const tid = prompt("ENTER TARGET NODE ID:");
-                    if(!tid) return;
-                    const snap = await get(ref(DB, `v25/map/${tid}`));
-                    if(snap.exists()){
-                        const tuid = snap.val();
-                        await update(ref(DB, `v25/social/${Goliath.State.Me.uid}/${tuid}`), { id: tid, uid: tuid });
-                        await update(ref(DB, `v25/social/${tuid}/${Goliath.State.Me.uid}`), { id: Goliath.State.Me.id, uid: Goliath.State.Me.uid });
-                        Goliath.Log("AGENT LINKED: " + tid);
-                    } else { alert("TARGET NOT FOUND IN MESH"); }
-                },
-
-                syncSocial: () => {
-                    onValue(ref(DB, `v25/social/${Goliath.State.Me.uid}`), snap => {
-                        const list = document.getElementById('agent-list');
-                        list.innerHTML = "";
-                        snap.forEach(c => {
-                            const d = c.val();
-                            const item = document.createElement('div');
-                            item.className = "p-6 bg-[var(--bg-surf)] rounded-[25px] border border-[var(--bg-line)] flex justify-between items-center active:scale-95 transition-all shadow-lg cursor-pointer";
-                            item.innerHTML = `
+                syncContacts: () => {
+                    const contactsRef = ref(database, `v27/social/${TitanEngine.State.CurrentUser.uid}`);
+                    onValue(contactsRef, (snapshot) => {
+                        const contactsContainer = document.getElementById('contacts-container');
+                        contactsContainer.innerHTML = "";
+                        
+                        snapshot.forEach((child) => {
+                            const contactData = child.val();
+                            const contactElement = document.createElement('div');
+                            contactElement.className = "p-6 bg-[var(--surface-color)] rounded-[30px] border border-[var(--border-color)] flex justify-between items-center active:scale-95 transition-all cursor-pointer shadow-lg";
+                            contactElement.innerHTML = `
                                 <div class="flex items-center gap-5">
-                                    <div class="w-14 h-14 bg-blue-600/10 rounded-2xl flex items-center justify-center text-blue-500 font-black text-xl">${d.id[0].toUpperCase()}</div>
-                                    <div><b class="text-white text-lg">${d.id}</b><p class="text-[9px] text-gray-500 font-bold uppercase mt-1">Ready for sync</p></div>
+                                    <div class="w-14 h-14 bg-blue-600/10 rounded-2xl flex items-center justify-center text-blue-500 font-black text-xl">
+                                        ${contactData.id[0].toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <b class="text-white text-lg">${contactData.id}</b>
+                                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Доступен</p>
+                                    </div>
                                 </div>
                                 <i class="fas fa-chevron-right opacity-20"></i>
                             `;
-                            item.onclick = () => Goliath.Chat.open(d);
-                            list.appendChild(item);
+                            contactElement.onclick = () => TitanEngine.Chat.openRoom(contactData);
+                            contactsContainer.appendChild(contactElement);
                         });
                     });
                 }
             },
 
             Chat: {
-                open: (peer) => {
-                    Goliath.State.ActivePeer = peer;
-                    Goliath.State.RoomId = [Goliath.State.Me.uid, peer.uid].sort().join("_");
-                    Goliath.Nav.go('chat');
-                    document.getElementById('target-id').innerText = peer.id;
-                    Goliath.Chat.listen();
+                openRoom: (partner) => {
+                    TitanEngine.State.ActivePartner = partner;
+                    TitanEngine.State.CurrentRoom = [TitanEngine.State.CurrentUser.uid, partner.uid].sort().join("_");
+                    
+                    TitanEngine.Navigation.switch('chat');
+                    document.getElementById('chat-partner-name').innerText = partner.id;
+                    
+                    TitanEngine.Chat.listenForMessages();
                 },
 
-                listen: () => {
-                    onValue(ref(DB, `v25/rooms/${Goliath.State.RoomId}`), snap => {
-                        const feed = document.getElementById('chat-feed');
+                listenForMessages: () => {
+                    const messagesRef = ref(database, `v27/rooms/${TitanEngine.State.CurrentRoom}`);
+                    onValue(messagesRef, (snapshot) => {
+                        const feed = document.getElementById('chat-messages-feed');
                         feed.innerHTML = "";
-                        snap.forEach(m => {
-                            const d = m.val();
-                            const isMe = d.sid === Goliath.State.Me.uid;
-                            let html = "";
-                            if(d.type === 'text') html = `<div class="bubble ${isMe ? 'b-me' : 'b-he'}">${d.txt}</div>`;
-                            else if(d.type === 'media') {
-                                const tag = d.fileType.includes('image') ? `<img src="${d.url}">` : `<video src="${d.url}" controls></video>`;
-                                html = `<div class="media-box ${isMe ? 'b-me' : 'b-he'}">${tag}</div>`;
+                        
+                        snapshot.forEach((messageChild) => {
+                            const message = messageChild.val();
+                            const isMe = message.senderId === TitanEngine.State.CurrentUser.uid;
+                            
+                            let messageContent = "";
+                            if (message.type === 'text') {
+                                messageContent = message.text;
+                            } else if (message.type === 'media') {
+                                if (message.fileMime.includes('image')) {
+                                    messageContent = `<img src="${message.fileUrl}" class="media-attachment" onclick="window.open('${message.fileUrl}')">`;
+                                } else {
+                                    messageContent = `<video src="${message.fileUrl}" controls class="media-attachment"></video>`;
+                                }
                             }
-                            feed.innerHTML += `<div class="message-row ${isMe ? 'm-me' : 'm-he'}">${html}</div>`;
+                            
+                            feed.innerHTML += `
+                                <div class="message-bubble ${isMe ? 'bubble-me' : 'bubble-peer'}">
+                                    ${messageContent}
+                                </div>
+                            `;
                         });
                         feed.scrollTop = feed.scrollHeight;
                     });
                 },
 
-                sendText: () => {
-                    const inp = document.getElementById('chat-input');
-                    if(!inp.value.trim()) return;
-                    push(ref(DB, `v25/rooms/${Goliath.State.RoomId}`), {
-                        sid: Goliath.State.Me.uid,
-                        txt: inp.value,
+                sendMessage: () => {
+                    const inputField = document.getElementById('chat-message-input');
+                    const text = inputField.value.trim();
+                    
+                    if (!text) return;
+                    
+                    const newMessageRef = push(ref(database, `v27/rooms/${TitanEngine.State.CurrentRoom}`));
+                    set(newMessageRef, {
+                        senderId: TitanEngine.State.CurrentUser.uid,
+                        text: text,
                         type: 'text',
-                        ts: Date.now()
+                        timestamp: Date.now()
                     });
-                    inp.value = "";
-                },
-
-                sendMedia: async (el) => {
-                    const file = el.files[0];
-                    if(!file) return;
-                    Goliath.Log("UPLOADING MEDIA...");
-                    const storageRef = sRef(ST, `v25/${Date.now()}_${file.name}`);
-                    try {
-                        await uploadBytes(storageRef, file);
-                        const url = await getDownloadURL(storageRef);
-                        push(ref(DB, `v25/rooms/${Goliath.State.RoomId}`), {
-                            sid: Goliath.State.Me.uid,
-                            url,
-                            type: 'media',
-                            fileType: file.type,
-                            ts: Date.now()
-                        });
-                        Goliath.Log("MEDIA TRANSMITTED");
-                    } catch (e) { alert("UPLOAD ERROR"); }
+                    
+                    inputField.value = "";
                 }
             },
 
-            Call: {
-                initiate: async (video) => {
-                    Goliath.Log("OPENING SIGNAL CHANNEL...");
-                    document.getElementById('call-stage').style.display = 'block';
+            Media: {
+                handleFileUpload: async (inputElement) => {
+                    const file = inputElement.files[0];
+                    if (!file) return;
+
+                    const fileId = Date.now() + "_" + file.name;
+                    const fileReference = storageRef(firebaseStorage, `v27/uploads/${fileId}`);
+                    
                     try {
-                        Goliath.State.LocalStream = await navigator.mediaDevices.getUserMedia({
-                            video: video ? { facingMode: Goliath.State.FacingMode } : false,
+                        console.log("Начало загрузки файла...");
+                        await uploadBytes(fileReference, file);
+                        const downloadUrl = await getDownloadURL(fileReference);
+                        
+                        const newMessageRef = push(ref(database, `v27/rooms/${TitanEngine.State.CurrentRoom}`));
+                        set(newMessageRef, {
+                            senderId: TitanEngine.State.CurrentUser.uid,
+                            fileUrl: downloadUrl,
+                            fileMime: file.type,
+                            type: 'media',
+                            timestamp: Date.now()
+                        });
+                        console.log("Файл успешно отправлен.");
+                    } catch (error) {
+                        alert("Ошибка при загрузке файла: " + error.message);
+                    }
+                },
+
+                initiateCall: async (withVideo) => {
+                    document.getElementById('video-call-overlay').style.display = 'block';
+                    
+                    try {
+                        // Захват камеры и микрофона
+                        TitanEngine.State.LocalMediaStream = await navigator.mediaDevices.getUserMedia({
+                            video: withVideo ? { facingMode: TitanEngine.State.CameraMode } : false,
                             audio: true
                         });
-                        document.getElementById('local-v').srcObject = Goliath.State.LocalStream;
                         
-                        Goliath.State.RTC = new RTCPeerConnection({
+                        document.getElementById('local-video-preview').srcObject = TitanEngine.State.LocalMediaStream;
+                        
+                        // Настройка WebRTC
+                        TitanEngine.State.RTCPeer = new RTCPeerConnection({
                             iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
                         });
 
-                        Goliath.State.LocalStream.getTracks().forEach(t => Goliath.State.RTC.addTrack(t, Goliath.State.LocalStream));
-                        
-                        Goliath.State.RTC.ontrack = (e) => {
-                            document.getElementById('remote-v').srcObject = e.streams[0];
-                        };
-
-                        Goliath.State.RTC.onicecandidate = (e) => {
-                            if(e.candidate) push(ref(DB, `v25/calls/${Goliath.State.ActivePeer.uid}/ice`), e.candidate.toJSON());
-                        };
-
-                        const offer = await Goliath.State.RTC.createOffer();
-                        await Goliath.State.RTC.setLocalDescription(offer);
-                        
-                        await set(ref(DB, `v25/calls/${Goliath.State.ActivePeer.uid}/sig`), {
-                            offer,
-                            from: Goliath.State.Me.uid,
-                            fromId: Goliath.State.Me.id,
-                            video
+                        // Добавление треков в поток
+                        TitanEngine.State.LocalMediaStream.getTracks().forEach(track => {
+                            TitanEngine.State.RTCPeer.addTrack(track, TitanEngine.State.LocalMediaStream);
                         });
 
-                        onValue(ref(DB, `v25/calls/${Goliath.State.ActivePeer.uid}/ans`), async snap => {
-                            const ans = snap.val();
-                            if(ans && !Goliath.State.RTC.currentRemoteDescription) {
-                                await Goliath.State.RTC.setRemoteDescription(new RTCSessionDescription(ans));
+                        // Прием удаленного потока
+                        TitanEngine.State.RTCPeer.ontrack = (event) => {
+                            document.getElementById('remote-video-stream').srcObject = event.streams[0];
+                        };
+
+                        // ICE кандидаты
+                        TitanEngine.State.RTCPeer.onicecandidate = (event) => {
+                            if (event.candidate) {
+                                const iceRef = push(ref(database, `v27/calls/${TitanEngine.State.ActivePartner.uid}/ice_candidates`));
+                                set(iceRef, event.candidate.toJSON());
+                            }
+                        };
+
+                        // Создание Offer
+                        const offer = await TitanEngine.State.RTCPeer.createOffer();
+                        await TitanEngine.State.RTCPeer.setLocalDescription(offer);
+                        
+                        // Сигнализация о вызове
+                        await set(ref(database, `v27/calls/${TitanEngine.State.ActivePartner.uid}/signal`), {
+                            offer: offer,
+                            callerId: TitanEngine.State.CurrentUser.uid,
+                            callerName: TitanEngine.State.CurrentUser.id,
+                            videoEnabled: withVideo,
+                            timestamp: Date.now()
+                        });
+
+                        // Ожидание ответа (Answer)
+                        const answerRef = ref(database, `v27/calls/${TitanEngine.State.CurrentUser.uid}/answer`);
+                        onValue(answerRef, async (snapshot) => {
+                            const answer = snapshot.val();
+                            if (answer && !TitanEngine.State.RTCPeer.currentRemoteDescription) {
+                                await TitanEngine.State.RTCPeer.setRemoteDescription(new RTCSessionDescription(answer));
                             }
                         });
 
-                    } catch (err) { alert("MEDIA BLOCKED"); location.reload(); }
+                    } catch (error) {
+                        console.error(error);
+                        alert("Доступ к камере/микрофону запрещен.");
+                        location.reload();
+                    }
                 },
 
-                listen: () => {
-                    onValue(ref(DB, `v25/calls/${Goliath.State.Me.uid}/sig`), async snap => {
-                        const d = snap.val();
-                        if(d && !Goliath.State.RTC) {
-                            if(confirm(`INCOMING FROM ${d.fromId}?`)) {
-                                Goliath.State.ActivePeer = { uid: d.from, id: d.fromId };
-                                await Goliath.Call.initiate(d.video);
-                                await Goliath.State.RTC.setRemoteDescription(new RTCSessionDescription(d.offer));
-                                const ans = await Goliath.State.RTC.createAnswer();
-                                await Goliath.State.RTC.setLocalDescription(ans);
-                                set(ref(DB, `v25/calls/${d.from}/ans`), ans);
-                                
-                                onValue(ref(DB, `v25/calls/${Goliath.State.Me.uid}/ice`), iSnap => {
-                                    iSnap.forEach(c => Goliath.State.RTC.addIceCandidate(new RTCIceCandidate(c.val())));
-                                });
-                            } else {
-                                remove(ref(DB, `v25/calls/${Goliath.State.Me.uid}`));
-                            }
-                        }
-                    });
-                },
-
-                toggleMic: () => {
-                    Goliath.State.MicStatus = !Goliath.State.MicStatus;
-                    Goliath.State.LocalStream.getAudioTracks()[0].enabled = Goliath.State.MicStatus;
-                    document.getElementById('mic-toggle').style.color = Goliath.State.MicStatus ? 'white' : 'red';
+                toggleMicrophone: () => {
+                    TitanEngine.State.MicrophoneActive = !TitanEngine.State.MicrophoneActive;
+                    TitanEngine.State.LocalMediaStream.getAudioTracks()[0].enabled = TitanEngine.State.MicrophoneActive;
+                    
+                    const micBtn = document.getElementById('call-mic-btn');
+                    micBtn.style.color = TitanEngine.State.MicrophoneActive ? 'white' : 'red';
+                    micBtn.style.background = TitanEngine.State.MicrophoneActive ? 'rgba(255,255,255,0.15)' : 'rgba(255,0,0,0.2)';
                 },
 
                 flipCamera: async () => {
-                    Goliath.State.FacingMode = Goliath.State.FacingMode === 'user' ? 'environment' : 'user';
-                    if(Goliath.State.LocalStream) {
-                        Goliath.State.LocalStream.getTracks().forEach(t => t.stop());
-                        Goliath.State.LocalStream = await navigator.mediaDevices.getUserMedia({
-                            video: { facingMode: Goliath.State.FacingMode },
+                    TitanEngine.State.CameraMode = TitanEngine.State.CameraMode === 'user' ? 'environment' : 'user';
+                    
+                    if (TitanEngine.State.LocalMediaStream) {
+                        // Останавливаем старые треки
+                        TitanEngine.State.LocalMediaStream.getTracks().forEach(track => track.stop());
+                        
+                        // Запускаем новую камеру
+                        TitanEngine.State.LocalMediaStream = await navigator.mediaDevices.getUserMedia({
+                            video: { facingMode: TitanEngine.State.CameraMode },
                             audio: true
                         });
-                        document.getElementById('local-v').srcObject = Goliath.State.LocalStream;
-                        const vTrack = Goliath.State.LocalStream.getVideoTracks()[0];
-                        const sender = Goliath.State.RTC.getSenders().find(s => s.track.kind === 'video');
-                        if(sender) sender.replaceTrack(vTrack);
+                        
+                        document.getElementById('local-video-preview').srcObject = TitanEngine.State.LocalMediaStream;
+                        
+                        // Обновляем трек в RTCPeer
+                        const videoTrack = TitanEngine.State.LocalMediaStream.getVideoTracks()[0];
+                        const sender = TitanEngine.State.RTCPeer.getSenders().find(s => s.track.kind === 'video');
+                        if (sender) sender.replaceTrack(videoTrack);
                     }
                 }
             }
         };
 
-        // LIFECYCLE CONTROLLER
-        onAuthStateChanged(AUTH, user => {
-            if(user) {
-                onValue(ref(DB, `v25/users/${user.uid}`), snap => {
-                    Goliath.State.Me = snap.val();
-                    if(Goliath.State.Me) {
-                        Goliath.Nav.go('hub');
-                        Goliath.Hub.init();
-                        Goliath.Call.listen();
-                        const stRef = ref(DB, `v25/status/${user.uid}`);
-                        set(stRef, "online");
-                        onDisconnect(stRef).set("offline");
+        // СЛУШАТЕЛЬ ВХОДЯЩИХ ВЫЗОВОВ
+        function setupIncomingCallListener() {
+            const callSignalRef = ref(database, `v27/calls/${TitanEngine.State.CurrentUser.uid}/signal`);
+            onValue(callSignalRef, async (snapshot) => {
+                const callData = snapshot.val();
+                
+                if (callData && !TitanEngine.State.RTCPeer) {
+                    if (confirm(`ВХОДЯЩИЙ ВЫЗОВ ОТ: ${callData.callerName}`)) {
+                        TitanEngine.State.ActivePartner = { uid: callData.callerId, id: callData.callerName };
+                        
+                        await TitanEngine.Media.initiateCall(callData.videoEnabled);
+                        
+                        // Установка Remote Description (Offer)
+                        await TitanEngine.State.RTCPeer.setRemoteDescription(new RTCSessionDescription(callData.offer));
+                        
+                        // Создание и отправка Answer
+                        const answer = await TitanEngine.State.RTCPeer.createAnswer();
+                        await TitanEngine.State.RTCPeer.setLocalDescription(answer);
+                        
+                        await set(ref(database, `v27/calls/${callData.callerId}/answer`), answer);
+                        
+                        // Прием ICE кандидатов
+                        const iceCandidatesRef = ref(database, `v27/calls/${TitanEngine.State.CurrentUser.uid}/ice_candidates`);
+                        onValue(iceCandidatesRef, (iceSnapshot) => {
+                            iceSnapshot.forEach((candidateChild) => {
+                                TitanEngine.State.RTCPeer.addIceCandidate(new RTCIceCandidate(candidateChild.val()));
+                            });
+                        });
+                    } else {
+                        // Отклонение вызова
+                        remove(ref(database, `v27/calls/${TitanEngine.State.CurrentUser.uid}`));
+                    }
+                }
+            });
+        }
+
+        // ОСНОВНОЙ ЦИКЛ ЖИЗНИ ПРИЛОЖЕНИЯ
+        onAuthStateChanged(firebaseAuth, (user) => {
+            if (user) {
+                console.log("Пользователь авторизован:", user.uid);
+                
+                onValue(ref(database, `v27/users/${user.uid}`), (snapshot) => {
+                    TitanEngine.State.CurrentUser = snapshot.val();
+                    
+                    if (TitanEngine.State.CurrentUser) {
+                        TitanEngine.Navigation.switch('hub');
+                        document.getElementById('user-identity-display').innerText = "ID: " + TitanEngine.State.CurrentUser.id;
+                        
+                        TitanEngine.Social.syncContacts();
+                        setupIncomingCallListener();
+                        
+                        // Статус Online
+                        const statusRef = ref(database, `v27/status/${user.uid}`);
+                        set(statusRef, "online");
+                        onDisconnect(statusRef).set("offline");
                     }
                 });
-            } else { Goliath.Nav.go('auth'); }
+            } else {
+                TitanEngine.Navigation.switch('auth');
+            }
         });
 
-        Goliath.Log("CORE v25.0 FULLY OPERATIONAL");
+        console.log("TITAN UNLIMITED CORE v27.0 ЗАПУЩЕН");
     </script>
 </body>
 </html>
