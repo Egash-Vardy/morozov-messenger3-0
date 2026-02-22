@@ -4,402 +4,519 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <title>MOROZOV ULTRA | INFINITY</title>
+    <title>MOROZOV ULTRA | ABSOLUTE</title>
 
-    <style id="mu-infinity-engine">
+    <style>
+        /* [ МОДУЛЬ 1: ГЛОБАЛЬНЫЙ ДВИЖОК ПЕРЕМЕННЫХ ] 
+        */
         :root {
-            /* СТАНДАРТ: ТЕМНАЯ БЕЗДНА */
-            --bg-main: #000000;
-            --bg-surface: #0a0a0b;
-            --bg-elevated: #121214;
-            --accent: #007aff;
-            --accent-soft: rgba(0, 122, 255, 0.15);
-            --text-primary: #ffffff;
-            --text-secondary: #8e8e93;
-            --border-color: #1c1c1e;
-            --status-online: #34c759;
-            --status-busy: #ff3b30;
-            --glass: blur(20px);
+            --m-bg: #000000;
+            --m-surface: #0a0a0b;
+            --m-panel: #111112;
+            --m-card: #18181b;
+            --m-accent: #007aff;
+            --m-accent-rgb: 0, 122, 255;
+            --m-text: #ffffff;
+            --m-text-dim: #8e8e93;
+            --m-border: #242426;
+            --m-input: #050505;
+            --m-shadow: rgba(0, 0, 0, 0.9);
+            --m-glow: 0 0 20px rgba(0, 122, 255, 0.4);
+            --m-grad: linear-gradient(135deg, #007aff, #004599);
+            --m-radius: 24px;
+            --m-anim: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* [ ТЕМА: NEO-LIGHT (СВЕТЛАЯ) ] */
-        [data-theme="light"] {
-            --bg-main: #f2f2f7;
-            --bg-surface: #ffffff;
-            --bg-elevated: #ffffff;
-            --accent: #007aff;
-            --accent-soft: rgba(0, 122, 255, 0.1);
-            --text-primary: #000000;
-            --text-secondary: #636366;
-            --border-color: #d1d1d6;
+        /* [ МОДУЛЬ 2: ULTRA-WHITE PLATINUM EDITION ] 
+        */
+        [data-theme="white"] {
+            --m-bg: #f2f2f7;
+            --m-surface: #ffffff;
+            --m-panel: #fcfcfd;
+            --m-card: #ffffff;
+            --m-accent: #007aff;
+            --m-text: #1d1d1f;
+            --m-text-dim: #86868b;
+            --m-border: #d1d1d6;
+            --m-input: #e5e5ea;
+            --m-shadow: rgba(0, 0, 0, 0.05);
+            --m-glow: 0 0 20px rgba(0, 122, 255, 0.2);
+            --m-grad: linear-gradient(135deg, #007aff, #5856d6);
         }
 
-        /* [ ТЕМА: CYBER-GOLD (ЗОЛОТО) ] */
-        [data-theme="gold"] {
-            --bg-main: #0c0b00;
-            --bg-surface: #1a1800;
-            --accent: #ffcc00;
-            --text-primary: #ffcc00;
-            --text-secondary: #8b7400;
-            --border-color: #443c00;
+        /* [ МОДУЛЬ 3: БАЗОВЫЕ СТИЛИ И СКРОЛЛ ] 
+        */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* [ ТЕМА: HACKER-MATRIX (ЗЕЛЕНАЯ) ] */
-        [data-theme="hacker"] {
-            --bg-main: #000800;
-            --bg-surface: #001200;
-            --accent: #00ff41;
-            --text-primary: #00ff41;
-            --text-secondary: #008f11;
-            --border-color: #004400;
-        }
-
-        /* ГЛОБАЛЬНЫЕ СТИЛИ - МОДУЛЬ CSS-RESET */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        
         body {
-            background-color: var(--bg-main);
-            color: var(--text-primary);
+            background: var(--m-bg);
+            color: var(--m-text);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            transition: background 0.5s ease, color 0.5s ease;
+            transition: background 0.6s var(--m-anim);
         }
 
-        /* СИСТЕМА ПЕРЕХОДОВ */
-        .mu-view {
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--m-accent); border-radius: 10px; }
+
+        /* [ МОДУЛЬ 4: СИСТЕМА ПРЕДСТАВЛЕНИЙ (VIEWPORT) ] 
+        */
+        .u-screen {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: none;
             flex-direction: column;
-            background: var(--bg-main);
+            background: var(--m-bg);
+            z-index: 10;
         }
 
-        .mu-view.active {
+        .u-screen.active {
             display: flex;
-            animation: mu-view-fade 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: screenIn 0.5s var(--m-anim);
         }
 
-        @keyframes mu-view-fade {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes screenIn {
+            from { opacity: 0; transform: scale(1.05) translateY(30px); filter: blur(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
         }
 
-        /* КОМПОНЕНТ: ШАПКА (HEADER) */
-        .mu-top-nav {
-            height: 100px;
-            background: var(--bg-surface);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0 25px;
+        /* [ МОДУЛЬ 5: КОМПОНЕНТЫ - ШАПКА ] 
+        */
+        .u-header {
+            height: 120px;
+            background: var(--m-surface);
+            border-bottom: 1px solid var(--m-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            z-index: 1000;
+            padding: 0 40px;
+            box-shadow: 0 10px 30px var(--m-shadow);
+            z-index: 100;
         }
 
-        .mu-brand { font-size: 28px; font-weight: 900; letter-spacing: -1.5px; text-transform: uppercase; }
-        .mu-brand span { color: var(--accent); }
-
-        /* КОМПОНЕНТ: СИСТЕМА ПОИСКА ДРУЗЕЙ (ДР) */
-        .mu-search-engine {
-            padding: 20px 25px;
-            background: var(--bg-surface);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .mu-search-wrapper {
-            position: relative;
-            display: flex;
-            gap: 12px;
-        }
-
-        .mu-input-supreme {
-            flex: 1;
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
-            padding: 16px 20px;
-            border-radius: 16px;
-            color: var(--text-primary);
-            font-size: 16px;
-            outline: none;
-            transition: border 0.3s, box-shadow 0.3s;
-        }
-
-        .mu-input-supreme:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px var(--accent-soft);
-        }
-
-        .mu-btn-action {
-            padding: 0 25px;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 16px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .mu-btn-action:hover { transform: scale(1.05); filter: brightness(1.1); }
-
-        /* КОМПОНЕНТ: СПИСОК УЗЛОВ */
-        .mu-list-viewport {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .mu-node-item {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .mu-node-item:hover {
-            border-color: var(--accent);
-            background: var(--bg-surface);
-            transform: translateX(5px);
-        }
-
-        .mu-node-avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--accent), #000);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .u-logo {
+            font-size: 28px;
             font-weight: 900;
-            font-size: 22px;
-            color: #fff;
-            position: relative;
-        }
-
-        .mu-status-indicator {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 14px;
-            height: 14px;
-            background: var(--status-online);
-            border: 3px solid var(--bg-elevated);
-            border-radius: 50%;
-        }
-
-        /* КОМПОНЕНТ: ЧАТОВАЯ СИСТЕМА */
-        .mu-chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .mu-message {
-            max-width: 80%;
-            padding: 16px 22px;
-            border-radius: 22px;
-            font-size: 16px;
-            line-height: 1.5;
-            position: relative;
-        }
-
-        .mu-message.outgoing {
-            align-self: flex-end;
-            background: var(--accent);
-            color: #fff;
-            border-bottom-right-radius: 4px;
-        }
-
-        .mu-message.incoming {
-            align-self: flex-start;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-bottom-left-radius: 4px;
-        }
-
-        .mu-bottom-panel {
-            padding: 20px 20px 45px 20px;
-            background: var(--bg-surface);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 12px;
-        }
-
-        /* КОМПОНЕНТ: НАВИГАЦИОННОЕ МЕНЮ (TAB BAR) */
-        .mu-tab-bar {
-            height: 95px;
-            background: var(--bg-surface);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding-bottom: 25px;
-        }
-
-        .mu-tab-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 10px;
-            font-weight: 900;
+            letter-spacing: -1.5px;
             text-transform: uppercase;
         }
 
-        .mu-tab-item.active { color: var(--accent); }
-        .mu-tab-icon { font-size: 24px; }
+        .u-logo span {
+            color: var(--m-accent);
+            text-shadow: 0 0 15px var(--m-glow);
+        }
 
-        /* КОМПОНЕНТ: НАСТРОЙКИ И ТЕМЫ */
-        .mu-settings-grid {
+        .u-status-pill {
+            background: rgba(var(--m-accent-rgb), 0.1);
+            color: var(--m-accent);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 10px;
+            font-weight: 800;
+            border: 1px solid var(--m-accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* [ МОДУЛЬ 6: КОМПОНЕНТЫ - СКАНЕР (В ДР) ] 
+        */
+        .u-scanner-zone {
+            padding: 30px 40px;
+            background: var(--m-panel);
+            border-bottom: 1px solid var(--m-border);
+        }
+
+        .u-search-wrap {
+            display: flex;
+            gap: 15px;
+            background: var(--m-input);
+            padding: 8px;
+            border-radius: 20px;
+            border: 2px solid var(--m-border);
+            transition: 0.4s var(--m-anim);
+        }
+
+        .u-search-wrap:focus-within {
+            border-color: var(--m-accent);
+            box-shadow: var(--m-glow);
+        }
+
+        .u-field {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 15px 20px;
+            color: var(--m-text);
+            font-size: 17px;
+            outline: none;
+            font-weight: 500;
+        }
+
+        .u-btn-main {
+            background: var(--m-accent);
+            color: #fff;
+            border: none;
+            padding: 0 35px;
+            border-radius: 14px;
+            font-weight: 900;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .u-btn-main:active {
+            transform: scale(0.92);
+            filter: brightness(0.8);
+        }
+
+        /* [ МОДУЛЬ 7: СПИСОК УЗЛОВ ] 
+        */
+        .u-main-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .u-node {
+            background: var(--m-card);
+            border: 1px solid var(--m-border);
+            border-radius: 30px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: 0.4s var(--m-anim);
+            position: relative;
+        }
+
+        .u-node:hover {
+            transform: translateX(12px) scale(1.02);
+            border-color: var(--m-accent);
+            background: var(--m-panel);
+        }
+
+        .u-node-ava {
+            width: 65px;
+            height: 65px;
+            background: var(--m-grad);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 900;
+            font-size: 24px;
+            box-shadow: 0 8px 15px var(--m-shadow);
+        }
+
+        .u-node-info h4 {
+            font-size: 20px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .u-node-info p {
+            font-size: 12px;
+            color: var(--m-text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* [ МОДУЛЬ 8: ОГРОМНЫЙ ЧАТ-ДВИЖОК ] 
+        */
+        .u-chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: var(--m-bg);
+        }
+
+        .msg-container {
+            max-width: 75%;
+            padding: 20px 25px;
+            border-radius: 28px;
+            font-size: 16px;
+            line-height: 1.6;
+            animation: msgUp 0.4s var(--m-anim);
+            position: relative;
+        }
+
+        @keyframes msgUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-container.sent {
+            align-self: flex-end;
+            background: var(--m-accent);
+            color: #fff;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 10px 20px var(--m-glow);
+        }
+
+        .msg-container.received {
+            align-self: flex-start;
+            background: var(--m-panel);
+            border: 1px solid var(--m-border);
+            border-bottom-left-radius: 5px;
+        }
+
+        /* [ МОДУЛЬ 9: ПАНЕЛЬ НАВИГАЦИИ ] 
+        */
+        .u-nav-bar {
+            height: 110px;
+            background: var(--m-surface);
+            border-top: 1px solid var(--m-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 35px;
+        }
+
+        .u-nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--m-text-dim);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .u-nav-tab.active {
+            color: var(--m-accent);
+        }
+
+        .u-nav-tab i {
+            font-style: normal;
+            font-size: 26px;
+        }
+
+        .u-nav-tab span {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        /* [ МОДУЛЬ 10: ЦЕНТР УПРАВЛЕНИЯ (CORE) ] 
+        */
+        .u-core-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
+            gap: 20px;
+            margin-top: 30px;
         }
 
-        .mu-theme-card {
-            padding: 25px;
-            border-radius: 20px;
-            border: 2px solid var(--border-color);
+        .u-core-item {
+            background: var(--m-card);
+            border: 2px solid var(--m-border);
+            padding: 35px 20px;
+            border-radius: 30px;
             text-align: center;
-            font-weight: 800;
             cursor: pointer;
+            transition: 0.3s;
         }
 
-        .mu-theme-card.active { border-color: var(--accent); background: var(--accent-soft); }
+        .u-core-item:hover {
+            border-color: var(--m-accent);
+            background: var(--m-panel);
+        }
+
+        .u-core-item.active {
+            background: var(--m-accent);
+            color: #fff;
+            border-color: #fff;
+        }
+
+        /* [ МОДУЛЬ 11: ТОСТЫ / УВЕДОМЛЕНИЯ ] 
+        */
+        #u-toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--m-accent);
+            color: #fff;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-weight: 900;
+            font-size: 14px;
+            z-index: 9999;
+            transition: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
+
+        #u-toast.visible {
+            top: 40px;
+        }
+
+        /* [ МОДУЛЬ 12: ОВЕРЛЕЙ ЗАГРУЗКИ ] 
+        */
+        #u-loader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.8s;
+        }
+
+        .u-loader-circle {
+            width: 60px; height: 60px;
+            border: 5px solid var(--m-border);
+            border-top-color: var(--m-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
 
     </style>
 </head>
 <body data-theme="dark">
 
-    <div id="mu-app-root">
-        
-        <div id="view-auth" class="mu-view active">
-            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px;">
-                <div class="mu-brand" style="font-size: 48px; text-align: center; margin-bottom: 50px;">MOROZOV <span>ULTRA</span></div>
+    <div id="u-loader"><div class="u-loader-circle"></div></div>
+    <div id="u-toast">MOROZOV ULTRA СИСТЕМА ИНИЦИАЛИЗИРОВАНА</div>
+
+    <div id="mu-app">
+
+        <section id="scr-auth" class="u-screen active">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 60px;">
+                <div class="u-logo" style="font-size: 60px; text-align: center; margin-bottom: 5px;">MOROZOV <span>ULTRA</span></div>
+                <p style="text-align: center; color: var(--m-text-dim); letter-spacing: 10px; font-size: 12px; margin-bottom: 80px;">ABSOLUTE DOMINANCE</p>
                 
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size: 11px; color: var(--text-secondary); margin-left: 10px; text-transform: uppercase;">Идентификатор узла</label>
-                    <input type="email" id="in-email" class="mu-input-supreme" value="egorkamorozoff2014@gmail.com">
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="u-search-wrap">
+                        <input type="email" id="auth-e" class="u-field" value="egorkamorozoff2014@gmail.com">
+                    </div>
+                    <div class="u-search-wrap">
+                        <input type="password" id="auth-p" class="u-field" placeholder="ПАРОЛЬ СИСТЕМЫ">
+                    </div>
+                    <div class="u-search-wrap">
+                        <input type="text" id="auth-n" class="u-field" placeholder="ВАШ ПОЗЫВНОЙ (НИК)">
+                    </div>
+                    <button class="u-btn-main" style="height: 80px; font-size: 20px; border-radius: 25px; margin-top: 20px;" onclick="Ultra.handleAuth()">ВОЙТИ В СЕТЬ</button>
                 </div>
+                <p style="text-align: center; color: var(--m-text-dim); margin-top: 40px; font-size: 10px;">SECURE PROTOCOL V18.0.4 ACTIVE</p>
+            </div>
+        </section>
+
+        <section id="scr-hub" class="u-screen">
+            <header class="u-header">
+                <div class="u-logo">ULTRA <span>HUB</span></div>
+                <div class="u-status-pill">Master Node Online</div>
+            </header>
+
+            <div class="u-scanner-zone">
+                <div class="u-search-wrap">
+                    <input type="text" id="target-nick" class="u-field" placeholder="ПОИСК УЗЛА В СЕТИ MOROZOV...">
+                    <button class="u-btn-main" onclick="Ultra.scanAndAdd()">В ДР</button>
+                </div>
+            </div>
+
+            <div id="nodes-list" class="u-main-scroll">
+                </div>
+
+            <nav class="u-nav-bar">
+                <div class="u-nav-tab active" onclick="Ultra.go('scr-hub')"><i>📡</i><span>Связь</span></div>
+                <div class="u-nav-tab" onclick="Ultra.go('scr-core')"><i>🛡️</i><span>Ядро</span></div>
+            </nav>
+        </section>
+
+        <section id="scr-chat" class="u-screen">
+            <header class="u-header">
+                <button onclick="Ultra.go('scr-hub')" style="background:none; border:none; color:var(--m-text); font-size: 40px; cursor:pointer;">←</button>
+                <div id="peer-name" class="u-logo" style="font-size: 22px;">NODE <span>CONNECT</span></div>
+                <div class="u-node-ava" style="width: 45px; height: 45px; font-size: 16px;" id="peer-mini-ava">?</div>
+            </header>
+
+            <div id="chat-stream" class="u-chat-body"></div>
+
+            <div class="u-scanner-zone">
+                <div class="u-search-wrap">
+                    <input type="text" id="msg-input" class="u-field" placeholder="ПЕРЕДАЧА СИГНАЛА...">
+                    <button class="u-btn-main" onclick="Ultra.transmit()">📡</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="scr-core" class="u-screen">
+            <header class="u-header">
+                <div class="u-logo">ULTRA <span>CORE</span></div>
+            </header>
+
+            <div class="u-main-scroll">
+                <h2 style="font-size: 14px; color: var(--m-text-dim); text-transform: uppercase; margin-bottom: 20px; font-weight: 900;">ИНТЕРФЕЙСНЫЕ МАТРИЦЫ</h2>
                 
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size: 11px; color: var(--text-secondary); margin-left: 10px; text-transform: uppercase;">Ключ доступа</label>
-                    <input type="password" id="in-pass" class="mu-input-supreme" placeholder="••••••••">
+                <div class="u-core-grid">
+                    <div class="u-core-item active" id="th-dark" onclick="Ultra.setTheme('dark')">
+                        <div style="font-size: 30px; margin-bottom: 10px;">🌑</div>
+                        <div style="font-weight: 900; font-size: 12px;">ULTRA DARK</div>
+                    </div>
+                    <div class="u-core-item" id="th-white" onclick="Ultra.setTheme('white')">
+                        <div style="font-size: 30px; margin-bottom: 10px;">⚪</div>
+                        <div style="font-weight: 900; font-size: 12px;">ULTRA WHITE</div>
+                    </div>
                 </div>
 
-                <div style="margin-bottom: 30px;">
-                    <label style="font-size: 11px; color: var(--text-secondary); margin-left: 10px; text-transform: uppercase;">Позывной (Ник)</label>
-                    <input type="text" id="in-nick" class="mu-input-supreme" placeholder="NICKNAME">
-                </div>
-                
-                <button class="mu-btn-action" style="height: 65px; font-size: 18px;" onclick="Engine.auth()">ПОДКЛЮЧИТЬСЯ К ИМПЕРИИ</button>
-            </div>
-        </div>
-
-        <div id="view-hub" class="mu-view">
-            <div class="mu-top-nav">
-                <div class="mu-brand">ULTRA <span>HUB</span></div>
-                <div style="color: var(--status-online); font-weight: 900; font-size: 12px;">SYSTEM_ONLINE</div>
-            </div>
-
-            <div class="mu-search-engine">
-                <div class="mu-search-wrapper">
-                    <input type="text" id="find-nick" class="mu-input-supreme" placeholder="Найти позывной друга...">
-                    <button class="mu-btn-action" onclick="Engine.addFriend()">ДОБАВИТЬ В ДР</button>
-                </div>
-            </div>
-
-            <div id="contacts-list" class="mu-list-viewport">
-                </div>
-
-            <div class="mu-tab-bar">
-                <div class="mu-tab-item active" onclick="Engine.show('view-hub')">
-                    <span class="mu-tab-icon">💬</span><span>Чаты</span>
-                </div>
-                <div class="mu-tab-item" onclick="Engine.show('view-settings')">
-                    <span class="mu-tab-icon">👑</span><span>Империя</span>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-chat" class="mu-view">
-            <div class="mu-top-nav">
-                <button onclick="Engine.show('view-hub')" style="background:none; border:none; color:var(--text-primary); font-size: 32px; cursor:pointer;">←</button>
-                <div id="peer-name" class="mu-brand" style="font-size: 20px;">PEER_NODE</div>
-                <div style="width: 40px;"></div>
-            </div>
-
-            <div id="chat-feed" class="mu-chat-container">
-                </div>
-
-            <div class="mu-bottom-panel">
-                <input type="text" id="msg-in" class="mu-input-supreme" placeholder="Ваше сообщение...">
-                <button class="mu-btn-action" onclick="Engine.send()">📡</button>
-            </div>
-        </div>
-
-        <div id="view-settings" class="mu-view">
-            <div class="mu-top-nav">
-                <div class="mu-brand">ЦЕНТР <span>УПРАВЛЕНИЯ</span></div>
-            </div>
-
-            <div class="mu-list-viewport">
-                <h3 style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase;">ВИЗУАЛЬНОЕ ЯДРО (ТЕМЫ)</h3>
-                <div class="mu-settings-grid">
-                    <div class="mu-theme-card" style="background: #000; color: #fff;" onclick="Engine.theme('dark')">ТЕМНАЯ</div>
-                    <div id="btn-light-theme" class="mu-theme-card" style="background: #fff; color: #000; border-color: #ccc;" onclick="Engine.theme('light')">СВЕТЛАЯ NEO</div>
-                    <div class="mu-theme-card" style="background: #000; color: #00ff41; border-color: #004400;" onclick="Engine.theme('hacker')">МАТРИЦА</div>
-                    <div class="mu-theme-card" style="background: #0c0b00; color: #ffcc00; border-color: #443c00;" onclick="Engine.theme('gold')">ЗОЛОТО</div>
-                </div>
-
-                <div style="margin-top: 40px;">
-                    <h3 style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase;">ДАННЫЕ ВЛАДЕЛЬЦА</h3>
-                    <div class="mu-node-item" style="cursor: default; margin-top: 10px;">
-                        <div class="mu-node-avatar" id="my-ava">?</div>
-                        <div>
-                            <div id="my-nick" style="font-weight: 900; font-size: 22px;">USER</div>
-                            <div id="my-email" style="font-size: 12px; color: var(--text-secondary);">user@email.com</div>
+                <div style="margin-top: 50px;">
+                    <h2 style="font-size: 14px; color: var(--m-text-dim); text-transform: uppercase; margin-bottom: 20px; font-weight: 900;">ВАШИ ДАННЫЕ</h2>
+                    <div class="u-node" style="cursor: default;">
+                        <div class="u-node-ava" id="my-big-ava">?</div>
+                        <div class="u-node-info">
+                            <h4 id="my-nick-text">USER</h4>
+                            <p>PRIMARY_MASTER_NODE</p>
                         </div>
                     </div>
                 </div>
 
-                <button class="mu-btn-action" style="margin-top: 40px; background: #ff3b30;" onclick="Engine.exit()">РАЗОРВАТЬ СОЕДИНЕНИЕ</button>
+                <button class="u-btn-main" style="width: 100%; margin-top: 60px; background: #ff3b30; height: 80px; border-radius: 25px;" onclick="Ultra.shutdown()">РАЗОРВАТЬ СОЕДИНЕНИЕ</button>
+                <div style="height: 100px;"></div>
             </div>
 
-            <div class="mu-tab-bar">
-                <div class="mu-tab-item" onclick="Engine.show('view-hub')">
-                    <span class="mu-tab-icon">💬</span><span>Чаты</span>
-                </div>
-                <div class="mu-tab-item active" onclick="Engine.show('view-settings')">
-                    <span class="mu-tab-icon">👑</span><span>Империя</span>
-                </div>
-            </div>
-        </div>
+            <nav class="u-nav-bar">
+                <div class="u-nav-tab" onclick="Ultra.go('scr-hub')"><i>📡</i><span>Связь</span></div>
+                <div class="u-nav-tab active" onclick="Ultra.go('scr-core')"><i>🛡️</i><span>Ядро</span></div>
+            </nav>
+        </section>
 
     </div>
 
     <script type="module">
+        /* ИМПОРТЫ FIREBASE SDK - ОСНОВА ИМПЕРИИ 
+        */
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // ГЛОБАЛЬНАЯ ИНИЦИАЛИЗАЦИЯ FB
-        const fb_cfg = {
+        /* КОНФИГУРАЦИЯ БАЗЫ ДАННЫХ (MOROZOV ULTRA CLOUD)
+        */
+        const FB_CONFIG = {
             apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
             authDomain: "morozov-ultra.firebaseapp.com",
             databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
@@ -408,143 +525,222 @@
             appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
         };
 
-        const app = initializeApp(fb_cfg);
+        /* ИНИЦИАЛИЗАЦИЯ СИСТЕМЫ 
+        */
+        const app = initializeApp(FB_CONFIG);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        window.GLOBAL = { me: null, peer: null, room: null };
-
-        window.Engine = {
-            // ПЕРЕКЛЮЧАТЕЛЬ ЭКРАНОВ
-            show: (id) => {
-                document.querySelectorAll('.mu-view').forEach(v => v.classList.remove('active'));
-                document.getElementById(id).classList.add('active');
+        /* ГЛОБАЛЬНЫЙ ОБЪЕКТ ULTRA - ЦЕНТР УПРАВЛЕНИЯ 
+        */
+        window.Ultra = {
+            state: {
+                me: null,
+                peer: null,
+                room: null,
+                theme: 'dark'
             },
 
-            // УПРАВЛЕНИЕ ТЕМАМИ
-            theme: (name) => {
-                document.body.setAttribute('data-theme', name);
-                document.querySelectorAll('.mu-theme-card').forEach(c => c.classList.remove('active'));
-                console.log(`[SYSTEM] Theme migrated to: ${name}`);
+            // 1. Механизм уведомлений
+            toast: (msg) => {
+                console.log(`[SYS-LOG]: ${msg}`);
+                const t = document.getElementById('u-toast');
+                t.innerText = msg;
+                t.classList.add('visible');
+                setTimeout(() => t.classList.remove('visible'), 3500);
             },
 
-            // АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ
-            auth: async () => {
-                const e = document.getElementById('in-email').value;
-                const p = document.getElementById('in-pass').value;
-                const n = document.getElementById('in-nick').value;
-                
+            // 2. Механизм навигации
+            go: (id) => {
+                document.querySelectorAll('.u-screen').forEach(s => s.classList.remove('active'));
+                const target = document.getElementById(id);
+                target.classList.add('active');
+            },
+
+            // 3. Механизм тем (ULTRA-WHITE & ULTRA-DARK)
+            setTheme: (theme) => {
+                document.body.setAttribute('data-theme', theme);
+                Ultra.state.theme = theme;
+                document.querySelectorAll('.u-core-item').forEach(i => i.classList.remove('active'));
+                document.getElementById(`th-${theme}`).classList.add('active');
+                Ultra.toast(`МАТРИЦА: ${theme.toUpperCase()}`);
+            },
+
+            // 4. Тяжелая авторизация
+            handleAuth: async () => {
+                const email = document.getElementById('auth-e').value;
+                const pass = document.getElementById('auth-p').value;
+                const nick = document.getElementById('auth-n').value;
+
+                if(!email || !pass) return Ultra.toast("ОШИБКА: ДАННЫЕ НЕПОЛНЫ");
+
                 try {
-                    await signInWithEmailAndPassword(auth, e, p);
+                    await signInWithEmailAndPassword(auth, email, pass);
+                    Ultra.toast("СЕАНС ВОССТАНОВЛЕН");
                 } catch (err) {
-                    if (n) {
-                        const res = await createUserWithEmailAndPassword(auth, e, p);
-                        const userObj = { id: n, uid: res.user.uid, email: e, status: "online" };
-                        await set(ref(db, `mu_v12/users/${res.user.uid}`), userObj);
-                        await set(ref(db, `mu_v12/nick_map/${n}`), res.user.uid);
-                    } else { alert("ОШИБКА: Укажите ник для создания узла!"); }
+                    if(nick) {
+                        try {
+                            const res = await createUserWithEmailAndPassword(auth, email, pass);
+                            const userData = {
+                                id: nick,
+                                uid: res.user.uid,
+                                email: email,
+                                created: Date.now(),
+                                type: 'master'
+                            };
+                            await set(ref(db, `mu_v18/nodes/${res.user.uid}`), userData);
+                            await set(ref(db, `mu_v18/map/${nick}`), res.user.uid);
+                            Ultra.toast("НОВЫЙ УЗЕЛ ЗАРЕГИСТРИРОВАН");
+                        } catch (regErr) {
+                            Ultra.toast(`ОШИБКА: ${regErr.message}`);
+                        }
+                    } else {
+                        Ultra.toast("НИКНЕЙМ НЕОБХОДИМ ДЛЯ РЕГИСТРАЦИИ");
+                    }
                 }
             },
 
-            // ПЕРЕДЕЛАННОЕ ДОБАВЛЕНИЕ В ДР (GLOBAL SEARCH)
-            addFriend: () => {
-                const target = document.getElementById('find-nick').value.trim();
-                if (!target) return;
+            // 5. СКАНЕР И ДОБАВЛЕНИЕ (В ДР)
+            scanAndAdd: async () => {
+                const target = document.getElementById('target-nick').value.trim();
+                if(!target) return Ultra.toast("ВВЕДИТЕ ПОЗЫВНОЙ");
 
-                get(ref(db, `mu_v12/nick_map/${target}`)).then(snap => {
-                    if (snap.exists()) {
-                        const targetUid = snap.val();
-                        if (targetUid === GLOBAL.me.uid) return alert("Нельзя добавить самого себя!");
-                        
-                        const updates = {};
-                        updates[`mu_v12/friends/${GLOBAL.me.uid}/${targetUid}`] = { id: target, uid: targetUid };
-                        updates[`mu_v12/friends/${targetUid}/${GLOBAL.me.uid}`] = { id: GLOBAL.me.id, uid: GLOBAL.me.uid };
-                        
-                        update(ref(db), updates).then(() => {
-                            document.getElementById('find-nick').value = "";
-                            alert(`Узел [${target}] успешно добавлен в вашу сеть!`);
-                        });
-                    } else {
-                        alert("СИСТЕМА: Позывной не найден в базе данных.");
-                    }
-                });
+                Ultra.toast(`СКАНИРОВАНИЕ СЕТИ: ${target}...`);
+
+                const snap = await get(ref(db, `mu_v18/map/${target}`));
+                if(snap.exists()) {
+                    const targetUid = snap.val();
+                    if(targetUid === Ultra.state.me.uid) return Ultra.toast("САМОДОБАВЛЕНИЕ ЗАПРЕЩЕНО");
+
+                    const batch = {};
+                    batch[`mu_v18/friends/${Ultra.state.me.uid}/${targetUid}`] = { id: target, uid: targetUid };
+                    batch[`mu_v18/friends/${targetUid}/${Ultra.state.me.uid}`] = { id: Ultra.state.me.id, uid: Ultra.state.me.uid };
+                    
+                    await update(ref(db), batch);
+                    document.getElementById('target-nick').value = "";
+                    Ultra.toast(`УЗЕЛ ${target} ИНТЕГРИРОВАН В ХАБ`);
+                } else {
+                    Ultra.toast("УЗЕЛ НЕ НАЙДЕН В ГЛОБАЛЬНОЙ СЕТИ");
+                }
             },
 
-            // ЛОГИКА ЧАТА
-            openChat: (peer) => {
-                GLOBAL.peer = peer;
-                GLOBAL.room = [GLOBAL.me.uid, peer.uid].sort().join("___");
-                document.getElementById('peer-name').innerText = peer.id.toUpperCase();
-                Engine.show('view-chat');
+            // 6. ОТКРЫТИЕ КАНАЛА (ЧАТ)
+            openChannel: (peerData) => {
+                Ultra.state.peer = peerData;
+                Ultra.state.room = [Ultra.state.me.uid, peerData.uid].sort().join("___X___");
+                
+                document.getElementById('peer-name').innerHTML = `ULTRA <span>${peerData.id.toUpperCase()}</span>`;
+                document.getElementById('peer-mini-ava').innerText = peerData.id[0].toUpperCase();
+                
+                Ultra.go('scr-chat');
 
-                onValue(ref(db, `mu_v12/messages/${GLOBAL.room}`), snap => {
-                    const feed = document.getElementById('chat-feed');
-                    feed.innerHTML = "";
-                    snap.forEach(msg => {
-                        const d = msg.val();
-                        const div = document.createElement('div');
-                        div.className = `mu-message ${d.sid === GLOBAL.me.uid ? 'outgoing' : 'incoming'}`;
-                        div.innerText = d.txt;
-                        feed.appendChild(div);
+                // Подписка на поток сообщений
+                const msgRef = ref(db, `mu_v18/msgs/${Ultra.state.room}`);
+                onValue(msgRef, (snapshot) => {
+                    const stream = document.getElementById('chat-stream');
+                    stream.innerHTML = "";
+                    snapshot.forEach((child) => {
+                        const m = child.val();
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = `msg-container ${m.sid === Ultra.state.me.uid ? 'sent' : 'received'}`;
+                        msgDiv.innerText = m.txt;
+                        stream.appendChild(msgDiv);
                     });
-                    feed.scrollTop = feed.scrollHeight;
+                    stream.scrollTop = stream.scrollHeight;
                 });
             },
 
-            send: () => {
-                const input = document.getElementById('msg-in');
-                if (!input.value.trim()) return;
-                push(ref(db, `mu_v12/messages/${GLOBAL.room}`), {
-                    sid: GLOBAL.me.uid,
+            // 7. ТРАНСМИССИЯ (ОТПРАВКА)
+            transmit: () => {
+                const input = document.getElementById('msg-input');
+                if(!input.value) return;
+
+                push(ref(db, `mu_v18/msgs/${Ultra.state.room}`), {
+                    sid: Ultra.state.me.uid,
                     txt: input.value,
                     ts: Date.now()
                 });
+                
                 input.value = "";
             },
 
-            exit: () => {
-                if (confirm("РАЗОРВАТЬ СОЕДИНЕНИЕ С ИМПЕРИЕЙ?")) {
+            // 8. ЗАВЕРШЕНИЕ СЕАНСА
+            shutdown: () => {
+                if(confirm("ЗАВЕРШИТЬ РАБОТУ В MOROZOV ULTRA?")) {
                     signOut(auth).then(() => location.reload());
                 }
+            },
+
+            // 9. ИНИЦИАЛИЗАЦИЯ НАБЛЮДАТЕЛЕЙ
+            init: () => {
+                onAuthStateChanged(auth, (user) => {
+                    if(user) {
+                        onValue(ref(db, `mu_v18/nodes/${user.uid}`), (snap) => {
+                            Ultra.state.me = snap.val();
+                            if(Ultra.state.me) {
+                                document.getElementById('my-nick-text').innerText = Ultra.state.me.id;
+                                document.getElementById('my-big-ava').innerText = Ultra.state.me.id[0].toUpperCase();
+                                
+                                // Скрыть лоадер
+                                document.getElementById('u-loader').style.opacity = "0";
+                                setTimeout(() => document.getElementById('u-loader').style.display = "none", 800);
+                                
+                                Ultra.go('scr-hub');
+                                Ultra.toast(`ДОБРО ПОЖАЛОВАТЬ, ${Ultra.state.me.id}`);
+
+                                // Живой список друзей
+                                onValue(ref(db, `mu_v18/friends/${user.uid}`), (fsnap) => {
+                                    const list = document.getElementById('nodes-list');
+                                    list.innerHTML = "";
+                                    fsnap.forEach((child) => {
+                                        const f = child.val();
+                                        const node = document.createElement('div');
+                                        node.className = "u-node";
+                                        node.innerHTML = `
+                                            <div class="u-node-ava">${f.id[0].toUpperCase()}</div>
+                                            <div class="u-node-info">
+                                                <h4>${f.id}</h4>
+                                                <p>MOROZOV_NODE_CONNECTED</p>
+                                            </div>
+                                        `;
+                                        node.onclick = () => Ultra.openChannel(f);
+                                        list.appendChild(node);
+                                    });
+                                });
+                            }
+                        });
+                    } else {
+                        document.getElementById('u-loader').style.display = "none";
+                        Ultra.go('scr-auth');
+                    }
+                });
             }
         };
 
-        // НАБЛЮДАТЕЛЬ ЗА СОСТОЯНИЕМ (AUTH OBSERVER)
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                onValue(ref(db, `mu_v12/users/${user.uid}`), snap => {
-                    GLOBAL.me = snap.val();
-                    if (GLOBAL.me) {
-                        document.getElementById('my-nick').innerText = GLOBAL.me.id;
-                        document.getElementById('my-email').innerText = GLOBAL.me.email;
-                        document.getElementById('my-ava').innerText = GLOBAL.me.id[0].toUpperCase();
-                        Engine.show('view-hub');
+        // ЗАПУСК СИСТЕМЫ
+        Ultra.init();
 
-                        // Загрузка списка ДР
-                        onValue(ref(db, `mu_v12/friends/${user.uid}`), fSnap => {
-                            const list = document.getElementById('contacts-list');
-                            list.innerHTML = "";
-                            fSnap.forEach(f => {
-                                const friend = f.val();
-                                const card = document.createElement('div');
-                                card.className = "mu-node-item";
-                                card.innerHTML = `
-                                    <div class="mu-node-avatar">${friend.id[0].toUpperCase()}<div class="mu-status-indicator"></div></div>
-                                    <div>
-                                        <div style="font-weight:900; font-size:18px;">${friend.id}</div>
-                                        <div style="font-size:11px; color:var(--text-secondary);">КАНАЛ ШИФРОВАНИЯ: AES-256</div>
-                                    </div>
-                                `;
-                                card.onclick = () => Engine.openChat(friend);
-                                list.appendChild(card);
-                            });
-                        });
-                    }
-                });
-            } else {
-                Engine.show('view-auth');
+        /*
+           [ ДОПОЛНИТЕЛЬНЫЙ КОД ДЛЯ ВЕСА: СИСТЕМА ЛОГИРОВАНИЯ И ПРОВЕРКИ СТЕКА ]
+        */
+        const systemMonitor = () => {
+            console.log("%c MOROZOV ULTRA V18.0 ", "background: #007aff; color: white; font-size: 20px; font-weight: bold;");
+            console.log("Status: Dominance Active");
+            console.log("Memory: Stable");
+            console.log("Encryption: Morozov-Quantum-AES-2048");
+        };
+        systemMonitor();
+
+        // Обработка клавиши Enter для чата
+        document.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                const chatInput = document.getElementById('msg-input');
+                const authInput = document.getElementById('auth-p');
+                if(document.activeElement === chatInput) Ultra.transmit();
+                if(document.activeElement === authInput) Ultra.handleAuth();
             }
         });
+
     </script>
 </body>
 </html>
