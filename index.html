@@ -3,197 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MOROZOV ULTRA V31 | THEME ENGINE</title>
+    <title>MOROZOV ULTRA V38 | APOCALYPSE EDITION</title>
+    
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.18.0.js"></script>
+    
     <style>
-        /* [ SECTION 1: DYNAMIC VARIABLES ] */
         :root {
-            --m-bg: #000000;
-            --m-surf: #0a0a0c;
-            --m-card: #141417;
-            --m-text: #ffffff;
-            --m-text-dim: #8e8e93;
-            --m-accent: #007aff;
-            --m-border: rgba(255, 255, 255, 0.08);
-            --m-bubble-him: #1c1c1e;
-            --m-accent-glow: rgba(0, 122, 255, 0.4);
+            --bg: #000; --surf: #0a0a0c; --card: #141417; --text: #fff;
+            --accent: #007aff; --green: #34c759; --red: #ff3b30; --border: rgba(255,255,255,0.08);
+            --glass: rgba(255,255,255,0.03);
         }
-
-        /* [ LIGHT THEME OVERRIDE ] */
         body.light-mode {
-            --m-bg: #f2f2f7;
-            --m-surf: #ffffff;
-            --m-card: #ffffff;
-            --m-text: #000000;
-            --m-text-dim: #636366;
-            --m-accent: #007aff;
-            --m-border: rgba(0, 0, 0, 0.1);
-            --m-bubble-him: #e5e5ea;
-            --m-accent-glow: rgba(0, 122, 255, 0.2);
+            --bg: #f2f2f7; --surf: #fff; --card: #fff; --text: #000; --border: rgba(0,0,0,0.08);
         }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: -apple-system, sans-serif;
-            transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; transition: 0.5s; }
+
+        /* --- [ SYSTEM NOTIFICATIONS ] --- */
+        #ntf {
+            position: fixed; top: -100px; left: 15px; right: 15px; background: var(--accent);
+            padding: 16px; border-radius: 20px; z-index: 10005; display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
+        #ntf.show { top: calc(env(safe-area-inset-top) + 15px); }
 
-        body { background: var(--m-bg); color: var(--m-text); height: 100vh; overflow: hidden; }
-
-        /* [ NAVIGATION & SCREENS ] */
-        .mu-viewport { position: absolute; inset: 0; display: none; flex-direction: column; background: var(--m-bg); z-index: 10; }
-        .mu-viewport.active { display: flex; }
-
-        /* [ HEADERS ] */
-        .mu-header {
-            padding: calc(env(safe-area-inset-top) + 15px) 20px 15px;
-            background: var(--m-surf);
-            border-bottom: 1px solid var(--m-border);
-            display: flex; align-items: center; justify-content: space-between;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        }
-
-        .mu-brand { font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-        .mu-brand span { color: var(--m-accent); }
-
-        /* [ LISTS & NODES ] */
-        .mu-scroll { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
-        
-        .mu-node-card {
-            background: var(--m-card);
-            padding: 16px; border-radius: 18px;
-            display: flex; align-items: center; gap: 15px;
-            border: 1px solid var(--m-border);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .mu-ava {
-            width: 50px; height: 50px;
-            background: linear-gradient(135deg, var(--m-accent), #0055ff);
-            border-radius: 14px; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: #fff;
-        }
-
-        /* [ CHAT ENGINE ] */
-        .mu-bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; font-size: 16px; line-height: 1.5; }
-        .mu-sent { align-self: flex-end; background: var(--m-accent); color: #fff; border-bottom-right-radius: 4px; }
-        .mu-received { align-self: flex-start; background: var(--m-bubble-him); color: var(--m-text); border-bottom-left-radius: 4px; }
-
-        /* [ INPUT AREA ] */
-        .mu-bar {
-            padding: 10px 15px calc(env(safe-area-inset-bottom) + 10px);
-            background: var(--m-surf); border-top: 1px solid var(--m-border);
-            display: flex; align-items: center; gap: 10px;
-        }
-
-        .mu-input-box {
-            flex: 1; background: var(--m-bg); border: 1px solid var(--m-border);
-            border-radius: 20px; padding: 10px 15px; color: var(--m-text); outline: none;
-        }
-
-        /* [ BUTTONS ] */
-        .mu-btn-main {
-            width: 100%; padding: 18px; background: var(--m-accent); color: #fff;
-            border: none; border-radius: 15px; font-weight: 900; cursor: pointer;
-        }
-
-        .mu-theme-btn {
-            background: var(--m-card); border: 1px solid var(--m-border);
-            padding: 12px; border-radius: 12px; color: var(--m-text); font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-
-        /* [ NAVBAR ] */
-        .mu-nav {
-            height: calc(70px + env(safe-area-inset-bottom));
-            background: var(--m-surf); border-top: 1px solid var(--m-border);
-            display: flex; justify-content: space-around; padding-bottom: env(safe-area-inset-bottom);
-        }
-        .mu-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--m-text-dim); font-weight: bold; }
-        .mu-nav-item.active { color: var(--m-accent); }
-
-        /* [ CALL OVERLAY ] */
-        .mu-call-full {
-            position: fixed; inset: 0; background: #000; z-index: 1000;
+        /* --- [ CALL ENGINE UI ] --- */
+        #call-ui {
+            position: fixed; inset: 0; background: #000; z-index: 10000;
             display: none; flex-direction: column; align-items: center; justify-content: space-around;
         }
-        .mu-call-full.active { display: flex; }
+        #call-ui.active { display: flex; animation: zoomIn 0.4s ease; }
+        @keyframes zoomIn { from { transform: scale(1.1); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        #remote-player { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; object-fit: cover; }
+        #local-player { 
+            position: absolute; top: 60px; right: 20px; width: 110px; height: 160px; 
+            border-radius: 18px; border: 2px solid rgba(255,255,255,0.2); z-index: 5; background: #000; overflow: hidden; transform: scaleX(-1);
+        }
+
+        .call-content { position: relative; z-index: 10; text-align: center; width: 100%; }
+        .call-ava { 
+            width: 140px; height: 140px; background: var(--accent); border-radius: 50%; 
+            margin: 0 auto 30px; display: flex; align-items: center; justify-content: center;
+            font-size: 60px; font-weight: 900; position: relative;
+        }
+        .call-ava.ringing::after {
+            content: ''; position: absolute; inset: -10px; border: 2px solid var(--accent);
+            border-radius: 50%; animation: ping 1.5s infinite;
+        }
+        @keyframes ping { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+
+        .call-btns { display: flex; gap: 40px; position: relative; z-index: 10; }
+        .c-btn { width: 75px; height: 75px; border-radius: 50%; border: none; font-size: 30px; color: white; cursor: pointer; transition: 0.3s; }
+        .c-btn:active { transform: scale(0.85); }
+        .cb-hangup { background: var(--red); }
+        .cb-accept { background: var(--green); animation: pulse-g 1.5s infinite; }
+        @keyframes pulse-g { 0% { box-shadow: 0 0 0 0 rgba(52,199,89,0.7); } 70% { box-shadow: 0 0 0 20px rgba(52,199,89,0); } 100% { box-shadow: 0 0 0 0 rgba(52,199,89,0); } }
+
+        /* --- [ MAIN INTERFACE ] --- */
+        .viewport { position: absolute; inset: 0; display: none; flex-direction: column; background: var(--bg); }
+        .viewport.active { display: flex; }
+
+        header { 
+            padding: calc(env(safe-area-inset-top) + 20px) 20px 20px; 
+            background: var(--surf); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-title { font-size: 24px; font-weight: 900; letter-spacing: -1px; }
+        .header-title span { color: var(--accent); }
+
+        .scroller { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+
+        .agent-card {
+            background: var(--card); padding: 18px; border-radius: 22px;
+            display: flex; align-items: center; gap: 15px; border: 1px solid var(--border);
+        }
+        .agent-ava { width: 55px; height: 55px; background: var(--accent); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; }
+
+        .msg { max-width: 80%; padding: 14px 18px; border-radius: 22px; font-size: 16px; position: relative; }
+        .msg.me { align-self: flex-end; background: var(--accent); color: white; border-bottom-right-radius: 4px; }
+        .msg.him { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+
+        .input-bar { 
+            padding: 12px 15px calc(env(safe-area-inset-bottom) + 12px); 
+            background: var(--surf); border-top: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .input-bar input { flex: 1; background: var(--bg); border: 1px solid var(--border); padding: 14px 20px; border-radius: 30px; color: white; font-size: 16px; outline: none; }
+
+        .nav {
+            height: calc(75px + env(safe-area-inset-bottom)); background: var(--surf);
+            border-top: 1px solid var(--border); display: flex; justify-content: space-around;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; opacity: 0.4; font-weight: 800; }
+        .nav-tab.active { opacity: 1; color: var(--accent); }
+
+        /* --- [ AUTH PAGE ] --- */
+        .auth-box { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
+        .mu-input { width: 100%; background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 18px; color: white; margin-bottom: 12px; font-size: 16px; }
+        .mu-btn { width: 100%; background: var(--accent); color: white; padding: 20px; border: none; border-radius: 18px; font-weight: 900; font-size: 16px; box-shadow: 0 10px 20px rgba(0,122,255,0.3); }
+
     </style>
 </head>
 <body>
 
-    <div id="call-ui" class="mu-call-full">
-        <div style="text-align: center; color: white;">
-            <div id="c-ava" class="mu-ava" style="width:120px;height:120px;margin:0 auto 20px;font-size:40px;">?</div>
-            <h1 id="c-name">Node Incoming</h1>
-            <p style="color:var(--m-accent); margin-top:10px;">MOROZOV ENCRYPTED LINE</p>
+    <div id="ntf">
+        <div style="font-size: 24px;">🛡️</div>
+        <div><b id="nt-t">SYSTEM</b><br><small id="nt-b">Ready to secure</small></div>
+    </div>
+
+    <div id="call-ui">
+        <div id="remote-player"></div>
+        <div id="local-player"></div>
+        <div class="call-content">
+            <div id="c-ava" class="call-ava ringing">?</div>
+            <h1 id="c-name" style="font-size: 38px; font-weight: 900;">Agent</h1>
+            <p id="c-status" style="color:var(--accent); letter-spacing:3px; font-weight:900; margin-top:10px;">ENCRYPTED LINK</p>
+            <h2 id="c-timer" style="display:none; font-family:monospace; margin-top:20px; font-size:26px;">00:00</h2>
         </div>
-        <div style="display:flex; gap:40px;">
-            <div onclick="Engine.Call.stop()" style="width:70px;height:70px;background:#ff3b30;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;">✖</div>
-            <div onclick="Engine.Call.stop()" style="width:70px;height:70px;background:#34c759;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;">✔</div>
+        <div class="call-btns">
+            <button class="c-btn cb-hangup" onclick="Engine.Call.stop()">✖</button>
+            <button id="btn-answer" class="c-btn cb-accept" onclick="Engine.Call.answer()" style="display:none;">✔</button>
         </div>
     </div>
 
-    <section id="scr-auth" class="mu-viewport active">
-        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; padding:40px;">
-            <div class="mu-brand" style="font-size:32px; text-align:center; margin-bottom:50px;">MOROZOV <span>ULTRA</span></div>
-            <input type="email" id="e-mail" class="mu-input-box" style="margin-bottom:10px;" placeholder="Email">
-            <input type="password" id="e-pass" class="mu-input-box" style="margin-bottom:10px;" placeholder="Key">
-            <input type="text" id="e-nick" class="mu-input-box" style="margin-bottom:20px;" placeholder="Nickname">
-            <button class="mu-btn-main" onclick="Engine.Auth.run()">ACCESS SYSTEM</button>
+    <section id="scr-auth" class="viewport active">
+        <div class="auth-box">
+            <h1 style="font-size: 42px; font-weight: 900; text-align: center; margin-bottom: 40px;">MOROZOV <span>ULTRA</span></h1>
+            <input type="email" id="e-mail" class="mu-input" placeholder="Secure Email">
+            <input type="password" id="e-pass" class="mu-input" placeholder="Access Code">
+            <input type="text" id="e-nick" class="mu-input" placeholder="Agent Name">
+            <button class="mu-btn" onclick="Engine.Auth.run()">ENTER GATEWAY</button>
         </div>
     </section>
 
-    <section id="scr-hub" class="mu-viewport">
-        <header class="mu-header"><div class="mu-brand">MOROZOV <span>GATEWAY</span></div></header>
-        <div style="padding:15px;">
-            <div class="mu-node-card">
-                <input type="text" id="f-nick" class="mu-input-box" style="border:none; background:transparent;" placeholder="Link new peer...">
-                <div onclick="Engine.Net.link()" style="color:var(--m-accent); font-weight:900;">LINK</div>
+    <section id="scr-hub" class="viewport">
+        <header>
+            <div class="header-title">ULTRA <span>HUB</span></div>
+            <div onclick="Engine.Theme.toggle()" style="font-size: 22px;">🌓</div>
+        </header>
+        <div style="padding: 20px;">
+            <div class="agent-card">
+                <input type="text" id="f-nick" style="flex:1; background:transparent; border:none; color:white; outline:none;" placeholder="Search by nick...">
+                <b onclick="Engine.Net.link()" style="color:var(--accent); font-weight:900;">LINK</b>
             </div>
         </div>
-        <div id="peer-list" class="mu-scroll"></div>
-        <nav class="mu-nav">
-            <div class="mu-nav-item active" onclick="Engine.View.show('scr-hub')">📡 GATEWAY</div>
-            <div class="mu-nav-item" onclick="Engine.View.show('scr-core')">⚙️ CONTROL</div>
+        <div id="agent-list" class="scroller"></div>
+        <nav class="nav">
+            <div class="nav-tab active" onclick="Engine.View('scr-hub')">📡 HUB</div>
+            <div class="nav-tab" onclick="Engine.View('scr-settings')">⚙️ CORE</div>
         </nav>
     </section>
 
-    <section id="scr-chat" class="mu-viewport">
-        <header class="mu-header">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div onclick="Engine.View.show('scr-hub')" style="font-size:20px;">←</div>
-                <b id="p-name">Node</b>
+    <section id="scr-chat" class="viewport">
+        <header>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <b onclick="Engine.View('scr-hub')" style="font-size:26px;">←</b>
+                <div><b id="p-name" style="font-size:18px;">Agent</b><br><small style="color:var(--green); font-size:10px; font-weight:900;">SECURE LINE</small></div>
             </div>
-            <div onclick="Engine.Call.init()" style="color:var(--m-accent); font-size:22px;">📞</div>
+            <div style="display:flex; gap:20px;">
+                <b onclick="Engine.Call.init('audio')" style="color:var(--accent); font-size:22px;">📞</b>
+                <b onclick="Engine.Call.init('video')" style="color:var(--accent); font-size:22px;">📹</b>
+            </div>
         </header>
-        <div id="chat-stream" class="mu-scroll"></div>
-        <div class="mu-bar">
-            <label style="font-size:20px;">📎<input type="file" hidden onchange="Engine.Media.up(this)"></label>
-            <input type="text" id="m-val" class="mu-input-box" placeholder="Write data...">
-            <div onclick="Engine.Media.send()" style="color:var(--m-accent); font-weight:900;">SEND</div>
+        <div id="chat-stream" class="scroller"></div>
+        <div class="input-bar">
+            <label style="font-size:24px;">📎<input type="file" id="f-up" hidden onchange="Engine.Media.up(this)"></label>
+            <input type="text" id="m-val" placeholder="Secure message...">
+            <b onclick="Engine.Media.send()" style="color:var(--accent); font-weight:900;">SEND</b>
         </div>
     </section>
 
-    <section id="scr-core" class="mu-viewport">
-        <header class="mu-header"><div class="mu-brand">CONTROL <span>PANEL</span></div></header>
-        <div class="mu-scroll">
-            <div class="mu-node-card">
-                <div class="mu-ava" id="my-a">?</div>
-                <div><h2 id="my-n">Admin</h2><p style="color:var(--m-accent); font-size:12px;">SYSTEM OWNER</p></div>
+    <section id="scr-settings" class="viewport">
+        <header><div class="header-title">CORE <span>SETTINGS</span></div></header>
+        <div class="scroller">
+            <div class="agent-card">
+                <div id="my-ava" class="agent-ava">?</div>
+                <div><h3 id="my-name">Admin</h3><p style="color:var(--accent); font-size:11px; font-weight:900;">MASTER NODE</p></div>
             </div>
-
-            <div style="margin-top:30px; display:flex; flex-direction:column; gap:15px;">
-                <p style="font-size:12px; color:var(--m-text-dim); text-transform:uppercase;">Appearance</p>
-                <div class="mu-theme-btn" onclick="Engine.Theme.toggle()">
-                    <span id="t-icon">☀️</span> <span id="t-text">СВЕТЛАЯ ТЕМА</span>
-                </div>
-            </div>
-
-            <button onclick="location.reload()" style="margin-top:auto; padding:15px; background:none; border:1px solid #ff3b30; color:#ff3b30; border-radius:12px; font-weight:bold;">EXIT SYSTEM</button>
+            <div class="agent-card" onclick="Engine.Theme.toggle()" style="margin-top:20px; justify-content:center; font-weight:900;">TOGGLE SYSTEM THEME</div>
+            <button onclick="location.reload()" style="margin-top:auto; padding:20px; border-radius:20px; border:1px solid var(--red); background:none; color:var(--red); font-weight:900;">TERMINATE SESSION</button>
         </div>
-        <nav class="mu-nav">
-            <div class="mu-nav-item" onclick="Engine.View.show('scr-hub')">📡 GATEWAY</div>
-            <div class="mu-nav-item active" onclick="Engine.View.show('scr-core')">⚙️ CONTROL</div>
+        <nav class="nav">
+            <div class="nav-tab" onclick="Engine.View('scr-hub')">📡 HUB</div>
+            <div class="nav-tab active" onclick="Engine.View('scr-settings')">⚙️ CORE</div>
         </nav>
     </section>
 
@@ -202,136 +197,155 @@
         import { getDatabase, ref, set, push, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const cfg = {
-            apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk",
-            authDomain: "morozov-ultra.firebaseapp.com",
-            databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com",
-            projectId: "morozov-ultra",
-            appId: "1:255345933856:web:5b8d1b93696f36eb5d4645"
+        // AGORA CONFIG
+        const AGORA_IDS = {
+            video: "1a8f4707f44e49ca81e2903dc2bab4a7",
+            audio: "e3af51022f9541388ad48fa2675fc3fb"
         };
 
-        const app = initializeApp(cfg);
-        const db = getDatabase(app);
-        const auth = getAuth(app);
+        const fbConfig = { apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk", databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com", projectId: "morozov-ultra" };
+        const app = initializeApp(fbConfig); const db = getDatabase(app); const auth = getAuth(app);
+        const agoraClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+        let localTracks = { v: null, a: null };
 
         window.Engine = {
-            me: null, peer: null, room: null,
-            View: {
-                show: (id) => {
-                    document.querySelectorAll('.mu-viewport').forEach(v => v.classList.remove('active'));
-                    document.getElementById(id).classList.add('active');
-                }
-            },
-            Theme: {
-                toggle: () => {
-                    const b = document.body;
-                    const isLight = b.classList.toggle('light-mode');
-                    document.getElementById('t-icon').innerText = isLight ? '🌙' : '☀️';
-                    document.getElementById('t-text').innerText = isLight ? 'ТЕМНАЯ ТЕМА' : 'СВЕТЛАЯ ТЕМА';
-                    localStorage.setItem('mu-theme', isLight ? 'light' : 'dark');
-                }
-            },
+            me: null, peer: null, room: null, timer: null,
+            View: (id) => { document.querySelectorAll('.viewport').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); },
+            Notify: (t, b) => { const n = document.getElementById('ntf'); document.getElementById('nt-t').innerText = t; document.getElementById('nt-b').innerText = b; n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 3500); },
+            Theme: { toggle: () => document.body.classList.toggle('light-mode') },
+
             Auth: {
                 run: async () => {
                     const e = document.getElementById('e-mail').value, p = document.getElementById('e-pass').value, n = document.getElementById('e-nick').value;
-                    try { await signInWithEmailAndPassword(auth, e, p); }
-                    catch {
+                    try { await signInWithEmailAndPassword(auth, e, p); } catch {
                         if(n) {
                             const r = await createUserWithEmailAndPassword(auth, e, p);
-                            const d = { id: n, uid: r.user.uid };
-                            await set(ref(db, `v31/users/${r.user.uid}`), d);
-                            await set(ref(db, `v31/map/${n}`), r.user.uid);
+                            await set(ref(db, `v38/users/${r.user.uid}`), { id: n, uid: r.user.uid });
+                            await set(ref(db, `v38/map/${n}`), r.user.uid);
                         }
                     }
                 }
             },
+
             Net: {
                 link: async () => {
                     const nick = document.getElementById('f-nick').value;
-                    const snap = await get(ref(db, `v31/map/${nick}`));
-                    if(snap.exists()) {
-                        const uid = snap.val();
+                    const s = await get(ref(db, `v38/map/${nick}`));
+                    if(s.exists()) {
+                        const uid = s.val();
                         const up = {};
-                        up[`v31/friends/${Engine.me.uid}/${uid}`] = { id: nick, uid: uid };
-                        up[`v31/friends/${uid}/${Engine.me.uid}`] = { id: Engine.me.id, uid: Engine.me.uid };
+                        up[`v38/friends/${Engine.me.uid}/${uid}`] = { id: nick, uid: uid };
+                        up[`v38/friends/${uid}/${Engine.me.uid}`] = { id: Engine.me.id, uid: Engine.me.uid };
                         await update(ref(db), up);
+                        Engine.Notify("LINKED", "New agent added to hub");
                     }
                 }
             },
-            Media: {
-                send: () => {
-                    const i = document.getElementById('m-val'); if(!i.value) return;
-                    push(ref(db, `v31/msgs/${Engine.room}`), { sid: Engine.me.uid, type: 'text', val: i.value });
-                    i.value = "";
+
+            Call: {
+                init: async (type) => {
+                    const room = [Engine.me.uid, Engine.peer.uid].sort().join("");
+                    await set(ref(db, `v38/calls/${Engine.peer.uid}`), { from: Engine.me.id, from_uid: Engine.me.uid, room, type, status: 'request' });
+                    Engine.Call.openUI(Engine.peer.id, type, 'WAITING...');
                 },
-                up: (el) => {
-                    const file = el.files[0]; if(!file) return;
-                    const r = new FileReader();
-                    const t = file.type.startsWith('image') ? 'img' : 'vid';
-                    r.onload = (e) => push(ref(db, `v31/msgs/${Engine.room}`), { sid: Engine.me.uid, type: t, val: e.target.result });
-                    r.readAsDataURL(file);
+                answer: () => update(ref(db, `v38/calls/${Engine.me.uid}`), { status: 'accepted' }),
+                stop: async () => {
+                    if(localTracks.v) { localTracks.v.stop(); localTracks.v.close(); }
+                    if(localTracks.a) { localTracks.a.stop(); localTracks.a.close(); }
+                    await agoraClient.leave();
+                    clearInterval(Engine.timer); Engine.timer = null;
+                    remove(ref(db, `v38/calls/${Engine.me.uid}`));
+                    if(Engine.peer) remove(ref(db, `v38/calls/${Engine.peer.uid}`));
+                    document.getElementById('call-ui').classList.remove('active');
+                },
+                openUI: (name, type, status) => {
+                    document.getElementById('c-name').innerText = name;
+                    document.getElementById('c-ava').innerText = name[0];
+                    document.getElementById('c-status').innerText = status;
+                    document.getElementById('local-player').style.display = type === 'video' ? 'block' : 'none';
+                    document.getElementById('call-ui').classList.add('active');
+                },
+                joinAgora: async (room, type) => {
+                    await agoraClient.join(AGORA_IDS[type], room, null, Engine.me.uid);
+                    localTracks.a = await AgoraRTC.createMicrophoneAudioTrack();
+                    if(type === 'video') {
+                        localTracks.v = await AgoraRTC.createCameraVideoTrack();
+                        localTracks.v.play("local-player");
+                        await agoraClient.publish([localTracks.a, localTracks.v]);
+                    } else { await agoraClient.publish([localTracks.a]); }
+                    
+                    document.getElementById('c-status').innerText = "LIVE CONNECTION";
+                    document.getElementById('c-timer').style.display = "block";
+                    document.getElementById('btn-answer').style.display = "none";
+                    let s = 0; Engine.timer = setInterval(() => { s++; document.getElementById('c-timer').innerText = new Date(s * 1000).toISOString().substr(14, 5); }, 1000);
                 }
             },
-            Call: {
-                init: () => set(ref(db, `v31/calls/${Engine.peer.uid}`), { from: Engine.me.id }),
-                stop: () => {
-                    remove(ref(db, `v31/calls/${Engine.me.uid}`));
-                    document.getElementById('call-ui').classList.remove('active');
+
+            Media: {
+                send: () => {
+                    const v = document.getElementById('m-val').value; if(!v) return;
+                    push(ref(db, `v38/msgs/${Engine.room}`), { sid: Engine.me.uid, type: 'text', content: v });
+                    document.getElementById('m-val').value = "";
+                },
+                up: (el) => {
+                    const f = el.files[0]; if(!f) return;
+                    const r = new FileReader();
+                    r.onload = (e) => push(ref(db, `v38/msgs/${Engine.room}`), { sid: Engine.me.uid, type: f.type.startsWith('image') ? 'img' : 'vid', content: e.target.result });
+                    r.readAsDataURL(f);
                 }
             }
         };
 
-        // LOAD THEME
-        if(localStorage.getItem('mu-theme') === 'light') Engine.Theme.toggle();
+        agoraClient.on("user-published", async (u, type) => {
+            await agoraClient.subscribe(u, type);
+            if(type === "video") u.videoTrack.play("remote-player");
+            if(type === "audio") u.audioTrack.play();
+        });
 
         onAuthStateChanged(auth, u => {
             if(u) {
-                onValue(ref(db, `v31/users/${u.uid}`), s => {
-                    Engine.me = s.val();
-                    if(Engine.me) {
-                        Engine.View.show('scr-hub');
-                        document.getElementById('my-n').innerText = Engine.me.id;
-                        document.getElementById('my-a').innerText = Engine.me.id[0];
+                onValue(ref(db, `v38/users/${u.uid}`), s => {
+                    Engine.me = s.val(); if(!Engine.me) return;
+                    Engine.View('scr-hub');
+                    document.getElementById('my-name').innerText = Engine.me.id;
+                    document.getElementById('my-ava').innerText = Engine.me.id[0];
 
-                        onValue(ref(db, `v31/calls/${u.uid}`), cs => {
-                            if(cs.exists()) {
-                                document.getElementById('c-name').innerText = cs.val().from;
-                                document.getElementById('call-ui').classList.add('active');
-                            }
-                        });
+                    onValue(ref(db, `v38/calls/${u.uid}`), cs => {
+                        if(cs.exists()) {
+                            const d = cs.val(); Engine.Call.openUI(d.from, d.type, d.status === 'request' ? 'INCOMING...' : 'LIVE');
+                            if(d.status === 'request') document.getElementById('btn-answer').style.display = "flex";
+                            if(d.status === 'accepted' && !Engine.timer) Engine.Call.joinAgora(d.room, d.type);
+                        } else if(document.getElementById('call-ui').classList.contains('active')) Engine.Call.stop();
+                    });
 
-                        onValue(ref(db, `v31/friends/${u.uid}`), fs => {
-                            const list = document.getElementById('peer-list'); list.innerHTML = "";
-                            fs.forEach(f => {
-                                const d = f.val();
-                                const el = document.createElement('div');
-                                el.className = "mu-node-card";
-                                el.innerHTML = `<div class="mu-ava">${d.id[0]}</div><b>${d.id}</b>`;
-                                el.onclick = () => {
-                                    Engine.peer = d;
-                                    Engine.room = [Engine.me.uid, d.uid].sort().join("_");
-                                    document.getElementById('p-name').innerText = d.id;
-                                    Engine.View.show('scr-chat');
-                                    onValue(ref(db, `v31/msgs/${Engine.room}`), ms => {
-                                        const flow = document.getElementById('chat-stream'); flow.innerHTML = "";
-                                        ms.forEach(m => {
-                                            const data = m.val();
-                                            const bub = document.createElement('div');
-                                            bub.className = `mu-bubble ${data.sid === Engine.me.uid ? 'mu-sent' : 'mu-received'}`;
-                                            if(data.type === 'text') bub.innerText = data.val;
-                                            else if(data.type === 'img') bub.innerHTML = `<img src="${data.val}" style="width:100%; border-radius:10px;">`;
-                                            else if(data.type === 'vid') bub.innerHTML = `<video src="${data.val}" controls style="width:100%; border-radius:10px;"></video>`;
-                                            flow.appendChild(bub);
-                                        });
-                                        flow.scrollTop = flow.scrollHeight;
-                                    });
-                                };
-                                list.appendChild(el);
+                    onValue(ref(db, `v38/friends/${u.uid}`), fs => {
+                        const l = document.getElementById('agent-list'); l.innerHTML = "";
+                        fs.forEach(f => {
+                            const d = f.val(); const el = document.createElement('div');
+                            el.className = "agent-card"; el.innerHTML = `<div class="agent-ava">${d.id[0]}</div><b>${d.id}</b>`;
+                            onValue(ref(db, `v38/calls/${d.uid}`), out => {
+                                if(out.exists() && out.val().from_uid === u.uid && out.val().status === 'accepted' && !Engine.timer) 
+                                    Engine.Call.joinAgora(out.val().room, out.val().type);
                             });
+                            el.onclick = () => {
+                                Engine.peer = d; Engine.room = [Engine.me.uid, d.uid].sort().join("");
+                                document.getElementById('p-name').innerText = d.id; Engine.View('scr-chat');
+                                onValue(ref(db, `v38/msgs/${Engine.room}`), ms => {
+                                    const st = document.getElementById('chat-stream'); st.innerHTML = "";
+                                    ms.forEach(m => {
+                                        const msg = m.val(); const b = document.createElement('div');
+                                        b.className = `msg ${msg.sid === Engine.me.uid ? 'me' : 'him'}`;
+                                        if(msg.type === 'text') b.innerText = msg.content;
+                                        else if(msg.type === 'img') b.innerHTML = `<img src="${msg.content}" style="width:100%; border-radius:12px;">`;
+                                        else b.innerHTML = `<video src="${msg.content}" controls style="width:100%; border-radius:12px;"></video>`;
+                                        st.appendChild(b);
+                                    }); st.scrollTop = st.scrollHeight;
+                                });
+                            }; l.appendChild(el);
                         });
-                    }
+                    });
                 });
-            } else Engine.View.show('scr-auth');
+            } else Engine.View('scr-auth');
         });
     </script>
 </body>
