@@ -11,7 +11,6 @@
         :root {
             --bg: #000; --surf: #0a0a0c; --card: #141417; --text: #fff;
             --accent: #007aff; --green: #34c759; --red: #ff3b30; --border: rgba(255,255,255,0.08);
-            --glass: rgba(255,255,255,0.03);
         }
         body.light-mode {
             --bg: #f2f2f7; --surf: #fff; --card: #fff; --text: #000; --border: rgba(0,0,0,0.08);
@@ -20,7 +19,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; transition: 0.5s; }
 
-        /* --- [ SYSTEM NOTIFICATIONS ] --- */
+        /* NOTIFICATIONS */
         #ntf {
             position: fixed; top: -100px; left: 15px; right: 15px; background: var(--accent);
             padding: 16px; border-radius: 20px; z-index: 10005; display: flex; align-items: center; gap: 12px;
@@ -28,7 +27,7 @@
         }
         #ntf.show { top: calc(env(safe-area-inset-top) + 15px); }
 
-        /* --- [ CALL ENGINE UI ] --- */
+        /* CALL UI */
         #call-ui {
             position: fixed; inset: 0; background: #000; z-index: 10000;
             display: none; flex-direction: column; align-items: center; justify-content: space-around;
@@ -56,12 +55,11 @@
 
         .call-btns { display: flex; gap: 40px; position: relative; z-index: 10; }
         .c-btn { width: 75px; height: 75px; border-radius: 50%; border: none; font-size: 30px; color: white; cursor: pointer; transition: 0.3s; }
-        .c-btn:active { transform: scale(0.85); }
         .cb-hangup { background: var(--red); }
         .cb-accept { background: var(--green); animation: pulse-g 1.5s infinite; }
         @keyframes pulse-g { 0% { box-shadow: 0 0 0 0 rgba(52,199,89,0.7); } 70% { box-shadow: 0 0 0 20px rgba(52,199,89,0); } 100% { box-shadow: 0 0 0 0 rgba(52,199,89,0); } }
 
-        /* --- [ MAIN INTERFACE ] --- */
+        /* VIEWPORTS */
         .viewport { position: absolute; inset: 0; display: none; flex-direction: column; background: var(--bg); }
         .viewport.active { display: flex; }
 
@@ -70,18 +68,18 @@
             background: var(--surf); border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .header-title { font-size: 24px; font-weight: 900; letter-spacing: -1px; }
+        .header-title { font-size: 24px; font-weight: 900; }
         .header-title span { color: var(--accent); }
 
         .scroller { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
 
         .agent-card {
             background: var(--card); padding: 18px; border-radius: 22px;
-            display: flex; align-items: center; gap: 15px; border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 15px; border: 1px solid var(--border); cursor: pointer;
         }
         .agent-ava { width: 55px; height: 55px; background: var(--accent); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; }
 
-        .msg { max-width: 80%; padding: 14px 18px; border-radius: 22px; font-size: 16px; position: relative; }
+        .msg { max-width: 80%; padding: 14px 18px; border-radius: 22px; font-size: 16px; line-height: 1.4; }
         .msg.me { align-self: flex-end; background: var(--accent); color: white; border-bottom-right-radius: 4px; }
         .msg.him { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
 
@@ -90,28 +88,24 @@
             background: var(--surf); border-top: 1px solid var(--border);
             display: flex; align-items: center; gap: 12px;
         }
-        .input-bar input { flex: 1; background: var(--bg); border: 1px solid var(--border); padding: 14px 20px; border-radius: 30px; color: white; font-size: 16px; outline: none; }
+        .input-bar input { flex: 1; background: var(--bg); border: 1px solid var(--border); padding: 14px 20px; border-radius: 30px; color: white; outline: none; }
 
         .nav {
             height: calc(75px + env(safe-area-inset-bottom)); background: var(--surf);
-            border-top: 1px solid var(--border); display: flex; justify-content: space-around;
-            padding-bottom: env(safe-area-inset-bottom);
+            border-top: 1px solid var(--border); display: flex; padding-bottom: env(safe-area-inset-bottom);
         }
-        .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; opacity: 0.4; font-weight: 800; }
+        .nav-tab { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; opacity: 0.4; font-weight: 800; cursor: pointer; }
         .nav-tab.active { opacity: 1; color: var(--accent); }
 
-        /* --- [ AUTH PAGE ] --- */
-        .auth-box { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
-        .mu-input { width: 100%; background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 18px; color: white; margin-bottom: 12px; font-size: 16px; }
-        .mu-btn { width: 100%; background: var(--accent); color: white; padding: 20px; border: none; border-radius: 18px; font-weight: 900; font-size: 16px; box-shadow: 0 10px 20px rgba(0,122,255,0.3); }
-
+        .mu-input { width: 100%; background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 18px; color: white; margin-bottom: 12px; }
+        .mu-btn { width: 100%; background: var(--accent); color: white; padding: 20px; border: none; border-radius: 18px; font-weight: 900; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="ntf">
         <div style="font-size: 24px;">🛡️</div>
-        <div><b id="nt-t">SYSTEM</b><br><small id="nt-b">Ready to secure</small></div>
+        <div><b id="nt-t">SYSTEM</b><br><small id="nt-b">Ready</small></div>
     </div>
 
     <div id="call-ui">
@@ -119,9 +113,9 @@
         <div id="local-player"></div>
         <div class="call-content">
             <div id="c-ava" class="call-ava ringing">?</div>
-            <h1 id="c-name" style="font-size: 38px; font-weight: 900;">Agent</h1>
-            <p id="c-status" style="color:var(--accent); letter-spacing:3px; font-weight:900; margin-top:10px;">ENCRYPTED LINK</p>
-            <h2 id="c-timer" style="display:none; font-family:monospace; margin-top:20px; font-size:26px;">00:00</h2>
+            <h1 id="c-name">Agent</h1>
+            <p id="c-status">ENCRYPTED</p>
+            <h2 id="c-timer" style="display:none; margin-top:15px;">00:00</h2>
         </div>
         <div class="call-btns">
             <button class="c-btn cb-hangup" onclick="Engine.Call.stop()">✖</button>
@@ -130,11 +124,11 @@
     </div>
 
     <section id="scr-auth" class="viewport active">
-        <div class="auth-box">
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; padding:40px;">
             <h1 style="font-size: 42px; font-weight: 900; text-align: center; margin-bottom: 40px;">MOROZOV <span>ULTRA</span></h1>
-            <input type="email" id="e-mail" class="mu-input" placeholder="Secure Email">
-            <input type="password" id="e-pass" class="mu-input" placeholder="Access Code">
-            <input type="text" id="e-nick" class="mu-input" placeholder="Agent Name">
+            <input type="email" id="e-mail" class="mu-input" placeholder="Email">
+            <input type="password" id="e-pass" class="mu-input" placeholder="Password">
+            <input type="text" id="e-nick" class="mu-input" placeholder="Nick (for registration)">
             <button class="mu-btn" onclick="Engine.Auth.run()">ENTER GATEWAY</button>
         </div>
     </section>
@@ -142,12 +136,12 @@
     <section id="scr-hub" class="viewport">
         <header>
             <div class="header-title">ULTRA <span>HUB</span></div>
-            <div onclick="Engine.Theme.toggle()" style="font-size: 22px;">🌓</div>
+            <div onclick="Engine.Theme.toggle()" style="font-size: 22px; cursor:pointer;">🌓</div>
         </header>
         <div style="padding: 20px;">
             <div class="agent-card">
-                <input type="text" id="f-nick" style="flex:1; background:transparent; border:none; color:white; outline:none;" placeholder="Search by nick...">
-                <b onclick="Engine.Net.link()" style="color:var(--accent); font-weight:900;">LINK</b>
+                <input type="text" id="f-nick" style="flex:1; background:transparent; border:none; color:inherit; outline:none;" placeholder="Search nick...">
+                <b onclick="Engine.Net.link()" style="color:var(--accent); cursor:pointer;">LINK</b>
             </div>
         </div>
         <div id="agent-list" class="scroller"></div>
@@ -160,19 +154,19 @@
     <section id="scr-chat" class="viewport">
         <header>
             <div style="display:flex; align-items:center; gap:15px;">
-                <b onclick="Engine.View('scr-hub')" style="font-size:26px;">←</b>
-                <div><b id="p-name" style="font-size:18px;">Agent</b><br><small style="color:var(--green); font-size:10px; font-weight:900;">SECURE LINE</small></div>
+                <b onclick="Engine.View('scr-hub')" style="font-size:26px; cursor:pointer;">←</b>
+                <div><b id="p-name">Agent</b><br><small style="color:var(--green); font-size:10px;">SECURE</small></div>
             </div>
             <div style="display:flex; gap:20px;">
-                <b onclick="Engine.Call.init('audio')" style="color:var(--accent); font-size:22px;">📞</b>
-                <b onclick="Engine.Call.init('video')" style="color:var(--accent); font-size:22px;">📹</b>
+                <b onclick="Engine.Call.init('audio')" style="color:var(--accent); cursor:pointer;">📞</b>
+                <b onclick="Engine.Call.init('video')" style="color:var(--accent); cursor:pointer;">📹</b>
             </div>
         </header>
         <div id="chat-stream" class="scroller"></div>
         <div class="input-bar">
-            <label style="font-size:24px;">📎<input type="file" id="f-up" hidden onchange="Engine.Media.up(this)"></label>
-            <input type="text" id="m-val" placeholder="Secure message...">
-            <b onclick="Engine.Media.send()" style="color:var(--accent); font-weight:900;">SEND</b>
+            <label style="font-size:24px; cursor:pointer;">📎<input type="file" id="f-up" hidden onchange="Engine.Media.up(this)"></label>
+            <input type="text" id="m-val" placeholder="Message...">
+            <b onclick="Engine.Media.send()" style="color:var(--accent); cursor:pointer;">SEND</b>
         </div>
     </section>
 
@@ -181,10 +175,9 @@
         <div class="scroller">
             <div class="agent-card">
                 <div id="my-ava" class="agent-ava">?</div>
-                <div><h3 id="my-name">Admin</h3><p style="color:var(--accent); font-size:11px; font-weight:900;">MASTER NODE</p></div>
+                <div><h3 id="my-name">Admin</h3><p style="color:var(--accent); font-size:11px;">MASTER NODE</p></div>
             </div>
-            <div class="agent-card" onclick="Engine.Theme.toggle()" style="margin-top:20px; justify-content:center; font-weight:900;">TOGGLE SYSTEM THEME</div>
-            <button onclick="location.reload()" style="margin-top:auto; padding:20px; border-radius:20px; border:1px solid var(--red); background:none; color:var(--red); font-weight:900;">TERMINATE SESSION</button>
+            <button onclick="location.reload()" style="margin-top:auto; padding:20px; border:1px solid var(--red); background:none; color:var(--red); font-weight:900; border-radius:20px; cursor:pointer;">TERMINATE SESSION</button>
         </div>
         <nav class="nav">
             <div class="nav-tab" onclick="Engine.View('scr-hub')">📡 HUB</div>
@@ -197,32 +190,52 @@
         import { getDatabase, ref, set, push, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // AGORA CONFIG
+        // AGORA API KEYS FROM YOUR REQUEST
         const AGORA_IDS = {
             video: "1a8f4707f44e49ca81e2903dc2bab4a7",
             audio: "e3af51022f9541388ad48fa2675fc3fb"
         };
 
-        const fbConfig = { apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk", databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com", projectId: "morozov-ultra" };
-        const app = initializeApp(fbConfig); const db = getDatabase(app); const auth = getAuth(app);
+        const fbConfig = { 
+            apiKey: "AIzaSyDutfZZER58asyHr68zWlCx7B5k1adFhIk", 
+            databaseURL: "https://morozov-ultra-default-rtdb.firebaseio.com", 
+            projectId: "morozov-ultra" 
+        };
+
+        const app = initializeApp(fbConfig); 
+        const db = getDatabase(app); 
+        const auth = getAuth(app);
         const agoraClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
         let localTracks = { v: null, a: null };
 
         window.Engine = {
             me: null, peer: null, room: null, timer: null,
-            View: (id) => { document.querySelectorAll('.viewport').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); },
-            Notify: (t, b) => { const n = document.getElementById('ntf'); document.getElementById('nt-t').innerText = t; document.getElementById('nt-b').innerText = b; n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 3500); },
+            View: (id) => { 
+                document.querySelectorAll('.viewport').forEach(v => v.classList.remove('active')); 
+                document.getElementById(id).classList.add('active'); 
+            },
+            Notify: (t, b) => { 
+                const n = document.getElementById('ntf'); 
+                document.getElementById('nt-t').innerText = t; 
+                document.getElementById('nt-b').innerText = b; 
+                n.classList.add('show'); 
+                setTimeout(() => n.classList.remove('show'), 3500); 
+            },
             Theme: { toggle: () => document.body.classList.toggle('light-mode') },
 
             Auth: {
                 run: async () => {
-                    const e = document.getElementById('e-mail').value, p = document.getElementById('e-pass').value, n = document.getElementById('e-nick').value;
-                    try { await signInWithEmailAndPassword(auth, e, p); } catch {
+                    const e = document.getElementById('e-mail').value, 
+                          p = document.getElementById('e-pass').value, 
+                          n = document.getElementById('e-nick').value;
+                    try { 
+                        await signInWithEmailAndPassword(auth, e, p); 
+                    } catch {
                         if(n) {
                             const r = await createUserWithEmailAndPassword(auth, e, p);
                             await set(ref(db, `v38/users/${r.user.uid}`), { id: n, uid: r.user.uid });
                             await set(ref(db, `v38/map/${n}`), r.user.uid);
-                        }
+                        } else alert("Error: User not found or wrong password");
                     }
                 }
             },
@@ -237,7 +250,7 @@
                         up[`v38/friends/${Engine.me.uid}/${uid}`] = { id: nick, uid: uid };
                         up[`v38/friends/${uid}/${Engine.me.uid}`] = { id: Engine.me.id, uid: Engine.me.uid };
                         await update(ref(db), up);
-                        Engine.Notify("LINKED", "New agent added to hub");
+                        Engine.Notify("LINKED", "Agent added to Hub");
                     }
                 }
             },
@@ -246,17 +259,18 @@
                 init: async (type) => {
                     const room = [Engine.me.uid, Engine.peer.uid].sort().join("");
                     await set(ref(db, `v38/calls/${Engine.peer.uid}`), { from: Engine.me.id, from_uid: Engine.me.uid, room, type, status: 'request' });
-                    Engine.Call.openUI(Engine.peer.id, type, 'WAITING...');
+                    Engine.Call.openUI(Engine.peer.id, type, 'CONNECTING...');
                 },
                 answer: () => update(ref(db, `v38/calls/${Engine.me.uid}`), { status: 'accepted' }),
                 stop: async () => {
-                    if(localTracks.v) { localTracks.v.stop(); localTracks.v.close(); }
-                    if(localTracks.a) { localTracks.a.stop(); localTracks.a.close(); }
+                    if(localTracks.v) { localTracks.v.stop(); localTracks.v.close(); localTracks.v = null; }
+                    if(localTracks.a) { localTracks.a.stop(); localTracks.a.close(); localTracks.a = null; }
                     await agoraClient.leave();
                     clearInterval(Engine.timer); Engine.timer = null;
                     remove(ref(db, `v38/calls/${Engine.me.uid}`));
                     if(Engine.peer) remove(ref(db, `v38/calls/${Engine.peer.uid}`));
                     document.getElementById('call-ui').classList.remove('active');
+                    document.getElementById('c-timer').style.display = "none";
                 },
                 openUI: (name, type, status) => {
                     document.getElementById('c-name').innerText = name;
@@ -266,7 +280,8 @@
                     document.getElementById('call-ui').classList.add('active');
                 },
                 joinAgora: async (room, type) => {
-                    await agoraClient.join(AGORA_IDS[type], room, null, Engine.me.uid);
+                    const appId = type === 'video' ? AGORA_IDS.video : AGORA_IDS.audio;
+                    await agoraClient.join(appId, room, null, Engine.me.uid);
                     localTracks.a = await AgoraRTC.createMicrophoneAudioTrack();
                     if(type === 'video') {
                         localTracks.v = await AgoraRTC.createCameraVideoTrack();
@@ -274,7 +289,7 @@
                         await agoraClient.publish([localTracks.a, localTracks.v]);
                     } else { await agoraClient.publish([localTracks.a]); }
                     
-                    document.getElementById('c-status').innerText = "LIVE CONNECTION";
+                    document.getElementById('c-status').innerText = "SECURE STREAM";
                     document.getElementById('c-timer').style.display = "block";
                     document.getElementById('btn-answer').style.display = "none";
                     let s = 0; Engine.timer = setInterval(() => { s++; document.getElementById('c-timer').innerText = new Date(s * 1000).toISOString().substr(14, 5); }, 1000);
